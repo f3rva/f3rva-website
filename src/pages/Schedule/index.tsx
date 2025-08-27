@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import './index.css';
 
 /**
@@ -41,46 +41,7 @@ const SchedulePage: React.FC = () => {
         </div>
       </section>
 
-      <section className="locations-section">
-        <h3 className="section-main-title">Where We Meet</h3>
-        <div className="locations-grid-container">
-          <div className="location-card-item">
-            <h4 className="location-title">Downtown RVA</h4>
-            <p className="location-description">
-              Kanawha Plaza<br />
-              Weekdays: 5:30 AM<br />
-              Contact: downtownrvaf3@gmail.com
-            </p>
-          </div>
-          
-          <div className="location-card-item">
-            <h4 className="location-title">West End</h4>
-            <p className="location-description">
-              Tuckahoe Creek Park<br />
-              Weekdays: 5:30 AM<br />
-              Contact: westendrvaf3@gmail.com
-            </p>
-          </div>
-          
-          <div className="location-card-item">
-            <h4 className="location-title">Southside</h4>
-            <p className="location-description">
-              Huguenot High School<br />
-              Weekdays: 5:30 AM<br />
-              Contact: southsidervaf3@gmail.com
-            </p>
-          </div>
-          
-          <div className="location-card-item">
-            <h4 className="location-title">Henrico</h4>
-            <p className="location-description">
-              Deep Run Park<br />
-              Weekdays: 5:30 AM<br />
-              Contact: henricorvaf3@gmail.com
-            </p>
-          </div>
-        </div>
-      </section>
+      <WorkoutScheduleTable />
 
       <section className="what-to-expect-section">
         <div className="expect-content-wrapper">
@@ -103,6 +64,166 @@ const SchedulePage: React.FC = () => {
         </div>
       </section>
     </div>
+  );
+};
+
+/**
+ * WorkoutScheduleTable component with tabbed interface for 1st F, 2nd F, and 3rd F workouts
+ * Displays workout information in a structured table format
+ */
+const WorkoutScheduleTable: React.FC = () => {
+  const [activeTab, setActiveTab] = useState<'1stF' | '2ndF' | '3rdF'>('1stF');
+
+  // Sample workout data - this should be replaced with actual data source
+  const workoutData = {
+    '1stF': [
+      {
+        location: 'Kanawha Plaza',
+        name: 'Downtown RVA',
+        dayOfWeek: 'Monday-Friday',
+        startTime: '5:30 AM',
+        endTime: '6:15 AM',
+        workoutStyle: 'Bootcamp',
+        siteQ: 'Toothless',
+        notes: 'Downtown location, all weather conditions'
+      },
+      {
+        location: 'Tuckahoe Creek Park',
+        name: 'West End',
+        dayOfWeek: 'Monday-Friday',
+        startTime: '5:30 AM',
+        endTime: '6:15 AM',
+        workoutStyle: 'HIIT',
+        siteQ: 'Pavement',
+        notes: 'Park setting with trails available'
+      },
+      {
+        location: 'Huguenot High School',
+        name: 'Southside',
+        dayOfWeek: 'Monday-Friday',
+        startTime: '5:30 AM',
+        endTime: '6:15 AM',
+        workoutStyle: 'Functional Fitness',
+        siteQ: 'Hammer',
+        notes: 'School campus, ample parking'
+      },
+      {
+        location: 'Deep Run Park',
+        name: 'Henrico',
+        dayOfWeek: 'Monday-Friday',
+        startTime: '5:30 AM',
+        endTime: '6:15 AM',
+        workoutStyle: 'Bootcamp',
+        siteQ: 'Clutch',
+        notes: 'Large park with varied terrain'
+      }
+    ],
+    '2ndF': [
+      {
+        location: 'Various Local Restaurants',
+        name: 'Coffee & Fellowship',
+        dayOfWeek: 'Saturday',
+        startTime: '8:00 AM',
+        endTime: '10:00 AM',
+        workoutStyle: 'Social',
+        siteQ: 'Rotating',
+        notes: 'Post-workout fellowship and community building'
+      },
+      {
+        location: 'Breweries & Bars',
+        name: 'Monthly Social',
+        dayOfWeek: 'Various',
+        startTime: '6:00 PM',
+        endTime: '9:00 PM',
+        workoutStyle: 'Social',
+        siteQ: 'All PAX',
+        notes: 'Monthly social gathering for all F3 members'
+      }
+    ],
+    '3rdF': [
+      {
+        location: 'Local Churches',
+        name: 'Faith Sharing',
+        dayOfWeek: 'Sunday',
+        startTime: '9:00 AM',
+        endTime: '10:30 AM',
+        workoutStyle: 'Discussion',
+        siteQ: 'Various',
+        notes: 'Optional faith-based discussions and community service'
+      },
+      {
+        location: 'Community Centers',
+        name: 'Service Projects',
+        dayOfWeek: 'Various',
+        startTime: 'Varies',
+        endTime: 'Varies',
+        workoutStyle: 'Service',
+        siteQ: 'Volunteer Leads',
+        notes: 'Community service opportunities and giving back initiatives'
+      }
+    ]
+  };
+
+  return (
+    <section className="workout-schedule-section">
+      <h3 className="section-main-title">Workout Details</h3>
+      
+      <div className="tab-container">
+        <div className="tab-buttons">
+          <button 
+            className={`tab-button ${activeTab === '1stF' ? 'active' : ''}`}
+            onClick={() => setActiveTab('1stF')}
+          >
+            1st F
+          </button>
+          <button 
+            className={`tab-button ${activeTab === '2ndF' ? 'active' : ''}`}
+            onClick={() => setActiveTab('2ndF')}
+          >
+            2nd F
+          </button>
+          <button 
+            className={`tab-button ${activeTab === '3rdF' ? 'active' : ''}`}
+            onClick={() => setActiveTab('3rdF')}
+          >
+            3rd F
+          </button>
+        </div>
+
+        <div className="tab-content">
+          <div className="table-container">
+            <table className="workout-table">
+              <thead>
+                <tr>
+                  <th>Location</th>
+                  <th>Name</th>
+                  <th>Day of Week</th>
+                  <th>Start Time</th>
+                  <th>End Time</th>
+                  <th>Workout Style</th>
+                  <th>Site Q</th>
+                  <th>Notes</th>
+                </tr>
+              </thead>
+              <tbody>
+                {workoutData[activeTab].map((workout, index) => (
+                  <tr key={index}>
+                    <td>{workout.location}</td>
+                    <td>{workout.name}</td>
+                    <td>{workout.dayOfWeek}</td>
+                    <td>{workout.startTime}</td>
+                    <td>{workout.endTime}</td>
+                    <td>{workout.workoutStyle}</td>
+                    <td>{workout.siteQ}</td>
+                    <td className="notes-column">{workout.notes}</td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </section>
   );
 };
 
