@@ -1,0 +1,106 @@
+/* Footer styles for F3 RVA website */
+.site-footer {
+  background-color: #343a40;
+  color: #ffffff;
+  margin-top: auto;
+}
+
+.footer-content-container {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 3rem 1rem 2rem;
+  display: grid;
+  grid-template-columns: 2fr 1fr;
+  gap: 2rem;
+}
+
+.footer-info-section,
+.footer-contact-section {
+  margin-bottom: 1rem;
+}
+
+.footer-organization-name {
+  font-size: 1.5rem;
+  margin-bottom: 1rem;
+  color: #ffffff;
+}
+
+.footer-mission-statement {
+  color: #adb5bd;
+  line-height: 1.6;
+  margin-bottom: 0;
+}
+
+.footer-section-title {
+  font-size: 1.1rem;
+  margin-bottom: 1rem;
+  color: #ffffff;
+}
+
+.footer-contact-info {
+  color: #adb5bd;
+  line-height: 1.6;
+  margin-bottom: 1rem;
+}
+
+/* Social media links styles */
+.social-media-links {
+  display: flex;
+  gap: 1rem;
+  margin-top: 1rem;
+}
+
+.social-link {
+  color: #adb5bd;
+  text-decoration: none;
+  transition: color 0.3s ease, transform 0.3s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  background-color: rgba(255, 255, 255, 0.1);
+}
+
+.social-link:hover {
+  color: #ffffff;
+  transform: translateY(-2px);
+  background-color: rgba(255, 255, 255, 0.2);
+}
+
+.social-link:focus {
+  outline: 2px solid #ffffff;
+  outline-offset: 2px;
+}
+
+.footer-copyright-section {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 1rem;
+  border-top: 1px solid #495057;
+  text-align: center;
+}
+
+.copyright-text {
+  color: #6c757d;
+  margin: 0;
+  font-size: 0.9rem;
+}
+
+/* Responsive design for smaller screens */
+@media (max-width: 768px) {
+  .footer-content-container {
+    grid-template-columns: 1fr;
+    padding: 2rem 1rem 1rem;
+  }
+  
+  .footer-organization-name {
+    font-size: 1.3rem;
+  }
+  
+  .social-media-links {
+    justify-content: center;
+    margin-top: 1.5rem;
+  }
+}

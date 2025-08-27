@@ -1,0 +1,51 @@
+/* Main site layout styles for F3 RVA website */
+.main-site-layout {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+
+/* Primary content area styles */
+.primary-content-area {
+  flex: 1;
+  background-color: #f8f9fa;
+}
+
+.page-title-section {
+  background-color: #ffffff;
+  padding: 2rem 0;
+  border-bottom: 1px solid #e9ecef;
+}
+
+.page-main-title {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 0 1rem;
+  font-size: 2.5rem;
+  color: #333;
+  text-align: center;
+}
+
+.content-wrapper {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 0 1rem 2rem;
+}
+
+/* Add top padding for all pages except home page */
+.content-wrapper > *:not(.home-page-container):first-child {
+  padding-top: 2rem;
+}
+
+/* Ensure home page sections after hero have proper spacing */
+.home-page-container {
+  padding-top: 0;
+}
+
+
+/* Responsive design for smaller screens */
+@media (max-width: 768px) {
+  .page-main-title {
+    font-size: 2rem;
+  }
+}

@@ -1,0 +1,176 @@
+/* Main navigation header styles for F3 RVA website */
+.main-navigation-header {
+  background-color: #1a1a1a;
+  color: white;
+  padding: 1rem 0;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.header-content-container {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 0 1rem;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+}
+
+/* Branding section styles */
+.branding-section {
+  text-align: left;
+}
+
+.home-link {
+  text-decoration: none;
+  color: inherit;
+  cursor: pointer;
+}
+
+.home-link:hover,
+.home-link:focus {
+  text-decoration: none;
+  color: inherit;
+}
+
+.organization-logo {
+  height: 30px;
+  width: auto;
+  margin: 0 0 0.5rem 0;
+}
+
+.organization-tagline {
+  font-size: 0.9rem;
+  margin: 0;
+  color: #cccccc;
+  font-style: italic;
+}
+
+/* Hamburger menu button styles */
+.hamburger-menu-button {
+  display: none;
+  flex-direction: column;
+  justify-content: space-around;
+  width: 2rem;
+  height: 2rem;
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  padding: 0;
+  z-index: 10;
+}
+
+.hamburger-line {
+  width: 2rem;
+  height: 0.25rem;
+  background: #cccccc;
+  border-radius: 10px;
+  transition: all 0.3s linear;
+  position: relative;
+  transform-origin: 1px;
+}
+
+/* Hamburger animation when menu is open */
+.hamburger-menu-button.menu-open .hamburger-line:first-child {
+  transform: rotate(45deg);
+}
+
+.hamburger-menu-button.menu-open .hamburger-line:nth-child(2) {
+  opacity: 0;
+}
+
+.hamburger-menu-button.menu-open .hamburger-line:nth-child(3) {
+  transform: rotate(-45deg);
+}
+
+/* Navigation menu styles */
+.primary-navigation {
+  margin-top: 1rem;
+}
+
+.navigation-menu-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  gap: 2rem;
+}
+
+.navigation-menu-item {
+  margin: 0;
+}
+
+.navigation-link {
+  color: #cccccc;
+  text-decoration: none;
+  font-weight: 500;
+  transition: color 0.3s ease;
+  padding: 0.5rem 1rem;
+  border-radius: 4px;
+}
+
+.navigation-link:hover,
+.navigation-link:focus {
+  color: white;
+  background-color: rgba(255, 255, 255, 0.1);
+  text-decoration: none;
+}
+
+/* Responsive design for smaller screens */
+@media (max-width: 768px) {
+  .header-content-container {
+    flex-direction: row;
+    justify-content: space-between;
+    align-items: center;
+    position: relative;
+  }
+  
+  .branding-section {
+    text-align: left;
+    margin-bottom: 0;
+  }
+  
+  .organization-logo {
+    height: 25px;
+  }
+  
+  /* Show hamburger menu on mobile */
+  .hamburger-menu-button {
+    display: flex;
+  }
+  
+  /* Hide navigation by default on mobile */
+  .primary-navigation {
+    display: none;
+    position: absolute;
+    top: 100%;
+    left: 0;
+    right: 0;
+    background-color: #1a1a1a;
+    border-top: 1px solid #333;
+    padding: 1rem;
+    margin-top: 0;
+    z-index: 9;
+  }
+  
+  /* Show navigation when menu is open */
+  .primary-navigation.nav-open {
+    display: block;
+  }
+  
+  .navigation-menu-list {
+    flex-direction: column;
+    gap: 0.5rem;
+  }
+  
+  .navigation-link {
+    display: block;
+    text-align: center;
+    padding: 1rem;
+    border-bottom: 1px solid #333;
+  }
+  
+  .navigation-link:last-child {
+    border-bottom: none;
+  }
+}

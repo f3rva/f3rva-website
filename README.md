@@ -1,70 +1,83 @@
-# Getting Started with Create React App
+# F3 RVA Website
 
-This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
+A React-based website for F3 RVA (Fitness, Fellowship, Faith - Richmond, Virginia), 
+built to serve the local F3 community with information about workouts, locations, 
+and community events.
 
-## Available Scripts
+## About F3 RVA
 
-In the project directory, you can run:
+F3 RVA is part of the national F3 movement, focused on building stronger men through:
+- **Fitness**: Free, peer-led workouts held outdoors
+- **Fellowship**: Building lasting relationships with like-minded men
+- **Faith**: Growing spiritually and encouraging leadership development
+
+## Project Structure
+
+```
+src/
+├── components/          # Reusable React components
+│   ├── Header.js       # Main navigation header
+│   ├── Layout.js       # Site layout wrapper
+│   └── *.css           # Component-specific styles
+├── pages/              # Page-specific components
+│   ├── Home.js         # Homepage content
+│   └── *.css           # Page-specific styles
+├── styles/             # Global styles and utilities
+├── App.js              # Main application component
+└── index.js            # Application entry point
+```
+
+## Development Commands
 
 ### `npm start`
-
-Runs the app in the development mode.\
-Open [http://localhost:3000](http://localhost:3000) to view it in your browser.
-
-The page will reload when you make changes.\
-You may also see any lint errors in the console.
+Runs the development server on [http://localhost:3000](http://localhost:3000).
+The page will reload when you make changes.
 
 ### `npm test`
-
-Launches the test runner in the interactive watch mode.\
-See the section about [running tests](https://facebook.github.io/create-react-app/docs/running-tests) for more information.
+Launches the test runner in interactive watch mode.
 
 ### `npm run build`
+Builds the app for production to the `build` folder.
+Creates an optimized build ready for deployment.
 
-Builds the app for production to the `build` folder.\
-It correctly bundles React in production mode and optimizes the build for the best performance.
+## Development Guidelines
 
-The build is minified and the filenames include the hashes.\
-Your app is ready to be deployed!
+This project follows the coding standards outlined in `CLAUDE.md`:
+- Use descriptive, narrative variable and component names
+- Provide adequate commenting to describe intent, not just implementation
+- Follow React best practices and component patterns
+- Use test-driven development approach when adding new features
 
-See the section about [deployment](https://facebook.github.io/create-react-app/docs/deployment) for more information.
+## Technologies Used
 
-### `npm run eject`
+- **React 19.1.1**: Frontend framework
+- **Create React App**: Development toolchain
+- **CSS3**: Styling with responsive design
+- **React Testing Library**: Component testing
 
-**Note: this is a one-way operation. Once you `eject`, you can't go back!**
+## Getting Started
 
-If you aren't satisfied with the build tool and configuration choices, you can `eject` at any time. This command will remove the single build dependency from your project.
+1. Clone the repository
+2. Install dependencies:
+   ```bash
+   npm install
+   ```
+3. Start the development server:
+   ```bash
+   npm start
+   ```
+4. Open [http://localhost:3000](http://localhost:3000) to view the website
 
-Instead, it will copy all the configuration files and the transitive dependencies (webpack, Babel, ESLint, etc) right into your project so you have full control over them. All of the commands except `eject` will still work, but they will point to the copied scripts so you can tweak them. At this point you're on your own.
+## Deployment
 
-You don't have to ever use `eject`. The curated feature set is suitable for small and middle deployments, and you shouldn't feel obligated to use this feature. However we understand that this tool wouldn't be useful if you couldn't customize it when you are ready for it.
+The application can be deployed to any static hosting service:
+1. Build the production bundle: `npm run build`
+2. Deploy the `build` folder contents to your hosting provider
 
-## Learn More
+## Contributing
 
-You can learn more in the [Create React App documentation](https://facebook.github.io/create-react-app/docs/getting-started).
-
-To learn React, check out the [React documentation](https://reactjs.org/).
-
-### Code Splitting
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/code-splitting](https://facebook.github.io/create-react-app/docs/code-splitting)
-
-### Analyzing the Bundle Size
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size](https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size)
-
-### Making a Progressive Web App
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app](https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app)
-
-### Advanced Configuration
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/advanced-configuration](https://facebook.github.io/create-react-app/docs/advanced-configuration)
-
-### Deployment
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/deployment](https://facebook.github.io/create-react-app/docs/deployment)
-
-### `npm run build` fails to minify
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify](https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify)
+When contributing to this project:
+1. Follow the established component structure and naming conventions
+2. Write tests for new components and features
+3. Ensure responsive design across all device sizes
+4. Use semantic HTML and accessibility best practices
