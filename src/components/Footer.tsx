@@ -34,7 +34,7 @@ const Footer: React.FC = () => {
               <FaSlack size={24} />
             </a>
             <a 
-              href="http://instagram.com/F3Richmond" 
+              href="https://instagram.com/F3Richmond" 
               target="_blank" 
               rel="noopener noreferrer"
               className="social-link"
@@ -43,7 +43,7 @@ const Footer: React.FC = () => {
               <FaInstagram size={24} />
             </a>
             <a 
-              href="http://facebook.com/F3Richmond" 
+              href="https://facebook.com/F3Richmond" 
               target="_blank" 
               rel="noopener noreferrer"
               className="social-link"
@@ -52,7 +52,7 @@ const Footer: React.FC = () => {
               <FaFacebook size={24} />
             </a>
             <a 
-              href="http://x.com/F3Richmond" 
+              href="https://x.com/F3Richmond" 
               target="_blank" 
               rel="noopener noreferrer"
               className="social-link"
