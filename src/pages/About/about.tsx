@@ -1,5 +1,5 @@
 import React from 'react';
-import './index.css';
+import './about.css';
 
 /**
  * About page component for F3 RVA website

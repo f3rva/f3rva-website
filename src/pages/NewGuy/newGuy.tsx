@@ -1,12 +1,12 @@
 import React from 'react';
-import './index.css';
+import './newGuy.css';
 
 /**
  * Friendly New Guy (FNG) page component for F3 RVA website
  * Provides guidance and information for newcomers to F3
  * Helps new participants understand expectations and feel welcome
  */
-const FriendlyNewGuyPage: React.FC = () => {
+const NewGuyPage: React.FC = () => {
   return (
     <div className="fng-page-container">
       <section className="fng-hero-section">
@@ -117,4 +117,4 @@ const FriendlyNewGuyPage: React.FC = () => {
   );
 };
 
-export default FriendlyNewGuyPage;
+export default NewGuyPage;

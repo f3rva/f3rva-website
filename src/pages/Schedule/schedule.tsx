@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import './index.css';
+import './schedule.css';
 import workoutDataJson from './workoutData.json';
 
 /**

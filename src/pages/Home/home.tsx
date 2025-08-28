@@ -2,7 +2,7 @@ import React from 'react';
 import { Link } from 'react-router-dom';
 import { MdGroups, MdOutlineDirectionsRun, MdOutlinePinDrop, MdMoneyOff, MdPeople, MdHandshake, MdForum } from 'react-icons/md';
 import { WiDayShowers } from "react-icons/wi";
-import './index.css';
+import './home.css';
 
 /**
  * Home page component for F3 RVA website
