@@ -2,3 +2,31 @@
 .App {
   /* Minimal styling - Layout component handles structure */
 }
+
+/* Global link styles - consistent across the site */
+.content-link {
+  color: #2c3e50;
+  text-decoration: none;
+  font-weight: 600;
+  transition: all 0.3s ease;
+  position: relative;
+}
+
+.content-link:hover {
+  color: #e74c3c;
+  text-decoration: underline;
+}
+
+.content-link:focus {
+  outline: 2px solid #e74c3c;
+  outline-offset: 2px;
+  border-radius: 2px;
+}
+
+.content-link:visited {
+  color: #495057;
+}
+
+.content-link:visited:hover {
+  color: #e74c3c;
+}

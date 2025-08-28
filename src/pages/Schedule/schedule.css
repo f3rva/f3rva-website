@@ -200,34 +200,6 @@
   line-height: 1.4;
 }
 
-/* Schedule table link styles */
-.workout-table a {
-  color: #2c3e50;
-  text-decoration: none;
-  font-weight: 600;
-  transition: all 0.3s ease;
-  position: relative;
-}
-
-.workout-table a:hover {
-  color: #e74c3c;
-  text-decoration: underline;
-  transform: translateY(-1px);
-}
-
-.workout-table a:focus {
-  outline: 2px solid #e74c3c;
-  outline-offset: 2px;
-  border-radius: 2px;
-}
-
-.workout-table a:visited {
-  color: #495057;
-}
-
-.workout-table a:visited:hover {
-  color: #e74c3c;
-}
 
 /* Responsive design for smaller screens */
 @media (max-width: 768px) {

@@ -1,19 +1,22 @@
 import React from 'react';
-import './index.css';
+import { Link } from 'react-router-dom';
+import './newGuy.css';
 
 /**
  * Friendly New Guy (FNG) page component for F3 RVA website
  * Provides guidance and information for newcomers to F3
  * Helps new participants understand expectations and feel welcome
  */
-const FriendlyNewGuyPage: React.FC = () => {
+const NewGuyPage: React.FC = () => {
   return (
     <div className="fng-page-container">
       <section className="fng-hero-section">
         <div className="hero-content-wrapper">
           <h2 className="fng-main-heading">Welcome, FNG!</h2>
           <p className="fng-description">
-            New to F3? You're a "Friendly New Guy" (FNG) and we're excited to have you join us!
+            So you want to be a FNG (Friendly New Guy)?
+            <br />
+            What did you think FNG stood for?
           </p>
         </div>
       </section>
@@ -23,16 +26,31 @@ const FriendlyNewGuyPage: React.FC = () => {
         <div className="first-workout-content-wrapper">
           <p className="first-workout-description">
             Showing up for your first F3 workout can feel intimidating, but our community is built 
-            on welcoming new members. Here's what you need to know to feel confident and prepared.
+            on welcoming new members. Here's a great intro video from our friends at F3 Nation
+            that should give you a good feel for what is in your future.
           </p>
+          
+          <div className="video-placeholder">
+            <div className="vimeo-embed-container">
+                <iframe
+                  src="https://player.vimeo.com/video/143444379?badge=0&amp;autopause=0&amp;player_id=0&amp;app_id=58479"
+                  allow="autoplay; fullscreen; picture-in-picture; clipboard-write; encrypted-media; web-share"
+                  referrerPolicy="strict-origin-when-cross-origin"
+                  style={{ position: 'absolute', top: 0, left: 0, width: '100%', height: '100%' }}
+                  title="What is F3?"
+                ></iframe>
+              <script src="https://player.vimeo.com/api/player.js"></script>
+            </div>
+          </div>
+          
           <div className="preparation-grid-container">
             <div className="preparation-card-item">
               <h4 className="preparation-title">What to Bring</h4>
               <ul className="preparation-list">
                 <li>Comfortable workout clothes</li>
-                <li>Running shoes</li>
-                <li>Water bottle</li>
+                <li>Athletic shoes</li>
                 <li>Positive attitude</li>
+                <li>Gloves (optional)</li>
               </ul>
               <p className="preparation-note">That's it! No gym membership or equipment needed.</p>
             </div>
@@ -40,50 +58,13 @@ const FriendlyNewGuyPage: React.FC = () => {
             <div className="preparation-card-item">
               <h4 className="preparation-title">What to Expect</h4>
               <ul className="preparation-list">
-                <li>45-minute high-intensity workout</li>
+                <li>45 to 60 minute high-intensity workout</li>
                 <li>Bodyweight and functional exercises</li>
                 <li>Outdoor setting in all weather</li>
-                <li>Circle of Trust (COT) to close</li>
+                <li>Jovial banter from the PAX</li>
               </ul>
               <p className="preparation-note">Every workout is different and scalable to your fitness level.</p>
             </div>
-          </div>
-        </div>
-      </section>
-
-      <section className="fng-traditions-section">
-        <h3 className="section-main-title">F3 Traditions You'll Learn</h3>
-        <div className="traditions-grid-container">
-          <div className="tradition-card-item">
-            <h4 className="tradition-title">Name Your Workout</h4>
-            <p className="tradition-description">
-              After your first few workouts, you'll receive your F3 name - a unique nickname 
-              given by your fellow HIMs (Humans In Motion) based on something memorable about you.
-            </p>
-          </div>
-          
-          <div className="tradition-card-item">
-            <h4 className="tradition-title">No One Left Behind</h4>
-            <p className="tradition-description">
-              We modify exercises to include everyone. Whether you're a former athlete or 
-              haven't exercised in years, you'll find your place in our community.
-            </p>
-          </div>
-          
-          <div className="tradition-card-item">
-            <h4 className="tradition-title">Circle of Trust</h4>
-            <p className="tradition-description">
-              Each workout ends with announcements, intentions, and encouragement. 
-              It's where fitness meets fellowship and builds lasting friendships.
-            </p>
-          </div>
-          
-          <div className="tradition-card-item">
-            <h4 className="tradition-title">Step Up to Lead</h4>
-            <p className="tradition-description">
-              Once you're comfortable, you'll be encouraged to "take the Q" (lead a workout). 
-              Leadership development is part of what makes F3 transformational.
-            </p>
           </div>
         </div>
       </section>
@@ -107,8 +88,8 @@ const FriendlyNewGuyPage: React.FC = () => {
           </div>
           <div className="call-to-action-section">
             <p className="call-to-action-text">
-              <strong>Just show up!</strong> Find a workout location and time that works for you, 
-              and take the first step toward becoming part of the F3 RVA community.
+              <strong>Just show up!</strong> Find a <Link to="/schedule" className="content-link">workout location</Link> and time that
+              works for you, and take the first step toward becoming part of the F3 RVA community.
             </p>
           </div>
         </div>
@@ -117,4 +98,4 @@ const FriendlyNewGuyPage: React.FC = () => {
   );
 };
 
-export default FriendlyNewGuyPage;
+export default NewGuyPage;

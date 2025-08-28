@@ -1,7 +1,7 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
 import { MdHome, MdSearch, MdArrowBack } from 'react-icons/md';
-import './index.css';
+import './notFound.css';
 
 /**
  * 404 Not Found page component for F3 RVA website

@@ -1,11 +1,11 @@
 import React from 'react';
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import MainSiteLayout from './components/Layout';
-import HomePage from './pages/Home';
-import AboutPage from './pages/About';
-import SchedulePage from './pages/Schedule';
-import FriendlyNewGuyPage from './pages/FriendlyNewGuy';
-import NotFoundPage from './pages/NotFound';
+import HomePage from './pages/Home/home';
+import AboutPage from './pages/About/about';
+import SchedulePage from './pages/Schedule/schedule';
+import NewGuyPage from './pages/NewGuy/newGuy';
+import NotFoundPage from './pages/NotFound/notFound';
 import './App.css';
 
 /**
@@ -22,7 +22,7 @@ const App: React.FC = () => {
             <Route path="/" element={<HomePage />} />
             <Route path="/about" element={<AboutPage />} />
             <Route path="/schedule" element={<SchedulePage />} />
-            <Route path="/friendly-new-guy" element={<FriendlyNewGuyPage />} />
+            <Route path="/friendly-new-guy" element={<NewGuyPage />} />
             <Route path="*" element={<NotFoundPage />} />
           </Routes>
         </MainSiteLayout>
