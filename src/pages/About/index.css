@@ -5,7 +5,7 @@
 
 /* About hero section styles */
 .about-hero-section {
-  background: linear-gradient(135deg, #27ae60 0%, #2ecc71 100%);
+  background: linear-gradient(135deg, #6c757d 0%, #5a6268 100%);
   color: white;
   padding: 4rem 2rem;
   text-align: center;
@@ -102,7 +102,7 @@
 .value-title {
   font-size: 1.5rem;
   margin-bottom: 1rem;
-  color: #27ae60;
+  color: #495057;
   font-weight: 600;
 }
 

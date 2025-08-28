@@ -20,7 +20,7 @@ const HomePage: React.FC = () => {
         />
         <div className="hero-overlay"></div>
         <div className="hero-content-wrapper">
-          <h2 className="welcome-main-heading">Welcome to F3 RVA</h2>
+          <h2 className="welcome-main-heading">Welcome to F3RVA</h2>
           <p className="welcome-description">
             Building stronger men through fitness, fellowship, and faith in the Richmond region.
           </p>
