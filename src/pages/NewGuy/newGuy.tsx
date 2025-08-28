@@ -77,15 +77,6 @@ const NewGuyPage: React.FC = () => {
             a community that will challenge you physically, support you personally, and help you 
             grow in ways you never expected.
           </p>
-          <div className="encouragement-highlights-list">
-            <ul className="highlights-item-list">
-              <li className="highlight-item">Everyone was an FNG once</li>
-              <li className="highlight-item">You'll be welcomed and supported</li>
-              <li className="highlight-item">Modify any exercise as needed</li>
-              <li className="highlight-item">Focus on showing up consistently</li>
-              <li className="highlight-item">Ask questions - we love to help</li>
-            </ul>
-          </div>
           <div className="call-to-action-section">
             <p className="call-to-action-text">
               <strong>Just show up!</strong> Find a <Link to="/schedule" className="content-link">workout location</Link> and time that
