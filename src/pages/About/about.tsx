@@ -22,9 +22,8 @@ const AboutPage: React.FC = () => {
         <h3 className="section-main-title">Our Mission</h3>
         <div className="mission-content-wrapper">
           <p className="mission-description">
-            F3 is a national fitness movement focused on peer-led workouts that are free of charge, 
-            open to all men, and held outdoors in all weather conditions. We plant, grow and serve 
-            small workout groups for men for the invigoration of male community leadership.
+            The Mission of F3 is to plant, grow, and serve small workout groups for men for 
+            the invigoration of male community leadership.
           </p>
         </div>
       </section>
@@ -53,8 +52,8 @@ const AboutPage: React.FC = () => {
             Over the years, there have been many memorable moments and milestones for F3RVA. They
             are too numerous to list here, but when you come to your first workout, you will likely
             hear stories of the Blue Ridge Relay (BRR), The Century Classic, The Corporate Challenge,
-            The Ghost Flag, The Podcast, The Frozen Triangle, Thanksgiving History Lessons, and many
-            more.
+            The Ghost Flag, The Podcast, The Sit-n-Sip, The Frozen Triangle, Thanksgiving History Lessons, 
+            Chili Cookoffs, and many more.
           </p>
           <p className="history-description">
             These events served as a foundation for the culture that continues to grow within each of
@@ -69,10 +68,55 @@ const AboutPage: React.FC = () => {
             Outside of our region, we helped start F3 Hampton Roads and F3 Charlottesville to help expand
             the F3 movement throughout the Commonwealth of Virginia.
           </p>
+
+          <p className="history-description">
+            One of the most common questions we get is "What does faith mean?", or "Is this
+            a prayer group?" The short answer is no. While faith is an important part of F3,
+            we are not a religious organization. We welcome men from all backgrounds and
+            beliefs to join us in our mission of self-improvement and community service.
+            In this group, faith is believing that the world is bigger than yourself.
+          </p>
+
+          <p className="history-description">
+            From Richmond to the surrounding counties, our nano regions ensure that 
+            no matter where you live or work, there's an F3 workout group nearby. Each nano 
+            region operates with its own identity and local leadership while remaining connected 
+            to the broader F3RVA family. This structure allows us to maintain the intimate, 
+            feel of smaller groups while leveraging the strength and resources of our 
+            larger community.
+          </p>
         </div>
       </section>
 
       <section className="values-section">
+        <h3 className="section-main-title">F3 Explained</h3>
+        <div className="values-grid-container">
+          <div className="value-card-item">
+            <h4 className="value-title">Fitness</h4>
+            <p className="value-description">
+              Open to men of any fitness level with peer led workouts designed to be
+              challenging for all, while not leaving anyone behind
+            </p>
+          </div>
+          
+          <div className="value-card-item">
+            <h4 className="value-title">Fellowship</h4>
+            <p className="value-description">
+              Bonds of genuine friendship are formed in the pre-dawn gloom and strengthened
+              through social gatherings, races, and endurance challenges
+            </p>
+          </div>
+          
+          <div className="value-card-item">
+            <h4 className="value-title">Faith</h4>
+            <p className="value-description">
+              Not a religious organization, but we believe we are not the center of the 
+              universe and challenge each other to live for somethign bigger than ourselves
+            </p>
+          </div>
+        </div>
+      </section>
+      {/* <section className="values-section">
         <h3 className="section-main-title">Our Values</h3>
         <div className="values-grid-container">
           <div className="value-card-item">
@@ -99,7 +143,7 @@ const AboutPage: React.FC = () => {
             </p>
           </div>
         </div>
-      </section>
+      </section> */}
     </div>
   );
 };

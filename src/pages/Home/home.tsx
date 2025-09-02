@@ -22,11 +22,12 @@ const HomePage: React.FC = () => {
         <div className="hero-content-wrapper">
           <h2 className="welcome-main-heading">Welcome to F3RVA</h2>
           <p className="welcome-description">
-            Building stronger men through fitness, fellowship, and faith in the Richmond region.
+            F3 is a national network of free, peer-led workouts for men. We plant, grow, 
+            and serve these groups to invigorate male community leadership.
           </p>
           <div className="call-to-action-buttons">
             <Link to="/schedule" className="primary-action-button">Find a Workout</Link>
-            <Link to="/about" className="secondary-action-button">Learn More</Link>
+            <Link to="/friendly-new-guy" className="secondary-action-button">New to F3?</Link>
           </div>
         </div>
       </section>
@@ -47,42 +48,25 @@ const HomePage: React.FC = () => {
             The F3RVA region represents all of the greater Richmond region while providing
             opportunities to individually connect in the neighborhood that you call home.
           </p>
-
-          <p className="narrative-description">
-            One of the most common questions we get is "What does faith mean?", or "Is this
-            a prayer group?" The short answer is no. While faith is an important part of F3,
-            we are not a religious organization. We welcome men from all backgrounds and
-            beliefs to join us in our mission of self-improvement and community service.
-            In this group, faith is believing that the world is bigger than yourself.
-          </p>
-
-          <p className="narrative-description">
-            From Richmond to the surrounding counties, our nano regions ensure that 
-            no matter where you live or work, there's an F3 workout group nearby. Each nano 
-            region operates with its own identity and local leadership while remaining connected 
-            to the broader F3 RVA family. This structure allows us to maintain the intimate, 
-            feel of smaller groups while leveraging the strength and resources of our 
-            larger community.
-          </p>
           
           <div className="community-stats">
             <div className="stat-item">
               <div className="stat-icon">
-                <MdOutlineDirectionsRun size={40} color="#e74c3c" />
+                <MdOutlineDirectionsRun className="stat-icon" />
               </div>
               <h4 className="stat-number">30+</h4>
               <p className="stat-label">Active Workouts</p>
             </div>
             <div className="stat-item">
               <div className="stat-icon">
-                <MdGroups size={40} color="#e74c3c" />
+                <MdGroups className="stat-icon" />
               </div>
               <h4 className="stat-number">200+</h4>
               <p className="stat-label">Active Participants</p>
             </div>
             <div className="stat-item">
               <div className="stat-icon">
-                <MdOutlinePinDrop size={40} color="#e74c3c" />
+                <MdOutlinePinDrop className="stat-icon" />
               </div>
               <h4 className="stat-number">5</h4>
               <p className="stat-label">Nano Regions</p>
@@ -96,7 +80,7 @@ const HomePage: React.FC = () => {
         <div className="principles-grid-container">
           <div className="principle-item">
             <div className="principle-icon">
-              <MdMoneyOff size={40} color="#e74c3c" />
+              <MdMoneyOff className="principle-icon" />
             </div>
             <h4 className="principle-title">Free of Charge</h4>
             <p className="principle-description">
@@ -106,7 +90,7 @@ const HomePage: React.FC = () => {
           
           <div className="principle-item">
             <div className="principle-icon">
-              <MdPeople size={40} color="#e74c3c" />
+              <MdPeople className="principle-icon" />
             </div>
             <h4 className="principle-title">Open to all Men</h4>
             <p className="principle-description">
@@ -116,7 +100,7 @@ const HomePage: React.FC = () => {
           
           <div className="principle-item">
             <div className="principle-icon">
-              <WiDayShowers size={40} color="#e74c3c" />
+              <WiDayShowers className="principle-icon" />
             </div>
             <h4 className="principle-title">Held Outdoors</h4>
             <p className="principle-description">
@@ -126,7 +110,7 @@ const HomePage: React.FC = () => {
           
           <div className="principle-item">
             <div className="principle-icon">
-              <MdHandshake size={40} color="#e74c3c" />
+              <MdHandshake className="principle-icon" />
             </div>
             <h4 className="principle-title">Peer Led</h4>
             <p className="principle-description">
@@ -136,13 +120,26 @@ const HomePage: React.FC = () => {
           
           <div className="principle-item">
             <div className="principle-icon">
-              <MdForum size={40} color="#e74c3c" />
+              <MdForum className="principle-icon" />
             </div>
             <h4 className="principle-title">Ends with a COT</h4>
             <p className="principle-description">
               Always ends with a Circle of Trust
             </p>
           </div>
+        </div>
+      </section>
+
+      <section className="credo-section">
+        <div className="credo-content-wrapper">
+          <img 
+            src="/images/f3-logo.webp" 
+            alt="F3 Logo" 
+            className="credo-logo"
+          />
+          <p className="credo-text">
+            Leave No Man Behind, <br/> But Leave No Man Where You Find Him.
+          </p>
         </div>
       </section>
 
@@ -156,12 +153,8 @@ const HomePage: React.FC = () => {
             perhaps bring a friend, and the rest is taken care of.
           </p>
           <div className="community-call-to-action">
-            <Link to="/schedule" className="primary-action-button">
-              Find a Workout
-            </Link>
-            <Link to="/friendly-new-guy" className="tertiary-action-button">
-              New to F3?
-            </Link>
+            <Link to="/schedule" className="primary-action-button">Find a Workout</Link>
+            <Link to="/about" className="tertiary-action-button">Learn More</Link>
           </div>
         </div>
       </section>
