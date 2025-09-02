@@ -47,7 +47,7 @@ const NotFoundPage: React.FC = () => {
               <p className="link-description">Find workout times and locations</p>
             </Link>
             
-            <Link to="/friendly-new-guy" className="helpful-link">
+            <Link to="/new-guy" className="helpful-link">
               <h4 className="link-title">New to F3?</h4>
               <p className="link-description">Everything you need to know to get started</p>
             </Link>
