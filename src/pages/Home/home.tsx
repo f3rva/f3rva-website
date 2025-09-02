@@ -130,6 +130,19 @@ const HomePage: React.FC = () => {
         </div>
       </section>
 
+      <section className="credo-section">
+        <div className="credo-content-wrapper">
+          <img 
+            src="/images/f3-logo.webp" 
+            alt="F3 Logo" 
+            className="credo-logo"
+          />
+          <p className="credo-text">
+            Leave No Man Behind, <br/> But Leave No Man Where You Find Him.
+          </p>
+        </div>
+      </section>
+
       <section className="community-information-section">
         <div className="information-content-wrapper">
           <h3 className="section-main-title">Join Our Community</h3>

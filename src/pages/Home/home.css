@@ -233,6 +233,33 @@ svg.principle-icon {
   margin: 0;
 }
 
+/* Credo section styles */
+.credo-section {
+  padding: 4rem 2rem;
+  background-color: #e74c3c;
+  background-color: rgba(231, 76, 60, 0.85);
+}
+
+.credo-content-wrapper {
+  max-width: 800px;
+  margin: 0 auto;
+  text-align: center;
+}
+
+.credo-logo {
+  height: 80px;
+  width: auto;
+  margin-bottom: 2rem;
+}
+
+.credo-text {
+  font-size: 1.8rem;
+  font-weight: 600;
+  line-height: 1.6;
+  color: white;
+  margin: 0;
+}
+
 /* Community information section styles */
 .community-information-section {
   padding: 4rem 2rem;
@@ -310,5 +337,13 @@ svg.principle-icon {
   
   .principle-title {
     font-size: 1.2rem;
+  }
+  
+  .credo-logo {
+    height: 60px;
+  }
+  
+  .credo-text {
+    font-size: 1.4rem;
   }
 }
