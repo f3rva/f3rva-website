@@ -69,6 +69,26 @@ const NewGuyPage: React.FC = () => {
         </div>
       </section>
 
+      <section className="podcast-section">
+        <div className="podcast-content-wrapper">
+          <h3 className="section-main-title">Learn More About F3</h3>
+          <p className="podcast-description">
+            Want to understand the deeper purpose behind F3? Check out this excellent podcast episode 
+            from The Art of Manliness that explores how F3 builds communities of strong men.
+          </p>
+          <div className="podcast-link-container">
+            <a 
+              href="https://www.artofmanliness.com/people/relationships/podcast-1068-building-tribe-how-to-create-and-sustain-communities-of-men/" 
+              target="_blank" 
+              rel="noopener noreferrer"
+              className="podcast-link"
+            >
+              Listen to "Building Tribe - How to Create and Sustain Communities of Men"
+            </a>
+          </div>
+        </div>
+      </section>
+
       <section className="fng-encouragement-section">
         <div className="encouragement-content-wrapper">
           <h3 className="section-main-title">Ready to Start?</h3>
