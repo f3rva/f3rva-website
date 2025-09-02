@@ -1,0 +1,97 @@
+name: CI / Build & Deploy
+
+on:
+  push:
+    branches: [ main ]            # deploy to development on pushes to main
+  release:
+    types: [ published ]          # deploy to production when a release is published
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    outputs:
+      artifact-name: site
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Use Node.js 18
+        uses: actions/setup-node@v4
+        with:
+          node-version: '18'
+
+      - name: Cache node modules
+        uses: actions/cache@v4
+        with:
+          path: ~/.npm
+          key: ${{ runner.os }}-node-${{ hashFiles('**/package-lock.json') }}
+          restore-keys: |
+            ${{ runner.os }}-node-
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Build
+        run: npm run build
+        env:
+          CI: false
+
+      - name: Upload build artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: site
+          path: build/
+
+  deploy-dev:
+    needs: build
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+    runs-on: ubuntu-latest
+    steps:
+      - name: Download build artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: site
+
+      - name: Configure AWS credentials (OIDC / role for dev)
+        uses: aws-actions/configure-aws-credentials@v2
+        with:
+          role-to-assume: ${{ secrets.DEV_AWS_ROLE_ARN_DEV }}
+          aws-region: ${{ secrets.DEV_AWS_REGION }}
+
+      - name: Sync build to Dev S3
+        run: |
+          aws s3 sync build/ s3://${{ secrets.DEV_S3_BUCKET }}/ \
+            --delete --acl public-read --no-progress
+
+      - name: Invalidate CloudFront
+        run: |
+          aws cloudfront create-invalidation \
+            --distribution-id ${{ secrets.DEV_CLOUDFRONT_DISTRIBUTION_ID }} \
+            --paths "/*"
+  
+  deploy-prod:
+    needs: build
+    if: github.event_name == 'release'
+    runs-on: ubuntu-latest
+    steps:
+      - name: Download build artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: site
+
+      - name: Configure AWS credentials (OIDC / role for prod)
+        uses: aws-actions/configure-aws-credentials@v2
+        with:
+          role-to-assume: ${{ secrets.PROD_AWS_ROLE_ARN_PROD }}
+          aws-region: ${{ secrets.PROD_AWS_REGION }}
+
+      - name: Sync build to Prod S3
+        run: |
+          aws s3 sync build/ s3://${{ secrets.PROD_S3_BUCKET }}/ \
+            --delete --acl public-read --no-progress
+
+      - name: Invalidate CloudFront
+        run: |
+          aws cloudfront create-invalidation \
+            --distribution-id ${{ secrets.PROD_CLOUDFRONT_DISTRIBUTION_ID }} \
+            --paths "/*"
