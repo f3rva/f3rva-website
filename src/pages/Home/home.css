@@ -162,6 +162,12 @@
   align-items: center;
 }
 
+svg.stat-icon {
+  height: 40px;
+  width: 40px;
+  color: #e74c3c
+}
+
 .stat-number {
   font-size: 2.5rem;
   font-weight: 700;
@@ -205,6 +211,12 @@
   display: flex;
   justify-content: center;
   align-items: center;
+}
+
+svg.principle-icon {
+  height: 40px;
+  width: 40px;
+  color: #e74c3c
 }
 
 .principle-title {
