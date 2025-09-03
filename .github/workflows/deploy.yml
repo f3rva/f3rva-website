@@ -45,6 +45,9 @@ jobs:
   deploy-dev:
     needs: build
     environment: development
+    permissions:
+      contents: read
+      id-token: write
     if: github.event_name == 'push' && github.ref == 'refs/heads/main'
     runs-on: ubuntu-latest
     steps:
