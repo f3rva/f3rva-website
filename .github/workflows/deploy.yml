@@ -66,7 +66,7 @@ jobs:
       - name: Sync build to Dev S3
         run: |
           aws s3 sync site/ s3://${{ secrets.DEV_S3_BUCKET }}/ \
-            --delete --acl public-read --no-progress
+            --delete --no-progress
 
       - name: Invalidate CloudFront
         run: |
@@ -94,7 +94,7 @@ jobs:
       - name: Sync build to Prod S3
         run: |
           aws s3 sync site/ s3://${{ secrets.PROD_S3_BUCKET }}/ \
-            --delete --acl public-read --no-progress
+            --delete --no-progress
 
       - name: Invalidate CloudFront
         run: |
