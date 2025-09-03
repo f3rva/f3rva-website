@@ -13,12 +13,12 @@ jobs:
       artifact-name: site
     steps:
       - name: Checkout
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
 
-      - name: Use Node.js 18
-        uses: actions/setup-node@v4
+      - name: Use Node.js 24
+        uses: actions/setup-node@v5
         with:
-          node-version: '18'
+          node-version: '24'
 
       - name: Cache node modules
         uses: actions/cache@v4
@@ -44,6 +44,7 @@ jobs:
 
   deploy-dev:
     needs: build
+    environment: development
     if: github.event_name == 'push' && github.ref == 'refs/heads/main'
     runs-on: ubuntu-latest
     steps:
@@ -53,7 +54,7 @@ jobs:
           name: site
 
       - name: Configure AWS credentials (OIDC / role for dev)
-        uses: aws-actions/configure-aws-credentials@v2
+        uses: aws-actions/configure-aws-credentials@v4
         with:
           role-to-assume: ${{ secrets.DEV_AWS_ROLE_ARN_DEV }}
           aws-region: ${{ secrets.DEV_AWS_REGION }}
@@ -71,6 +72,7 @@ jobs:
   
   deploy-prod:
     needs: build
+    environment: production
     if: github.event_name == 'release'
     runs-on: ubuntu-latest
     steps:
@@ -80,7 +82,7 @@ jobs:
           name: site
 
       - name: Configure AWS credentials (OIDC / role for prod)
-        uses: aws-actions/configure-aws-credentials@v2
+        uses: aws-actions/configure-aws-credentials@v4
         with:
           role-to-assume: ${{ secrets.PROD_AWS_ROLE_ARN_PROD }}
           aws-region: ${{ secrets.PROD_AWS_REGION }}
