@@ -27,7 +27,7 @@ const HomePage: React.FC = () => {
           </p>
           <div className="call-to-action-buttons">
             <Link to="/schedule" className="primary-action-button">Find a Workout</Link>
-            <Link to="/friendly-new-guy" className="secondary-action-button">New to F3?</Link>
+            <Link to="/new-guy" className="secondary-action-button">New to F3?</Link>
           </div>
         </div>
       </section>
