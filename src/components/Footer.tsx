@@ -1,5 +1,5 @@
 import React from 'react';
-import { FaFacebook, FaInstagram, FaSlack, FaTwitter } from 'react-icons/fa';
+import { FaFacebook, FaInstagram, FaSlack, FaXTwitter } from 'react-icons/fa6';
 import './Footer.css';
 
 /**
@@ -18,10 +18,31 @@ const Footer: React.FC = () => {
           </p>
         </div>
         
+        <div className="footer-links-section">
+          <h4 className="footer-section-title">Related Links</h4>
+          <div className="external-links">
+            <a 
+              href="http://bigdata.brianbischoff.com" 
+              target="_blank" 
+              rel="noopener noreferrer"
+              className="external-link"
+            >
+              Big Data
+            </a>
+            <a 
+              href="https://f3nation.com" 
+              target="_blank" 
+              rel="noopener noreferrer"
+              className="external-link"
+            >
+              F3Nation
+            </a>
+          </div>
+        </div>
+
         <div className="footer-contact-section">
-          <h4 className="footer-section-title">Connect With Us</h4>
+          <h4 className="footer-section-title">Connect</h4>
           <p className="footer-contact-info">
-            Connect with us through various social platforms.
           </p>
           <div className="social-media-links">
             <a 
@@ -58,10 +79,11 @@ const Footer: React.FC = () => {
               className="social-link"
               aria-label="Follow F3RVA on Twitter"
             >
-              <FaTwitter size={24} />
+              <FaXTwitter size={24} />
             </a>
           </div>
         </div>
+        
       </div>
       
       <div className="footer-copyright-section">

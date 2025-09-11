@@ -10,12 +10,13 @@
   margin: 0 auto;
   padding: 3rem 1rem 2rem;
   display: grid;
-  grid-template-columns: 2fr 1fr;
+  grid-template-columns: 2fr 1fr 1fr;
   gap: 2rem;
 }
 
 .footer-info-section,
-.footer-contact-section {
+.footer-contact-section,
+.footer-links-section {
   margin-bottom: 1rem;
 }
 
@@ -70,6 +71,32 @@
 }
 
 .social-link:focus {
+  outline: 2px solid #ffffff;
+  outline-offset: 2px;
+}
+
+/* External links styles */
+.external-links {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  margin-top: 1rem;
+}
+
+.external-link {
+  color: #adb5bd;
+  text-decoration: none;
+  transition: color 0.3s ease;
+  padding: 0.25rem 0;
+  border-bottom: 1px solid transparent;
+}
+
+.external-link:hover {
+  color: #ffffff;
+  border-bottom-color: #ffffff;
+}
+
+.external-link:focus {
   outline: 2px solid #ffffff;
   outline-offset: 2px;
 }
