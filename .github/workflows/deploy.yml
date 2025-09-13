@@ -57,6 +57,11 @@ jobs:
           name: site
           path: site
 
+      - name: Use development robots.txt
+        run: |
+          cp site/robots-dev.txt site/robots.txt
+          echo "Using development robots.txt - blocking all crawlers"
+
       - name: Configure AWS credentials (OIDC / role for dev)
         uses: aws-actions/configure-aws-credentials@v4
         with:
@@ -87,6 +92,11 @@ jobs:
         uses: actions/download-artifact@v4
         with:
           name: site
+
+      - name: Use production robots.txt
+        run: |
+          cp site/robots-prod.txt site/robots.txt
+          echo "Using production robots.txt - allowing crawlers"
 
       - name: Configure AWS credentials (OIDC / role for prod)
         uses: aws-actions/configure-aws-credentials@v4

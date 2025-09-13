@@ -27,13 +27,17 @@
     "web-vitals": "^2.1.4"
   },
   "scripts": {
-    "dev": "vite",
-    "start": "vite",
+    "dev": "node scripts/setup-robots.js dev && vite",
+    "start": "node scripts/setup-robots.js dev && vite",
     "build": "tsc && vite build",
+    "build:dev": "node scripts/setup-robots.js dev && npm run build",
+    "build:prod": "node scripts/setup-robots.js prod && npm run build",
     "lint": "eslint . --ext ts,tsx --report-unused-disable-directives --max-warnings 0",
     "preview": "vite preview",
     "test": "vitest",
     "generate-sitemap": "node scripts/generate-sitemap.js",
+    "setup-robots:dev": "node scripts/setup-robots.js dev",
+    "setup-robots:prod": "node scripts/setup-robots.js prod",
     "seo-check": "echo 'SEO files generated successfully. Check public/sitemap.xml and public/robots.txt'"
   },
   "browserslist": {

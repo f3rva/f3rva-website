@@ -1,0 +1,28 @@
+# Development robots.txt - Block all crawlers
+# https://www.robotstxt.org/robotstxt.html
+
+User-agent: *
+Disallow: /
+
+# Block all major search engines from indexing development site
+User-agent: Googlebot
+Disallow: /
+
+User-agent: Bingbot
+Disallow: /
+
+User-agent: Slurp
+Disallow: /
+
+User-agent: DuckDuckBot
+Disallow: /
+
+User-agent: Baiduspider
+Disallow: /
+
+User-agent: YandexBot
+Disallow: /
+
+# No sitemap for development
+# Crawl delay to reduce server load
+Crawl-delay: 86400
