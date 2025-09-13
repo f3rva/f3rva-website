@@ -60,7 +60,7 @@ const MainNavigationHeader: React.FC = () => {
               <Link to="/new-guy" className="navigation-link" onClick={closeMenu}>New Guy</Link>
             </li>
             <li className="navigation-menu-item">
-              <a href="https://f3rva.org/locations/richmond-va/" className="navigation-link" target="_blank" rel="noopener noreferrer" onClick={closeMenu}>Backblasts</a>
+              <a href="https://backblasts.f3rva.org/locations/richmond-va/" className="navigation-link" target="_blank" rel="noopener noreferrer" onClick={closeMenu}>Backblasts</a>
             </li>
           </ul>
         </nav>
