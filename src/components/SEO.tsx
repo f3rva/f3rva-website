@@ -1,5 +1,4 @@
 import React from 'react';
-import { Helmet } from 'react-helmet-async';
 
 interface SEOProps {
   title?: string;
@@ -17,6 +16,7 @@ interface SEOProps {
 
 /**
  * SEO component for managing meta tags, Open Graph, Twitter Cards, and structured data
+ * Uses React 19's native document metadata support - elements are automatically hoisted to <head>
  * Provides comprehensive SEO optimization for each page
  */
 const SEO: React.FC<SEOProps> = ({
@@ -37,7 +37,7 @@ const SEO: React.FC<SEOProps> = ({
   const fullCanonicalUrl = canonical || url;
 
   return (
-    <Helmet>
+    <>
       {/* Basic Meta Tags */}
       <title>{fullTitle}</title>
       <meta name="description" content={description} />
@@ -90,7 +90,7 @@ const SEO: React.FC<SEOProps> = ({
           {JSON.stringify(structuredData)}
         </script>
       )}
-    </Helmet>
+    </>
   );
 };
 
