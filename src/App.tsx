@@ -1,5 +1,6 @@
 import React from 'react';
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
+import { HelmetProvider } from 'react-helmet-async';
 import MainSiteLayout from './components/Layout';
 import HomePage from './pages/Home/home';
 import AboutPage from './pages/About/about';
@@ -15,19 +16,21 @@ import './App.css';
  */
 const App: React.FC = () => {
   return (
-    <div className="App">
-      <Router>
-        <MainSiteLayout>
-          <Routes>
-            <Route path="/" element={<HomePage />} />
-            <Route path="/about" element={<AboutPage />} />
-            <Route path="/schedule" element={<SchedulePage />} />
-            <Route path="/new-guy" element={<NewGuyPage />} />
-            <Route path="*" element={<NotFoundPage />} />
-          </Routes>
-        </MainSiteLayout>
-      </Router>
-    </div>
+    <HelmetProvider>
+      <div className="App">
+        <Router>
+          <MainSiteLayout>
+            <Routes>
+              <Route path="/" element={<HomePage />} />
+              <Route path="/about" element={<AboutPage />} />
+              <Route path="/schedule" element={<SchedulePage />} />
+              <Route path="/new-guy" element={<NewGuyPage />} />
+              <Route path="*" element={<NotFoundPage />} />
+            </Routes>
+          </MainSiteLayout>
+        </Router>
+      </div>
+    </HelmetProvider>
   );
 };
 
