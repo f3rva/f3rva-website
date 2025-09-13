@@ -2,6 +2,8 @@ import React from 'react';
 import { Link } from 'react-router-dom';
 import { MdGroups, MdOutlineDirectionsRun, MdOutlinePinDrop, MdMoneyOff, MdPeople, MdHandshake, MdForum } from 'react-icons/md';
 import { WiDayShowers } from "react-icons/wi";
+import SEO from '../../components/SEO';
+import { generateOrganizationSchema, generateWebsiteSchema, F3RVA_ORGANIZATION_DATA, F3RVA_WEBSITE_DATA } from '../../utils/structuredData';
 import './home.css';
 
 /**
@@ -10,8 +12,25 @@ import './home.css';
  * Serves as the primary landing page for new visitors
  */
 const HomePage: React.FC = () => {
+  const organizationSchema = generateOrganizationSchema(F3RVA_ORGANIZATION_DATA);
+  const websiteSchema = generateWebsiteSchema(F3RVA_WEBSITE_DATA);
+  
+  const combinedStructuredData = {
+    '@context': 'https://schema.org',
+    '@graph': [organizationSchema, websiteSchema]
+  };
+
   return (
     <>
+      <SEO
+        title="F3RVA - Always 70 and Sunny"
+        description="F3RVA - Fitness, Fellowship, Faith in Richmond, Virginia. Join free community workouts for men. Building stronger men through fitness, fellowship, and faith."
+        keywords={['f3', 'fitness', 'fellowship', 'faith', 'richmond', 'virginia', 'community', 'men', 'workout', 'free', 'bootcamp', 'exercise']}
+        image="/images/dogpile-flag-1024x1024.jpg"
+        url="https://f3rva.org"
+        type="website"
+        structuredData={combinedStructuredData}
+      />
       <section className="fullwidth-hero-section">
         <img 
           src="/images/dogpile-flag-1024x1024.jpg" 

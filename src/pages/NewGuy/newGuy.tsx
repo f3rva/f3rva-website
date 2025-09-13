@@ -1,5 +1,7 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
+import SEO from '../../components/SEO';
+import { generateBreadcrumbSchema } from '../../utils/structuredData';
 import './newGuy.css';
 
 /**
@@ -8,8 +10,35 @@ import './newGuy.css';
  * Helps new participants understand expectations and feel welcome
  */
 const NewGuyPage: React.FC = () => {
+  const breadcrumbData = {
+    itemListElement: [
+      {
+        '@type': 'ListItem',
+        position: 1,
+        name: 'Home',
+        item: 'https://f3rva.org'
+      },
+      {
+        '@type': 'ListItem',
+        position: 2,
+        name: 'New Guy',
+        item: 'https://f3rva.org/new-guy'
+      }
+    ]
+  };
+
+  const breadcrumbSchema = generateBreadcrumbSchema(breadcrumbData);
+
   return (
     <div className="fng-page-container">
+      <SEO
+        title="New Guy Guide - Start Your F3 Journey"
+        description="New to F3RVA? Learn what to expect at your first workout, what to bring, and how to get started with our welcoming community in Richmond, Virginia."
+        keywords={['f3rva', 'new guy', 'first workout', 'getting started', 'fng', 'richmond', 'virginia', 'fitness', 'newcomer', 'guide']}
+        url="https://f3rva.org/new-guy"
+        type="website"
+        structuredData={breadcrumbSchema}
+      />
       <section className="fng-hero-section">
         <div className="hero-content-wrapper">
           <h2 className="fng-main-heading">Welcome, FNG!</h2>

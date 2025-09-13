@@ -1,4 +1,6 @@
 import React, { useState } from 'react';
+import SEO from '../../components/SEO';
+import { generateBreadcrumbSchema } from '../../utils/structuredData';
 import './schedule.css';
 import workoutDataJson from './workoutData.json';
 
@@ -8,8 +10,35 @@ import workoutDataJson from './workoutData.json';
  * Helps visitors find and join local workout groups
  */
 const SchedulePage: React.FC = () => {
+  const breadcrumbData = {
+    itemListElement: [
+      {
+        '@type': 'ListItem',
+        position: 1,
+        name: 'Home',
+        item: 'https://f3rva.org'
+      },
+      {
+        '@type': 'ListItem',
+        position: 2,
+        name: 'Schedule',
+        item: 'https://f3rva.org/schedule'
+      }
+    ]
+  };
+
+  const breadcrumbSchema = generateBreadcrumbSchema(breadcrumbData);
+
   return (
     <div className="schedule-page-container">
+      <SEO
+        title="Workout Schedule"
+        description="Find free F3RVA workout times and locations throughout Richmond, Virginia. Join peer-led fitness groups for men of all fitness levels. Always free, always outdoors."
+        keywords={['f3rva', 'schedule', 'workout', 'times', 'locations', 'richmond', 'virginia', 'fitness', 'bootcamp', 'free', 'men', 'exercise']}
+        url="https://f3rva.org/schedule"
+        type="website"
+        structuredData={breadcrumbSchema}
+      />
       <section className="schedule-hero-section">
         <div className="hero-content-wrapper">
           <h2 className="schedule-main-heading">Workout Schedule</h2>

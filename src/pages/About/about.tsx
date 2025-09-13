@@ -1,4 +1,6 @@
 import React from 'react';
+import SEO from '../../components/SEO';
+import { generateBreadcrumbSchema } from '../../utils/structuredData';
 import './about.css';
 
 /**
@@ -7,8 +9,35 @@ import './about.css';
  * Educates visitors about the F3 movement and Richmond chapter specifics
  */
 const AboutPage: React.FC = () => {
+  const breadcrumbData = {
+    itemListElement: [
+      {
+        '@type': 'ListItem',
+        position: 1,
+        name: 'Home',
+        item: 'https://f3rva.org'
+      },
+      {
+        '@type': 'ListItem',
+        position: 2,
+        name: 'About',
+        item: 'https://f3rva.org/about'
+      }
+    ]
+  };
+
+  const breadcrumbSchema = generateBreadcrumbSchema(breadcrumbData);
+
   return (
     <div className="about-page-container">
+      <SEO
+        title="About F3RVA"
+        description="Learn about F3RVA's mission, history, and values. Discover how we're transforming men and communities in Richmond, Virginia through fitness, fellowship, and faith."
+        keywords={['f3rva', 'about', 'mission', 'history', 'values', 'fitness', 'fellowship', 'faith', 'richmond', 'virginia', 'community', 'men']}
+        url="https://f3rva.org/about"
+        type="website"
+        structuredData={breadcrumbSchema}
+      />
       <section className="about-hero-section">
         <div className="hero-content-wrapper">
           <h2 className="about-main-heading">About F3RVA</h2>

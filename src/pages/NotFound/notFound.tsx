@@ -1,6 +1,7 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
 import { MdHome, MdSearch, MdArrowBack } from 'react-icons/md';
+import { Helmet } from 'react-helmet-async';
 import './notFound.css';
 
 /**
@@ -11,6 +12,11 @@ import './notFound.css';
 const NotFoundPage: React.FC = () => {
   return (
     <div className="not-found-page-container">
+      <Helmet>
+        <title>Page Not Found | F3RVA</title>
+        <meta name="description" content="The page you're looking for doesn't exist. Find your way back to F3RVA workouts and community." />
+        <meta name="robots" content="noindex, nofollow" />
+      </Helmet>
       <section className="not-found-hero-section">
         <div className="hero-content-wrapper">
           <div className="error-code">404</div>

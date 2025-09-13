@@ -1,15 +1,40 @@
 {
-  "short_name": "F3RVA App",
-  "name": "Initial F3RVA Application",
+  "short_name": "F3RVA",
+  "name": "F3RVA - Always 70 and Sunny",
+  "description": "F3RVA - Fitness, Fellowship, Faith in Richmond, Virginia. Building stronger men through community workouts and leadership development.",
   "icons": [
     {
+      "src": "images/f3-logo.webp",
+      "sizes": "192x192",
+      "type": "image/webp",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "images/f3-logo.webp",
+      "sizes": "512x512",
+      "type": "image/webp",
+      "purpose": "any maskable"
+    },
+    {
       "src": "images/cropped-f3-150x150.png",
-      "sizes": "64x64 32x32 24x24 16x16",
-      "type": "image/x-icon"
+      "sizes": "150x150",
+      "type": "image/png"
     }
   ],
-  "start_url": ".",
+  "start_url": "/",
   "display": "standalone",
-  "theme_color": "#000000",
-  "background_color": "#ffffff"
+  "theme_color": "#343a40",
+  "background_color": "#ffffff",
+  "orientation": "portrait-primary",
+  "scope": "/",
+  "lang": "en-US",
+  "categories": ["fitness", "health", "lifestyle", "social"],
+  "screenshots": [
+    {
+      "src": "images/dogpile-flag-1024x1024.jpg",
+      "sizes": "1024x1024",
+      "type": "image/jpeg",
+      "form_factor": "wide"
+    }
+  ]
 }
