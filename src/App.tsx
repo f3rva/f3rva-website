@@ -1,6 +1,7 @@
 import React from 'react';
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import MainSiteLayout from './components/Layout';
+import GoogleAnalytics from './components/GoogleAnalytics';
 import HomePage from './pages/Home/home';
 import AboutPage from './pages/About/about';
 import SchedulePage from './pages/Schedule/schedule';
@@ -17,6 +18,7 @@ const App: React.FC = () => {
   return (
     <div className="App">
       <Router>
+        <GoogleAnalytics />
         <MainSiteLayout>
           <Routes>
             <Route path="/" element={<HomePage />} />

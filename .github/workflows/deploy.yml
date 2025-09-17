@@ -62,6 +62,11 @@ jobs:
           cp ./site/robots-dev.txt ./site/robots.txt
           echo "Using development robots.txt - blocking all crawlers"
 
+      - name: Configure Google Analytics for development
+        run: |
+          sed -i "s/G-XXXXXXXXXX/${{ secrets.DEV_GOOGLE_ANALYTICS_ID }}/g" ./site/index.html
+          echo "Configured Google Analytics ID for development"
+
       - name: Configure AWS credentials (OIDC / role for dev)
         uses: aws-actions/configure-aws-credentials@v4
         with:
@@ -98,6 +103,11 @@ jobs:
         run: |
           cp ./site/robots-prod.txt ./site/robots.txt
           echo "Using production robots.txt - allowing crawlers"
+
+      - name: Configure Google Analytics for production
+        run: |
+          sed -i "s/G-XXXXXXXXXX/${{ secrets.PROD_GOOGLE_ANALYTICS_ID }}/g" ./site/index.html
+          echo "Configured Google Analytics ID for production"
 
       - name: Configure AWS credentials (OIDC / role for prod)
         uses: aws-actions/configure-aws-credentials@v4
