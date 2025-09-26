@@ -1,8 +1,22 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import SEO from '../../components/SEO';
 import { generateBreadcrumbSchema } from '../../utils/structuredData';
 import './schedule.css';
 import workoutDataJson from './workoutData.json';
+
+// Custom hook to detect mobile breakpoint (e.g., < 768px)
+function useIsMobile(breakpoint = 768) {
+  const [isMobile, setIsMobile] = useState(false);
+
+  useEffect(() => {
+    const checkMobile = () => setIsMobile(window.innerWidth < breakpoint);
+    checkMobile();
+    window.addEventListener('resize', checkMobile);
+    return () => window.removeEventListener('resize', checkMobile);
+  }, [breakpoint]);
+
+  return isMobile;
+}
 
 /**
  * Schedule page component for F3 RVA website
@@ -28,6 +42,12 @@ const SchedulePage: React.FC = () => {
   };
 
   const breadcrumbSchema = generateBreadcrumbSchema(breadcrumbData);
+  const isMobile = useIsMobile();
+
+  // Choose src based on breakpoint
+  const mapSrc = isMobile
+    ? "https://map.f3nation.com/?lat=37.521167&lon=-77.35183535&zoom=9" // mobile version
+    : "https://map.f3nation.com/?lat=37.521167&lon=-77.41183535&zoom=10"; // desktop version
 
   return (
     <div className="schedule-page-container">
@@ -61,7 +81,7 @@ const SchedulePage: React.FC = () => {
         <div className="map-container">
           <iframe 
             style={{border: '1px solid #aaa'}} 
-            src="https://map.f3nation.com/?lat=37.521167&amp;lon=-77.41183535&amp;zoom=11" 
+            src={mapSrc}
             width="100%" 
             height="650" 
             allow="geolocation"
