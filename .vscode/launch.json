@@ -1,0 +1,12 @@
+{
+    "version": "0.2.0",
+    "configurations": [
+        {
+            "type": "chrome", // or "msedge" if you prefer Microsoft Edge
+            "request": "launch",
+            "name": "Launch Vite React App (Port 3000)",
+            "url": "http://localhost:3000", // ⬅️ Changed from 5173 to 3000
+            "webRoot": "${workspaceFolder}"
+        }
+    ]
+}
