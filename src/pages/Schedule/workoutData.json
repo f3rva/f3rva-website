@@ -409,6 +409,18 @@
       "notes": ""
     },
     {
+      "location": "Bon Air Elementary School",
+      "locationURL": "https://maps.app.goo.gl/HLDJ9GART3gxd26S7",
+      "name": "Bon Iron",
+      "tagURL": "/tag/bon-iron/",
+      "dayOfWeek": "Saturday",
+      "startTime": "0600",
+      "endTime": "0645",
+      "workoutStyle": "Bootcamp",
+      "siteQ": "Machismo",
+      "notes": "Meet by the lighted kiosk for Bon Air Elementary School just off McRae Rd"
+    },
+    {
       "location": "Atlee High School",
       "locationURL": "https://goo.gl/maps/qbBzHkz9NB12",
       "name": "DaPile",
