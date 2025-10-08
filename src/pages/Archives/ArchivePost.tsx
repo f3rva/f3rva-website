@@ -1,9 +1,32 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { useParams, Navigate } from 'react-router-dom';
 import { MdCalendarToday, MdPerson, MdGroup, MdLocationOn } from 'react-icons/md';
 import SEO from '../../components/SEO';
-import { getPostByDateAndSlug } from '../../data/archiveData';
 import './ArchivePost.css';
+
+/**
+ * Interface for workout post data structure from API
+ */
+interface WorkoutPost {
+  workoutId: number;
+  backblastUrl: string;
+  title: string;
+  slug: string;
+  ao: Array<{
+    id: number;
+    description: string;
+  }>;
+  q: Array<{
+    memberId: number;
+    f3Name: string;
+  }>;
+  pax: Array<{
+    memberId: number;
+    f3Name: string;
+  }>;
+  workoutDate: string;
+  content: string;
+}
 
 /**
  * Archive post component for displaying individual workout backblast posts
@@ -18,8 +41,74 @@ const ArchivePost: React.FC = () => {
     slug: string;
   }>();
 
-  // Get the post data based on URL parameters
-  const post = getPostByDateAndSlug(year!, month!, day!, slug!);
+  // State management for post data, loading, and errors
+  const [post, setPost] = useState<WorkoutPost | null>(null);
+  const [loading, setLoading] = useState<boolean>(true);
+  const [error, setError] = useState<string | null>(null);
+
+  // Fetch post data from API
+  useEffect(() => {
+    const controller = new AbortController();
+    
+    const fetchPost = async () => {
+      console.log('Fetching post with params:', { year, month, day, slug });
+      if (!year || !month || !day || !slug) {
+        setError('Invalid URL parameters');
+        setLoading(false);
+        return;
+      }
+
+      try {
+        setLoading(true);
+        setError(null);
+
+        // Construct the API URL - you may need to adjust this base URL
+        const baseUrl = import.meta.env.VITE_API_BASE_URL || 'http://localhost:9000';
+        const apiUrl = `${baseUrl}/api/v2/getWorkoutByDateSlug.php?year=${year}&month=${month}&day=${day}&slug=${slug}`;
+        
+        const response = await fetch(apiUrl);
+
+        if (!response.ok) {
+          throw new Error(`HTTP error! status: ${response.status}`);
+        }
+
+        const postData: WorkoutPost = await response.json();
+        setPost(postData);
+      } catch (err) {
+        setError(err instanceof Error ? err.message : 'Failed to fetch post');
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchPost();
+
+    // Cleanup function
+    return () => {
+      controller.abort();
+    };
+  }, [year, month, day, slug]);
+
+  // Loading state
+  if (loading) {
+    return (
+      <div className="archive-post-container">
+        <div className="loading-spinner">Loading post...</div>
+      </div>
+    );
+  }
+
+  // Error state
+  if (error) {
+    return (
+      <div className="archive-post-container">
+        <div className="error-message">
+          <h2>Error loading post</h2>
+          <p>{error}</p>
+        </div>
+      </div>
+    );
+  }
 
   // If post not found, redirect to 404
   if (!post) {
@@ -51,7 +140,10 @@ const ArchivePost: React.FC = () => {
       <SEO
         title={`${post.title} - F3RVA Archives`}
         description={getPostExcerpt(post.content)}
-        keywords={['f3', 'workout', 'backblast', 'fitness', 'richmond', 'virginia', ...post.qic, ...post.ao]}
+        keywords={[
+          'f3', 'workout', 'backblast', 'fitness', 'richmond', 'virginia',
+          ...post.ao.map(ao => ao.description)
+        ]}
         url={`https://f3rva.org/${year}/${month}/${day}/${slug}`}
         type="article"
       />
@@ -68,7 +160,7 @@ const ArchivePost: React.FC = () => {
               </div>
               <div className="metadata-content">
                 <span className="metadata-label">Date</span>
-                <span className="metadata-value">{formatDisplayDate(post.date)}</span>
+                <span className="metadata-value">{formatDisplayDate(post.workoutDate)}</span>
               </div>
             </div>
 
@@ -77,12 +169,12 @@ const ArchivePost: React.FC = () => {
                 <MdPerson />
               </div>
               <div className="metadata-content">
-                <span className="metadata-label">QIC{post.qic.length > 1 ? 's' : ''}</span>
+                <span className="metadata-label">QIC{post.q.length > 1 ? 's' : ''}</span>
                 <div className="metadata-value-list">
-                  {post.qic.map((qic, index) => (
-                    <span key={index} className="metadata-value">
-                      {qic}
-                      {index < post.qic.length - 1 && ', '}
+                  {post.q.map((qic, index) => (
+                    <span key={qic.memberId} className="metadata-value">
+                      {qic.f3Name}
+                      {index < post.q.length - 1 && ', '}
                     </span>
                   ))}
                 </div>
@@ -97,8 +189,8 @@ const ArchivePost: React.FC = () => {
                 <span className="metadata-label">AO{post.ao.length > 1 ? 's' : ''}</span>
                 <div className="metadata-value-list">
                   {post.ao.map((ao, index) => (
-                    <span key={index} className="metadata-value">
-                      {ao}
+                    <span key={ao.id} className="metadata-value">
+                      {ao.description}
                       {index < post.ao.length - 1 && ', '}
                     </span>
                   ))}
@@ -114,8 +206,8 @@ const ArchivePost: React.FC = () => {
                 <span className="metadata-label">PAX ({post.pax.length})</span>
                 <div className="pax-list">
                   {post.pax.map((paxMember, index) => (
-                    <span key={index} className="pax-member">
-                      {paxMember}
+                    <span key={paxMember.memberId} className="pax-member">
+                      {paxMember.f3Name}
                       {index < post.pax.length - 1 && ', '}
                     </span>
                   ))}
@@ -137,7 +229,7 @@ const ArchivePost: React.FC = () => {
         <footer className="post-footer-section">
           <div className="post-author-info">
             <span className="author-label">Posted by:</span>
-            <span className="author-name">{post.author}</span>
+            <span className="author-name">{post.q[0]?.f3Name || 'Unknown'}</span>
           </div>
         </footer>
       </article>
