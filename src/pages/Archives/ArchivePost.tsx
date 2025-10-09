@@ -1,32 +1,10 @@
 import React, { useState, useEffect } from 'react';
 import { useParams, Navigate } from 'react-router-dom';
 import { MdCalendarToday, MdPerson, MdGroup, MdLocationOn } from 'react-icons/md';
+import { config } from '../../config';
+import { WorkoutPost } from '../../types/WorkoutPost';
 import SEO from '../../components/SEO';
 import './ArchivePost.css';
-
-/**
- * Interface for workout post data structure from API
- */
-interface WorkoutPost {
-  workoutId: number;
-  backblastUrl: string;
-  title: string;
-  slug: string;
-  ao: Array<{
-    id: number;
-    description: string;
-  }>;
-  q: Array<{
-    memberId: number;
-    f3Name: string;
-  }>;
-  pax: Array<{
-    memberId: number;
-    f3Name: string;
-  }>;
-  workoutDate: string;
-  content: string;
-}
 
 /**
  * Archive post component for displaying individual workout backblast posts
@@ -62,9 +40,8 @@ const ArchivePost: React.FC = () => {
         setLoading(true);
         setError(null);
 
-        // Construct the API URL - you may need to adjust this base URL
-        const baseUrl = import.meta.env.VITE_API_BASE_URL || 'http://localhost:9000';
-        const apiUrl = `${baseUrl}/api/v2/getWorkoutByDateSlug.php?year=${year}&month=${month}&day=${day}&slug=${slug}`;
+        // Construct the API URL based on parameters
+        const apiUrl = `${config.apiBaseUrl}/api/v2/getWorkoutByDateSlug.php?year=${year}&month=${month}&day=${day}&slug=${slug}`;
         
         const response = await fetch(apiUrl);
 
