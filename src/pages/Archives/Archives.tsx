@@ -110,7 +110,7 @@ const Archives: React.FC = () => {
           <h1 className="archives-main-title">Workout Archives</h1>
           <p className="archives-description">
             Relive the pain and glory of past F3RVA workouts. Browse backblasts from
-            our QICs and PAX across the Richmond region.
+            across the region.
           </p>
         </header>
 
