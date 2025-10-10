@@ -1,12 +1,9 @@
 import React, { useState, useEffect } from 'react';
-import { Link } from 'react-router-dom';
-import { MdCalendarToday, MdPerson, MdGroup, MdLocationOn } from 'react-icons/md';
 import SEO from '../../components/SEO';
 import { config } from '../../config';
 import { WorkoutPost } from '../../types/WorkoutPost';
-import { formatDisplayDate, formatDateForUrl } from '../../utils/dateUtils';
-import { getPostExcerpt } from '../../utils/postUtils';
 import Pagination from '../../components/Pagination';
+import ArchivePostCard from '../../components/ArchivePostCard';
 import './Archives.css';
 
 /**
@@ -120,67 +117,9 @@ const Archives: React.FC = () => {
         {/* Archives Grid */}
         <main className="archives-content-section">
           <div className="archives-posts-grid">
-            {posts.map((post) => {
-              const { year, month, day } = formatDateForUrl(post.workoutDate);
-              const postUrl = `/${year}/${month}/${day}/${post.slug}`;
-
-              // Extract display data from WorkoutPost structure
-              const qicNames = post.q.map(q => q.f3Name);
-              const aoNames = post.ao.map(ao => ao.description);
-              const paxCount = post.paxCount || 0;
-
-              return (
-                <article key={post.workoutId} className="archive-post-card">
-                  <Link to={postUrl} className="post-card-link">
-                    {/* Card Header */}
-                    <header className="card-header">
-                      <h2 className="card-title">{post.title}</h2>
-                      <div className="card-date">
-                        <MdCalendarToday className="date-icon" />
-                        <span>{formatDisplayDate(post.workoutDate)}</span>
-                      </div>
-                    </header>
-
-                    {/* Card Metadata */}
-                    <div className="card-metadata">
-                      <div className="metadata-row">
-                        <div className="metadata-item">
-                          <MdPerson className="metadata-icon" />
-                          <span className="metadata-text">
-                            <strong>QIC{qicNames.length > 1 ? 's' : ''}:</strong> {qicNames.join(', ')}
-                          </span>
-                        </div>
-                        <div className="metadata-item">
-                          <MdLocationOn className="metadata-icon" />
-                          <span className="metadata-text">
-                            <strong>AO{aoNames.length > 1 ? 's' : ''}:</strong> {aoNames.join(', ')}
-                          </span>
-                        </div>
-                      </div>
-                      <div className="metadata-item metadata-pax-item">
-                        <MdGroup className="metadata-icon" />
-                        <span className="metadata-text">
-                          <strong>PAX:</strong> {paxCount} participant{paxCount !== 1 ? 's' : ''}
-                        </span>
-                      </div>
-                    </div>
-
-                    {/* Card Content Preview */}
-                    <div className="card-content">
-                      <p className="card-excerpt">
-                        {getPostExcerpt(post.content)}
-                      </p>
-                    </div>
-
-                    {/* Card Footer */}
-                    <footer className="card-footer">
-                      <span className="card-author">By {post.author}</span>
-                      <span className="read-more-text">Read more →</span>
-                    </footer>
-                  </Link>
-                </article>
-              );
-            })}
+            {posts.map((post) => (
+              <ArchivePostCard key={post.workoutId} post={post} />
+            ))}
           </div>
 
           {/* Pagination Controls */}
