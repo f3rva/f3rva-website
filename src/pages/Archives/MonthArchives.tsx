@@ -122,10 +122,11 @@ const MonthArchives: React.FC = () => {
       <div className="archives-container">
         {/* Page Header */}
         <header className="archives-header-section">
-          <h1 className="archives-main-title">{monthYearDisplay} Workout Archives</h1>
+          <h1 className="archives-main-title">Workout Archives</h1>
+          <h2 className="archives-subtitle">{monthYearDisplay}</h2>
+          
           <p className="archives-description">
-            Relive the workouts from {monthYearDisplay}. Browse backblasts from our QICs and PAX
-            across the Richmond region during this month.
+            Relive workouts from this month across the Richmond region.
           </p>
 
           {/* Breadcrumb Navigation */}

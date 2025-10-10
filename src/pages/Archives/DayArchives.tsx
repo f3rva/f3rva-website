@@ -1,11 +1,11 @@
 import React, { useState, useEffect } from 'react';
 import { Link, useParams, Navigate } from 'react-router-dom';
-import SEO from '../../components/SEO';
 import { config } from '../../config';
-import { WorkoutPost } from '../../types/WorkoutPost';
 import { formatDateDisplay } from '../../utils/dateUtils';
-import Pagination from '../../components/Pagination';
+import { WorkoutPost } from '../../types/WorkoutPost';
 import ArchivePostCard from '../../components/ArchivePostCard';
+import Pagination from '../../components/Pagination';
+import SEO from '../../components/SEO';
 import './Archives.css';
 
 /**
@@ -124,10 +124,11 @@ const DayArchives: React.FC = () => {
       <div className="archives-container">
         {/* Page Header */}
         <header className="archives-header-section">
-          <h1 className="archives-main-title">{dateDisplay} Workout Archives</h1>
+          <h1 className="archives-main-title">Workout Archives</h1>
+          <h2 className="archives-subtitle">{dateDisplay}</h2>
+          
           <p className="archives-description">
-            All workouts from {dateDisplay}. Browse backblasts from our QICs and PAX
-            across the Richmond region on this date.
+            Browse all workouts from this date across the Richmond region.
           </p>
 
           {/* Breadcrumb Navigation */}
