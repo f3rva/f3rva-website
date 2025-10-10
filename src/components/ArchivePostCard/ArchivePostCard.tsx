@@ -1,6 +1,6 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
-import { MdCalendarToday, MdPerson, MdGroup, MdLocationOn } from 'react-icons/md';
+import { MdCalendarToday } from 'react-icons/md';
 import { WorkoutPost } from '../../types/WorkoutPost';
 import { formatDisplayDate, formatDateForUrl } from '../../utils/dateUtils';
 import { getPostExcerpt } from '../../utils/postUtils';
@@ -47,20 +47,17 @@ const ArchivePostCard: React.FC<ArchivePostCardProps> = ({ post }) => {
         <div className="card-metadata">
           <div className="metadata-row">
             <div className="metadata-item">
-              <MdPerson className="metadata-icon" />
               <span className="metadata-text">
                 <strong>QIC{qicNames.length > 1 ? 's' : ''}:</strong> {qicNames.join(', ')}
               </span>
             </div>
             <div className="metadata-item">
-              <MdLocationOn className="metadata-icon" />
               <span className="metadata-text">
                 <strong>AO{aoNames.length > 1 ? 's' : ''}:</strong> {aoNames.join(', ')}
               </span>
             </div>
           </div>
           <div className="metadata-item metadata-pax-item">
-            <MdGroup className="metadata-icon" />
             <span className="metadata-text">
               {hasPaxCount ? (
                 <><strong>PAX:</strong> {paxCount} participant{paxCount !== 1 ? 's' : ''}</>
