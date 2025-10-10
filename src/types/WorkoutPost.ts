@@ -37,6 +37,9 @@ export interface WorkoutPost {
   /** Title of the workout post */
   title: string;
 
+  /** Author of the post */
+  author: string;
+
   /** URL-friendly slug for the post */
   slug: string;
 

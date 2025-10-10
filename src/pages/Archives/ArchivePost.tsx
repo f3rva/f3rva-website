@@ -206,7 +206,7 @@ const ArchivePost: React.FC = () => {
         <footer className="post-footer-section">
           <div className="post-author-info">
             <span className="author-label">Posted by:</span>
-            <span className="author-name">{post.q[0]?.f3Name || 'Unknown'}</span>
+            <span className="author-name">{post.author || 'Unknown'}</span>
           </div>
         </footer>
       </article>
