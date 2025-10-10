@@ -49,8 +49,11 @@ export interface WorkoutPost {
   /** Array of QICs (Q In Charge - workout leaders) */
   q: WorkoutMember[];
 
-  /** Array of PAX (participants in the workout) */
-  pax: WorkoutMember[];
+  /** Array of PAX (participants in the workout) - only available in detailed post views */
+  pax?: WorkoutMember[];
+
+  /** Count of PAX participants - available in listing views when pax array is not populated */
+  paxCount?: number;
 
   /** Date when the workout occurred (ISO string format) */
   workoutDate: string;

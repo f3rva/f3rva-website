@@ -1,8 +1,11 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { Link, useParams, Navigate } from 'react-router-dom';
 import { MdCalendarToday, MdPerson, MdGroup, MdLocationOn } from 'react-icons/md';
 import SEO from '../../components/SEO';
-import { getPostsByYearMonthDay, formatDateForUrl } from '../../data/archiveData';
+import { config } from '../../config';
+import { WorkoutPost } from '../../types/WorkoutPost';
+import { formatDisplayDate, formatDateForUrl, formatDateDisplay } from '../../utils/dateUtils';
+import { getPostExcerpt } from '../../utils/postUtils';
 import './Archives.css';
 
 /**
@@ -13,45 +16,81 @@ import './Archives.css';
 const DayArchives: React.FC = () => {
   const { year, month, day } = useParams<{ year: string; month: string; day: string }>();
 
+  // State management for posts, loading, and errors
+  const [posts, setPosts] = useState<WorkoutPost[]>([]);
+  const [loading, setLoading] = useState<boolean>(true);
+  const [error, setError] = useState<string | null>(null);
+
+  // Fetch posts data from API
+  useEffect(() => {
+    if (!year || !month || !day) {
+      return;
+    }
+
+    const controller = new AbortController();
+
+    const fetchPosts = async () => {
+      try {
+        setLoading(true);
+        setError(null);
+
+        // Construct the API URL for posts by date
+        const apiUrl = `${config.apiBaseUrl}/api/v2/getWorkoutsByDate.php?year=${year}&month=${month}&day=${day}`;
+
+        const response = await fetch(apiUrl, { signal: controller.signal });
+
+        if (!response.ok) {
+          throw new Error(`HTTP error! status: ${response.status}`);
+        }
+
+        const postsData: WorkoutPost[] = await response.json();
+        setPosts(postsData);
+      } catch (err) {
+        if (err instanceof Error && err.name !== 'AbortError') {
+          setError(err.message || 'Failed to fetch posts');
+        }
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchPosts();
+
+    // Cleanup function
+    return () => {
+      controller.abort();
+    };
+  }, [year, month, day]);
+
+  // Return early if invalid parameters
   if (!year || !month || !day) {
     return <Navigate to="/archives" replace />;
   }
 
-  // Get posts for the specified date
-  const posts = getPostsByYearMonthDay(year, month, day);
-
   // Sort posts by title for consistent ordering on same day
   const sortedPosts = [...posts].sort((a, b) => a.title.localeCompare(b.title));
 
-  // Format date for display
-  const formatDateDisplay = (year: string, month: string, day: string): string => {
-    const date = new Date(parseInt(year), parseInt(month) - 1, parseInt(day));
-    return date.toLocaleDateString('en-US', {
-      weekday: 'long',
-      year: 'numeric',
-      month: 'long',
-      day: 'numeric'
-    });
-  };
 
-  // Format short date for display
-  const formatDisplayDate = (dateString: string): string => {
-    const date = new Date(dateString);
-    return date.toLocaleDateString('en-US', {
-      weekday: 'short',
-      year: 'numeric',
-      month: 'short',
-      day: 'numeric'
-    });
-  };
+  // Loading state
+  if (loading) {
+    return (
+      <div className="archives-container">
+        <div className="loading-spinner">Loading day archives...</div>
+      </div>
+    );
+  }
 
-  // Create excerpt from content
-  const getPostExcerpt = (content: string): string => {
-    const textContent = content.replace(/<[^>]*>/g, '');
-    return textContent.length > 200
-      ? textContent.substring(0, 200).trim() + '...'
-      : textContent;
-  };
+  // Error state
+  if (error) {
+    return (
+      <div className="archives-container">
+        <div className="error-message">
+          <h2>Error loading day archives</h2>
+          <p>{error}</p>
+        </div>
+      </div>
+    );
+  }
 
   const dateDisplay = formatDateDisplay(year, month, day);
   const monthName = new Date(parseInt(year), parseInt(month) - 1).toLocaleDateString('en-US', { month: 'long' });
@@ -92,18 +131,23 @@ const DayArchives: React.FC = () => {
           {sortedPosts.length > 0 ? (
             <div className="archives-posts-grid">
               {sortedPosts.map((post) => {
-                const { year: postYear, month: postMonth, day: postDay } = formatDateForUrl(post.date);
+                const { year: postYear, month: postMonth, day: postDay } = formatDateForUrl(post.workoutDate);
                 const postUrl = `/${postYear}/${postMonth}/${postDay}/${post.slug}`;
 
+                // Extract display data from WorkoutPost structure
+                const qicNames = post.q.map(q => q.f3Name);
+                const aoNames = post.ao.map(ao => ao.description);
+                const paxCount = post.paxCount || 0;
+
                 return (
-                  <article key={post.id} className="archive-post-card">
+                  <article key={post.workoutId} className="archive-post-card">
                     <Link to={postUrl} className="post-card-link">
                       {/* Card Header */}
                       <header className="card-header">
                         <h2 className="card-title">{post.title}</h2>
                         <div className="card-date">
                           <MdCalendarToday className="date-icon" />
-                          <span>{formatDisplayDate(post.date)}</span>
+                          <span>{formatDisplayDate(post.workoutDate)}</span>
                         </div>
                       </header>
 
@@ -113,20 +157,20 @@ const DayArchives: React.FC = () => {
                           <div className="metadata-item">
                             <MdPerson className="metadata-icon" />
                             <span className="metadata-text">
-                              <strong>QIC{post.qic.length > 1 ? 's' : ''}:</strong> {post.qic.join(', ')}
+                              <strong>QIC{qicNames.length > 1 ? 's' : ''}:</strong> {qicNames.join(', ')}
                             </span>
                           </div>
                           <div className="metadata-item">
                             <MdLocationOn className="metadata-icon" />
                             <span className="metadata-text">
-                              <strong>AO{post.ao.length > 1 ? 's' : ''}:</strong> {post.ao.join(', ')}
+                              <strong>AO{aoNames.length > 1 ? 's' : ''}:</strong> {aoNames.join(', ')}
                             </span>
                           </div>
                         </div>
                         <div className="metadata-item metadata-pax-item">
                           <MdGroup className="metadata-icon" />
                           <span className="metadata-text">
-                            <strong>PAX ({post.pax.length}):</strong> {post.pax.join(', ')}
+                            <strong>PAX:</strong> {paxCount} participant{paxCount !== 1 ? 's' : ''}
                           </span>
                         </div>
                       </div>
