@@ -6,6 +6,7 @@ import { config } from '../../config';
 import { WorkoutPost } from '../../types/WorkoutPost';
 import { formatDisplayDate, formatDateForUrl } from '../../utils/dateUtils';
 import { getPostExcerpt } from '../../utils/postUtils';
+import Pagination from '../../components/Pagination';
 import './Archives.css';
 
 /**
@@ -21,7 +22,12 @@ const YearArchives: React.FC = () => {
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
 
-  // Fetch posts data from API
+  // Pagination state
+  const [currentPage, setCurrentPage] = useState<number>(1);
+  const [resultsPerPage, setResultsPerPage] = useState<number>(10);
+  const [hasMoreResults, setHasMoreResults] = useState<boolean>(true);
+
+  // Fetch posts data from API with pagination
   useEffect(() => {
     if (!year) {
       return;
@@ -33,8 +39,8 @@ const YearArchives: React.FC = () => {
         setLoading(true);
         setError(null);
 
-        // Construct the API URL for posts by year
-        const apiUrl = `${config.apiBaseUrl}/api/v2/getWorkoutsByDate.php?year=${year}`;
+        // Construct the API URL for posts by year with pagination
+        const apiUrl = `${config.apiBaseUrl}/api/v2/getWorkoutsByDate.php?year=${year}&page=${currentPage}&results=${resultsPerPage}`;
 
         const response = await fetch(apiUrl, { signal: controller.signal });
 
@@ -44,6 +50,10 @@ const YearArchives: React.FC = () => {
 
         const postsData: WorkoutPost[] = await response.json();
         setPosts(postsData);
+
+        // Determine if there are more results based on returned data length
+        // If we get fewer results than requested, we've reached the end
+        setHasMoreResults(postsData.length === resultsPerPage);
       } catch (err) {
         if (err instanceof Error && err.name !== 'AbortError') {
           setError(err.message || 'Failed to fetch posts');
@@ -59,17 +69,22 @@ const YearArchives: React.FC = () => {
     return () => {
       controller.abort();
     };
-  }, [year]);
+  }, [year, currentPage, resultsPerPage]);
 
   // Return early if invalid parameters
   if (!year) {
     return <Navigate to="/archives" replace />;
   }
 
-  // Sort posts by date, newest first
-  const sortedPosts = [...posts].sort((a, b) =>
-    new Date(b.workoutDate).getTime() - new Date(a.workoutDate).getTime()
-  );
+  // Pagination handlers
+  const handlePageChange = (newPage: number) => {
+    setCurrentPage(newPage);
+  };
+
+  const handleResultsPerPageChange = (newResultsPerPage: number) => {
+    setResultsPerPage(newResultsPerPage);
+    setCurrentPage(1); // Reset to first page when changing results per page
+  };
 
 
   // Loading state
@@ -122,9 +137,9 @@ const YearArchives: React.FC = () => {
 
         {/* Archives Grid */}
         <main className="archives-content-section">
-          {sortedPosts.length > 0 ? (
+          {posts.length > 0 ? (
             <div className="archives-posts-grid">
-              {sortedPosts.map((post) => {
+              {posts.map((post) => {
                 const { year: postYear, month, day } = formatDateForUrl(post.workoutDate);
                 const postUrl = `/${postYear}/${month}/${day}/${post.slug}`;
 
@@ -187,14 +202,26 @@ const YearArchives: React.FC = () => {
               })}
             </div>
           ) : (
-            <div className="archives-empty-state">
-              <h3>No archives available for {year}</h3>
-              <p>Check back soon for workout backblasts from this year!</p>
-              <Link to="/archives" className="tertiary-action-button">
-                View All Archives
-              </Link>
-            </div>
+            !loading && (
+              <div className="archives-empty-state">
+                <h3>No archives available for {year}</h3>
+                <p>Check back soon for workout backblasts from this year!</p>
+                <Link to="/archives" className="tertiary-action-button">
+                  View All Archives
+                </Link>
+              </div>
+            )
           )}
+
+          {/* Pagination Controls */}
+          <Pagination
+            currentPage={currentPage}
+            resultsPerPage={resultsPerPage}
+            hasMoreResults={hasMoreResults}
+            loading={loading}
+            onPageChange={handlePageChange}
+            onResultsPerPageChange={handleResultsPerPageChange}
+          />
         </main>
       </div>
     </>

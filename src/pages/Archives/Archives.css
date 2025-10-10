@@ -237,6 +237,7 @@
   flex-wrap: wrap;
 }
 
+
 /* Responsive Design */
 @media (max-width: 768px) {
   .archives-header-section {

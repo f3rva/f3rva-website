@@ -6,6 +6,7 @@ import { config } from '../../config';
 import { WorkoutPost } from '../../types/WorkoutPost';
 import { formatDisplayDate, formatDateForUrl, formatDateDisplay } from '../../utils/dateUtils';
 import { getPostExcerpt } from '../../utils/postUtils';
+import Pagination from '../../components/Pagination';
 import './Archives.css';
 
 /**
@@ -21,7 +22,12 @@ const DayArchives: React.FC = () => {
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
 
-  // Fetch posts data from API
+  // Pagination state
+  const [currentPage, setCurrentPage] = useState<number>(1);
+  const [resultsPerPage, setResultsPerPage] = useState<number>(10);
+  const [hasMoreResults, setHasMoreResults] = useState<boolean>(true);
+
+  // Fetch posts data from API with pagination
   useEffect(() => {
     if (!year || !month || !day) {
       return;
@@ -34,8 +40,8 @@ const DayArchives: React.FC = () => {
         setLoading(true);
         setError(null);
 
-        // Construct the API URL for posts by date
-        const apiUrl = `${config.apiBaseUrl}/api/v2/getWorkoutsByDate.php?year=${year}&month=${month}&day=${day}`;
+        // Construct the API URL for posts by date with pagination
+        const apiUrl = `${config.apiBaseUrl}/api/v2/getWorkoutsByDate.php?year=${year}&month=${month}&day=${day}&page=${currentPage}&results=${resultsPerPage}`;
 
         const response = await fetch(apiUrl, { signal: controller.signal });
 
@@ -45,6 +51,10 @@ const DayArchives: React.FC = () => {
 
         const postsData: WorkoutPost[] = await response.json();
         setPosts(postsData);
+
+        // Determine if there are more results based on returned data length
+        // If we get fewer results than requested, we've reached the end
+        setHasMoreResults(postsData.length === resultsPerPage);
       } catch (err) {
         if (err instanceof Error && err.name !== 'AbortError') {
           setError(err.message || 'Failed to fetch posts');
@@ -60,15 +70,22 @@ const DayArchives: React.FC = () => {
     return () => {
       controller.abort();
     };
-  }, [year, month, day]);
+  }, [year, month, day, currentPage, resultsPerPage]);
 
   // Return early if invalid parameters
   if (!year || !month || !day) {
     return <Navigate to="/archives" replace />;
   }
 
-  // Sort posts by title for consistent ordering on same day
-  const sortedPosts = [...posts].sort((a, b) => a.title.localeCompare(b.title));
+  // Pagination handlers
+  const handlePageChange = (newPage: number) => {
+    setCurrentPage(newPage);
+  };
+
+  const handleResultsPerPageChange = (newResultsPerPage: number) => {
+    setResultsPerPage(newResultsPerPage);
+    setCurrentPage(1); // Reset to first page when changing results per page
+  };
 
 
   // Loading state
@@ -128,9 +145,9 @@ const DayArchives: React.FC = () => {
 
         {/* Archives Grid */}
         <main className="archives-content-section">
-          {sortedPosts.length > 0 ? (
+          {posts.length > 0 ? (
             <div className="archives-posts-grid">
-              {sortedPosts.map((post) => {
+              {posts.map((post) => {
                 const { year: postYear, month: postMonth, day: postDay } = formatDateForUrl(post.workoutDate);
                 const postUrl = `/${postYear}/${postMonth}/${postDay}/${post.slug}`;
 
@@ -193,22 +210,34 @@ const DayArchives: React.FC = () => {
               })}
             </div>
           ) : (
-            <div className="archives-empty-state">
-              <h3>No archives available for {dateDisplay}</h3>
-              <p>Check back soon for workout backblasts from this date!</p>
-              <div className="archives-empty-actions">
-                <Link to={`/${year}/${month}`} className="tertiary-action-button">
-                  View {monthName} {year} Archives
-                </Link>
-                <Link to={`/${year}`} className="tertiary-action-button">
-                  View {year} Archives
-                </Link>
-                <Link to="/archives" className="tertiary-action-button">
-                  View All Archives
-                </Link>
+            !loading && (
+              <div className="archives-empty-state">
+                <h3>No archives available for {dateDisplay}</h3>
+                <p>Check back soon for workout backblasts from this date!</p>
+                <div className="archives-empty-actions">
+                  <Link to={`/${year}/${month}`} className="tertiary-action-button">
+                    View {monthName} {year} Archives
+                  </Link>
+                  <Link to={`/${year}`} className="tertiary-action-button">
+                    View {year} Archives
+                  </Link>
+                  <Link to="/archives" className="tertiary-action-button">
+                    View All Archives
+                  </Link>
+                </div>
               </div>
-            </div>
+            )
           )}
+
+          {/* Pagination Controls */}
+          <Pagination
+            currentPage={currentPage}
+            resultsPerPage={resultsPerPage}
+            hasMoreResults={hasMoreResults}
+            loading={loading}
+            onPageChange={handlePageChange}
+            onResultsPerPageChange={handleResultsPerPageChange}
+          />
         </main>
       </div>
     </>
