@@ -59,11 +59,11 @@ const MainNavigationHeader: React.FC = () => {
             <li className="navigation-menu-item">
               <Link to="/new-guy" className="navigation-link" onClick={closeMenu}>New Guy</Link>
             </li>
-            <li className="navigation-menu-item">
+            {/* <li className="navigation-menu-item">
               <Link to="/archives" className="navigation-link" onClick={closeMenu}>Archives</Link>
-            </li>
+            </li> */}
             <li className="navigation-menu-item">
-              <a href="https://backblasts.f3rva.org/locations/richmond-va/" className="navigation-link" target="_blank" rel="noopener noreferrer" onClick={closeMenu}>Backblasts</a>
+              <a href="https://backblasts.f3rva.org/" className="navigation-link" target="_blank" rel="noopener noreferrer" onClick={closeMenu}>Backblasts</a>
             </li>
           </ul>
         </nav>
