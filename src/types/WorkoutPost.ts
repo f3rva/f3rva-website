@@ -55,7 +55,7 @@ export interface WorkoutPost {
   /** Count of PAX participants - available in listing views when pax array is not populated */
   paxCount?: number;
 
-  /** Date when the workout occurred (ISO string format) */
+  /** Date when the workout occurred (YYYY-MM-DD, date-only string) */
   workoutDate: string;
 
   /** Rich text content of the backblast post */
