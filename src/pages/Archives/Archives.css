@@ -1,0 +1,352 @@
+/* Archives page styles for F3 RVA website */
+.archives-container {
+  width: 100%;
+}
+
+/* Archives Header Section */
+.archives-header-section {
+  background-color: white;
+  padding: 3rem 2rem;
+  text-align: center;
+  margin-bottom: 2rem;
+}
+
+.archives-main-title {
+  font-size: 3rem;
+  font-weight: 700;
+  color: #2c3e50;
+  margin: 0 0 1.5rem;
+}
+
+.archives-description {
+  font-size: 1.2rem;
+  line-height: 1.6;
+  color: #666;
+  max-width: 700px;
+  margin: 0 auto;
+}
+
+/* Archives Content Section */
+.archives-content-section {
+  padding: 0 1rem 2rem;
+}
+
+.archives-posts-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 2rem;
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+/* Archive Post Card Styles */
+.archive-post-card {
+  background-color: white;
+  border-radius: 8px;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+  overflow: hidden;
+  height: 100%; /* Ensure cards are same height */
+  display: flex;
+  flex-direction: column;
+}
+
+.archive-post-card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
+}
+
+.post-card-link {
+  text-decoration: none;
+  color: inherit;
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+}
+
+.post-card-link:hover {
+  text-decoration: none;
+  color: inherit;
+}
+
+/* Card Header */
+.card-header {
+  padding: 1.5rem 1.5rem 1rem;
+}
+
+.card-title {
+  font-size: 1.5rem;
+  font-weight: 600;
+  color: #2c3e50;
+  margin: 0 0 1rem;
+  line-height: 1.3;
+}
+
+.card-date {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 0.95rem;
+  color: #666;
+  font-weight: 500;
+}
+
+.date-icon {
+  width: 16px;
+  height: 16px;
+  color: #e74c3c;
+}
+
+/* Card Metadata */
+.card-metadata {
+  padding: 0 1.5rem 1rem;
+}
+
+.metadata-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1rem;
+  margin-bottom: 0.75rem;
+}
+
+.metadata-item {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.5rem;
+  font-size: 0.9rem;
+}
+
+.metadata-item.metadata-pax-item {
+  grid-column: span 2;
+}
+
+.metadata-icon {
+  width: 14px;
+  height: 14px;
+  color: #e74c3c;
+  flex-shrink: 0;
+  margin-top: 0.1rem;
+}
+
+.metadata-text {
+  line-height: 1.4;
+  color: #555;
+}
+
+.metadata-text strong {
+  color: #2c3e50;
+  font-weight: 600;
+}
+
+/* Card Content */
+.card-content {
+  padding: 0 1.5rem 1rem;
+  flex: 1; /* Take remaining space */
+}
+
+.card-excerpt {
+  font-size: 0.95rem;
+  line-height: 1.5;
+  color: #666;
+  margin: 0;
+}
+
+/* Card Footer */
+.card-footer {
+  padding: 1rem 1.5rem;
+  background-color: #f8f9fa;
+  border-top: 1px solid #e9ecef;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-top: auto; /* Push to bottom */
+}
+
+.card-author {
+  font-size: 0.9rem;
+  color: #666;
+  font-weight: 500;
+}
+
+.read-more-text {
+  font-size: 0.9rem;
+  color: #e74c3c;
+  font-weight: 600;
+  transition: color 0.3s ease;
+}
+
+.post-card-link:hover .read-more-text {
+  color: #c0392b;
+}
+
+/* Breadcrumb Navigation */
+.breadcrumb-nav {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  margin-top: 1.5rem;
+  font-size: 0.95rem;
+}
+
+.breadcrumb-link {
+  color: #e74c3c;
+  text-decoration: none;
+  font-weight: 500;
+  transition: color 0.3s ease;
+}
+
+.breadcrumb-link:hover {
+  color: #c0392b;
+  text-decoration: underline;
+}
+
+.breadcrumb-separator {
+  color: #999;
+  font-weight: bold;
+  margin: 0 0.25rem;
+}
+
+.breadcrumb-current {
+  color: #666;
+  font-weight: 500;
+}
+
+/* Empty State */
+.archives-empty-state {
+  text-align: center;
+  padding: 4rem 2rem;
+  color: #666;
+}
+
+.archives-empty-state h3 {
+  font-size: 1.5rem;
+  color: #2c3e50;
+  margin-bottom: 1rem;
+}
+
+.archives-empty-state p {
+  font-size: 1.1rem;
+  margin: 0 0 2rem 0;
+}
+
+.archives-empty-actions {
+  display: flex;
+  gap: 1rem;
+  justify-content: center;
+  flex-wrap: wrap;
+}
+
+
+/* Medium screens - switch to single column for better card sizing */
+@media (max-width: 900px) {
+  .archives-posts-grid {
+    grid-template-columns: 1fr;
+    gap: 1.5rem;
+  }
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+  .archives-header-section {
+    padding: 2rem 1.5rem;
+  }
+
+  .archives-main-title {
+    font-size: 2.5rem;
+    margin-bottom: 1rem;
+  }
+
+  .archives-description {
+    font-size: 1.1rem;
+  }
+
+  .archives-content-section {
+    padding: 0 0.5rem 2rem;
+  }
+
+  .card-header {
+    padding: 1.25rem 1.25rem 0.75rem;
+  }
+
+  .card-title {
+    font-size: 1.3rem;
+  }
+
+  .card-metadata {
+    padding: 0 1.25rem 0.75rem;
+  }
+
+  .metadata-row {
+    grid-template-columns: 1fr;
+    gap: 0.75rem;
+  }
+
+  .metadata-item.metadata-pax-item {
+    grid-column: span 1;
+  }
+
+  .card-content {
+    padding: 0 1.25rem 0.75rem;
+  }
+
+  .card-footer {
+    padding: 0.75rem 1.25rem;
+  }
+}
+
+/* Very small screens */
+@media (max-width: 480px) {
+  .archives-header-section {
+    padding: 1.5rem 1rem;
+  }
+
+  .archives-main-title {
+    font-size: 2rem;
+  }
+
+  .archives-description {
+    font-size: 1rem;
+  }
+
+  .archives-content-section {
+    padding: 0 0.25rem 1.5rem;
+  }
+
+  .card-header,
+  .card-metadata,
+  .card-content {
+    padding-left: 1rem;
+    padding-right: 1rem;
+  }
+
+  .card-footer {
+    padding: 0.75rem 1rem;
+  }
+
+  .card-title {
+    font-size: 1.2rem;
+  }
+
+  .metadata-text {
+    font-size: 0.85rem;
+  }
+
+  .card-excerpt {
+    font-size: 0.9rem;
+  }
+
+  .archives-empty-actions {
+    flex-direction: column;
+    align-items: center;
+  }
+
+  .breadcrumb-nav {
+    font-size: 0.9rem;
+    gap: 0.25rem;
+  }
+
+  .breadcrumb-separator {
+    margin: 0 0.1rem;
+  }
+}

@@ -1,0 +1,267 @@
+/* Archive post styles for F3 RVA website */
+.archive-post-container {
+  background-color: white;
+  border-radius: 8px;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+  margin: 2rem auto;
+  max-width: 900px;
+  overflow: hidden;
+}
+
+/* Post Header Section */
+.post-header-section {
+  background-color: #2c3e50;
+  color: white;
+  padding: 3rem 2rem 2rem;
+  text-align: center;
+}
+
+.post-main-title {
+  font-size: 2.5rem;
+  font-weight: 700;
+  margin: 0 0 2rem;
+  color: white;
+}
+
+/* Metadata Grid */
+.post-metadata-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 1.5rem;
+  margin-top: 2rem;
+}
+
+.metadata-item {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.75rem;
+  text-align: left;
+}
+
+.metadata-item.metadata-pax {
+  grid-column: 1 / -1; /* Full width for PAX list */
+}
+
+.metadata-icon {
+  flex-shrink: 0;
+  padding: 0.5rem;
+  background-color: rgba(255, 255, 255, 0.1);
+  border-radius: 6px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.metadata-icon svg {
+  width: 20px;
+  height: 20px;
+  color: #e74c3c;
+}
+
+.metadata-content {
+  flex: 1;
+  min-width: 0;
+}
+
+.metadata-label {
+  display: block;
+  font-size: 0.85rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  color: rgba(255, 255, 255, 0.7);
+  margin-bottom: 0.25rem;
+}
+
+.metadata-value {
+  display: block;
+  font-size: 1.1rem;
+  font-weight: 500;
+  color: white;
+  line-height: 1.4;
+}
+
+.metadata-value-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.25rem 0;
+}
+
+.metadata-value-list .metadata-value {
+  display: inline;
+}
+
+/* PAX List Styling */
+.pax-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem 0;
+}
+
+.pax-member {
+  font-size: 1rem;
+  font-weight: 500;
+  color: white;
+  line-height: 1.4;
+}
+
+/* Post Content Section */
+.post-content-section {
+  padding: 3rem 2rem;
+}
+
+.post-rich-content {
+  font-size: 1.1rem;
+  line-height: 1.7;
+  color: #333;
+}
+
+.post-rich-content h3 {
+  font-size: 1.5rem;
+  font-weight: 600;
+  color: #2c3e50;
+  margin: 2rem 0 1rem;
+  border-left: 4px solid #e74c3c;
+  padding-left: 1rem;
+}
+
+.post-rich-content p {
+  margin-bottom: 1.5rem;
+}
+
+.post-rich-content ul,
+.post-rich-content ol {
+  margin: 1.5rem 0;
+  padding-left: 2rem;
+}
+
+.post-rich-content li {
+  margin-bottom: 0.5rem;
+  line-height: 1.6;
+}
+
+.post-rich-content strong {
+  font-weight: 600;
+  color: #2c3e50;
+}
+
+.post-rich-content em {
+  font-style: italic;
+  color: #555;
+}
+
+/* Post Footer Section */
+.post-footer-section {
+  background-color: #f8f9fa;
+  padding: 1.5rem 2rem;
+  border-top: 1px solid #e9ecef;
+}
+
+.post-author-info {
+  text-align: center;
+  font-size: 1rem;
+}
+
+.author-label {
+  color: #666;
+  margin-right: 0.5rem;
+}
+
+.author-name {
+  font-weight: 600;
+  color: #2c3e50;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+  .archive-post-container {
+    margin: 1rem;
+    border-radius: 6px;
+  }
+
+  .post-header-section {
+    padding: 2rem 1.5rem 1.5rem;
+  }
+
+  .post-main-title {
+    font-size: 2rem;
+    margin-bottom: 1.5rem;
+  }
+
+  .post-metadata-grid {
+    grid-template-columns: 1fr;
+    gap: 1rem;
+    margin-top: 1.5rem;
+  }
+
+  .metadata-item {
+    gap: 0.5rem;
+  }
+
+  .metadata-icon {
+    padding: 0.4rem;
+  }
+
+  .metadata-icon svg {
+    width: 18px;
+    height: 18px;
+  }
+
+  .metadata-value {
+    font-size: 1rem;
+  }
+
+  .pax-list {
+    gap: 0.25rem 0;
+  }
+
+  .pax-member {
+    font-size: 0.95rem;
+  }
+
+  .post-content-section {
+    padding: 2rem 1.5rem;
+  }
+
+  .post-rich-content {
+    font-size: 1rem;
+  }
+
+  .post-rich-content h3 {
+    font-size: 1.3rem;
+    margin: 1.5rem 0 0.75rem;
+    padding-left: 0.75rem;
+  }
+
+  .post-rich-content ul,
+  .post-rich-content ol {
+    padding-left: 1.5rem;
+  }
+
+  .post-footer-section {
+    padding: 1rem 1.5rem;
+  }
+
+  .post-author-info {
+    font-size: 0.95rem;
+  }
+}
+
+/* Very small screens */
+@media (max-width: 480px) {
+  .post-header-section {
+    padding: 1.5rem 1rem;
+  }
+
+  .post-main-title {
+    font-size: 1.75rem;
+  }
+
+  .post-content-section {
+    padding: 1.5rem 1rem;
+  }
+
+  .post-footer-section {
+    padding: 1rem;
+  }
+}
