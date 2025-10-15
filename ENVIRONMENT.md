@@ -18,7 +18,7 @@ Base URL for API endpoints.
 
 - **Local**: `http://localhost:9000` (default fallback)
 - **Development**: `https://bigdata.brianbischoff.com`
-- **Production**: `https://api.f3rva.org`
+- **Production**: `https://bigdata.brianbischoff.com`
 
 ## Usage
 
