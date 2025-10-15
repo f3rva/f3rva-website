@@ -180,7 +180,7 @@ const ArchivePost: React.FC = () => {
                 <MdGroup />
               </div>
               <div className="metadata-content">
-                <span className="metadata-label">PAX ({post.pax?.length})</span>
+                <span className="metadata-label">PAX ({post.pax?.length ?? 0})</span>
                 <div className="pax-list">
                   {post.pax?.map((paxMember, index) => (
                     <span key={paxMember.memberId} className="pax-member">
