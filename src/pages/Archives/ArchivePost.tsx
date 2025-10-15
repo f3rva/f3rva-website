@@ -3,6 +3,8 @@ import { useParams, Navigate } from 'react-router-dom';
 import { MdCalendarToday, MdPerson, MdGroup, MdLocationOn } from 'react-icons/md';
 import { config } from '../../config';
 import { WorkoutPost } from '../../types/WorkoutPost';
+import { formatDisplayDate } from '../../utils/dateUtils';
+import { getPostExcerpt } from '../../utils/postUtils';
 import SEO from '../../components/SEO';
 import './ArchivePost.css';
 
@@ -91,26 +93,6 @@ const ArchivePost: React.FC = () => {
   if (!post) {
     return <Navigate to="/404" replace />;
   }
-
-  // Format the date for display
-  const formatDisplayDate = (dateString: string): string => {
-    const date = new Date(dateString);
-    return date.toLocaleDateString('en-US', {
-      weekday: 'long',
-      year: 'numeric',
-      month: 'long',
-      day: 'numeric'
-    });
-  };
-
-  // Create SEO-friendly description from content
-  const getPostExcerpt = (content: string): string => {
-    // Strip HTML tags and get first 160 characters
-    const textContent = content.replace(/<[^>]*>/g, '');
-    return textContent.length > 160
-      ? textContent.substring(0, 160).trim() + '...'
-      : textContent;
-  };
 
   return (
     <>
