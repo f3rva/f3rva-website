@@ -51,13 +51,13 @@
     {
       "location": "Pine Fork Park",
       "locationURL": "https://maps.app.goo.gl/MWLmQabbyqk5Bd2NA",
-      "name": "Mammoth Balls",
-      "tagURL": "/tag/mammoth-balls/",
+      "name": "Iron Haul",
+      "tagURL": "/tag/iron-haul/",
       "dayOfWeek": "Monday",
       "startTime": "0530",
       "endTime": "0615",
-      "workoutStyle": "Kettlebells & Sandbags",
-      "siteQ": "Beaver",
+      "workoutStyle": "Ruck & Run",
+      "siteQ": "Yukon Cornelius",
       "notes": ""
     },
     {
@@ -83,6 +83,18 @@
       "workoutStyle": "Tabata + Hot Lap",
       "siteQ": "OBT",
       "notes": "Park on Maple near Christopher Lane"
+    },
+    {
+      "location": "Huguenot High School",
+      "locationURL": "https://goo.gl/maps/pGzitc3Kzq82",
+      "name": "Huge Bells",
+      "tagURL": "/tag/huge-bells/",
+      "dayOfWeek": "Monday",
+      "startTime": "0530",
+      "endTime": "0615",
+      "workoutStyle": "Kettlebell",
+      "siteQ": "Dealer",
+      "notes": ""
     },
     {
       "location": "Goyne Park",
@@ -133,18 +145,6 @@
       "notes": "Meet in the school parking lot"
     },
     {
-      "location": "Pine Fork Park",
-      "locationURL": "https://maps.app.goo.gl/MWLmQabbyqk5Bd2NA",
-      "name": "Iron Haul",
-      "tagURL": "/tag/iron-haul/",
-      "dayOfWeek": "Tuesday",
-      "startTime": "0530",
-      "endTime": "0615",
-      "workoutStyle": "Ruck & Run",
-      "siteQ": "Yukon Cornelius",
-      "notes": ""
-    },
-    {
       "location": "Atlee High School",
       "locationURL": "https://goo.gl/maps/qbBzHkz9NB12",
       "name": "Raider Run",
@@ -167,6 +167,18 @@
       "workoutStyle": "Hill Run",
       "siteQ": "Splinter",
       "notes": "Meet in the sunken parking lot behind the commons."
+    },
+    {
+      "location": "Pine Fork Park",
+      "locationURL": "https://maps.app.goo.gl/MWLmQabbyqk5Bd2NA",
+      "name": "Mammoth Balls",
+      "tagURL": "/tag/mammoth-balls/",
+      "dayOfWeek": "Tuesday",
+      "startTime": "0530",
+      "endTime": "0615",
+      "workoutStyle": "Kettlebells & Sandbags",
+      "siteQ": "Beaver",
+      "notes": ""
     },
     {
       "location": "West End Assembly of God",
