@@ -18,39 +18,48 @@ const GoogleAnalytics: React.FC = () => {
 
   // Initialize Google Analytics only if user has accepted cookies
   useEffect(() => {
-    if (!config || !hasAcceptedCookies()) return;
+    if (!config) return;
 
-    // Check if already initialized to prevent double-loading
-    if (isAnalyticsInitialized) return;
+    const initializeAnalytics = () => {
+      // Check if already initialized to prevent double-loading
+      if (!hasAcceptedCookies() || isAnalyticsInitialized) return;
 
-    console.log('🍪 Initializing Google Analytics - User has accepted cookies');
+      console.log('🍪 Initializing Google Analytics - User has accepted cookies');
 
-    // Initialize Google Analytics
-    const script = document.createElement('script');
-    script.async = true;
-    script.src = `https://www.googletagmanager.com/gtag/js?id=${config.trackingId}`;
-    document.head.appendChild(script);
+      // Initialize Google Analytics
+      const script = document.createElement('script');
+      script.async = true;
+      script.src = `https://www.googletagmanager.com/gtag/js?id=${config.trackingId}`;
+      document.head.appendChild(script);
 
-    window.dataLayer = window.dataLayer || [];
-    window.gtag = function() {
-      window.dataLayer.push(arguments);
+      window.dataLayer = window.dataLayer || [];
+      window.gtag = function() {
+        window.dataLayer.push(arguments);
+      };
+
+      window.gtag('js', new Date());
+      window.gtag('config', config.trackingId, {
+        send_page_view: false, // We'll handle page views manually
+        anonymize_ip: false,   // Since user consented, we can collect IP
+        cookie_expires: 63072000, // 2 years in seconds
+      });
+
+      setIsAnalyticsInitialized(true);
     };
 
-    window.gtag('js', new Date());
-    window.gtag('config', config.trackingId, {
-      send_page_view: false, // We'll handle page views manually
-      anonymize_ip: false,   // Since user consented, we can collect IP
-      cookie_expires: 63072000, // 2 years in seconds
-    });
+    // Initialize on mount if already consented
+    initializeAnalytics();
 
-    setIsAnalyticsInitialized(true);
+    // Listen for consent acceptance event
+    window.addEventListener('cookieConsentAccepted', initializeAnalytics);
 
     return () => {
       // Cleanup script if component unmounts
+      window.removeEventListener('cookieConsentAccepted', initializeAnalytics);
       const scripts = document.querySelectorAll(`script[src*="${config.trackingId}"]`);
       scripts.forEach(s => s.remove());
     };
-  }, [config]); // Removed isAnalyticsInitialized from dependencies to prevent loop
+  }, [config, isAnalyticsInitialized]);
 
   // Track page views only if analytics is initialized and user has consented
   useEffect(() => {

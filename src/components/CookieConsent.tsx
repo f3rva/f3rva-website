@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { hasConsentChoice } from '../utils/cookieConsent';
+import { hasConsentChoice, CONSENT_KEY, CONSENT_VERSION } from '../utils/cookieConsent';
 import './CookieConsent.css';
 
 /**
@@ -11,8 +11,6 @@ import './CookieConsent.css';
  */
 const CookieConsent: React.FC = () => {
   const [showBanner, setShowBanner] = useState(false);
-  const CONSENT_KEY = 'f3rva-cookie-consent';
-  const CONSENT_VERSION = '1.0'; // Update this if you need to re-prompt users
 
   useEffect(() => {
     // Check if user has made a consent choice
@@ -32,6 +30,9 @@ const CookieConsent: React.FC = () => {
 
     localStorage.setItem(CONSENT_KEY, JSON.stringify(consentData));
     setShowBanner(false);
+
+    // Dispatch custom event to notify GoogleAnalytics component
+    window.dispatchEvent(new Event('cookieConsentAccepted'));
   };
 
   const handleDecline = () => {

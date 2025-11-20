@@ -5,8 +5,8 @@
  * Used by components that need to respect user's privacy choices
  */
 
-const CONSENT_KEY = 'f3rva-cookie-consent';
-const CONSENT_VERSION = '1.0';
+export const CONSENT_KEY = 'f3rva-cookie-consent';
+export const CONSENT_VERSION = '1.0';
 
 export interface ConsentData {
   accepted: boolean;
