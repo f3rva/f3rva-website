@@ -1,6 +1,7 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import { useLocation } from 'react-router-dom';
 import { getAnalyticsConfig } from '../config/analytics.js';
+import { hasAcceptedCookies } from '../utils/cookieConsent';
 
 declare global {
   interface Window {
@@ -13,9 +14,16 @@ declare global {
 const GoogleAnalytics: React.FC = () => {
   const location = useLocation();
   const config = getAnalyticsConfig();
+  const [isAnalyticsInitialized, setIsAnalyticsInitialized] = useState(false);
 
+  // Initialize Google Analytics only if user has accepted cookies
   useEffect(() => {
-    if (!config) return;
+    if (!config || !hasAcceptedCookies()) return;
+
+    // Check if already initialized to prevent double-loading
+    if (isAnalyticsInitialized) return;
+
+    console.log('🍪 Initializing Google Analytics - User has accepted cookies');
 
     // Initialize Google Analytics
     const script = document.createElement('script');
@@ -30,25 +38,30 @@ const GoogleAnalytics: React.FC = () => {
 
     window.gtag('js', new Date());
     window.gtag('config', config.trackingId, {
-      send_page_view: false // We'll handle page views manually
+      send_page_view: false, // We'll handle page views manually
+      anonymize_ip: false,   // Since user consented, we can collect IP
+      cookie_expires: 63072000, // 2 years in seconds
     });
+
+    setIsAnalyticsInitialized(true);
 
     return () => {
       // Cleanup script if component unmounts
       const scripts = document.querySelectorAll(`script[src*="${config.trackingId}"]`);
       scripts.forEach(s => s.remove());
     };
-  }, [config]);
+  }, [config]); // Removed isAnalyticsInitialized from dependencies to prevent loop
 
+  // Track page views only if analytics is initialized and user has consented
   useEffect(() => {
-    if (!config || !window.gtag) return;
+    if (!config || !window.gtag || !isAnalyticsInitialized || !hasAcceptedCookies()) return;
 
     // Track page view on route change
     window.gtag('config', config.trackingId, {
       page_path: location.pathname + location.search,
       page_title: document.title,
     });
-  }, [location, config]);
+  }, [location, config, isAnalyticsInitialized]);
 
   return null;
 };
