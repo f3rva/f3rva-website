@@ -58,7 +58,7 @@ const CookieConsent: React.FC = () => {
         <div className="cookie-consent-text">
           <p>
             We use cookies to enhance your browsing experience and analyze site traffic.
-            By continuing to use this site, you consent to our use of cookies.
+            Please choose whether you accept our use of cookies for analytics purposes.
           </p>
         </div>
         <div className="cookie-consent-actions">
