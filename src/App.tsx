@@ -2,6 +2,7 @@ import React from 'react';
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
 import MainSiteLayout from './components/Layout';
 import GoogleAnalytics from './components/GoogleAnalytics';
+import CookieConsent from './components/CookieConsent';
 import HomePage from './pages/Home/home';
 import AboutPage from './pages/About/about';
 import SchedulePage from './pages/Schedule/schedule';
@@ -24,6 +25,7 @@ const App: React.FC = () => {
     <div className="App">
       <Router>
         <GoogleAnalytics />
+        <CookieConsent />
         <MainSiteLayout>
           <Routes>
             <Route path="/" element={<HomePage />} />
