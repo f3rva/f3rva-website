@@ -81,8 +81,10 @@ describe('ArchivePost Page', () => {
     const nameElements = screen.getAllByText('Gomer Pyle');
     expect(nameElements.length).toBeGreaterThanOrEqual(2);
 
-    // Verify AO
-    expect(screen.getByText('The Zoo')).toBeInTheDocument();
+    // Verify AO link
+    const aoLink = screen.getByRole('link', { name: 'The Zoo' });
+    expect(aoLink).toBeInTheDocument();
+    expect(aoLink).toHaveAttribute('href', '/archives/ao/the%20zoo');
 
     // Verify PAX count and names
     expect(screen.getByText(/PAX \(3\)/)).toBeInTheDocument();

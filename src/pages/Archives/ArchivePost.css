@@ -81,6 +81,20 @@
   line-height: 1.4;
 }
 
+.metadata-link {
+  color: #e74c3c;
+  font-size: 1.1rem;
+  line-height: 1.4;
+  text-decoration: none;
+  font-weight: 600;
+  transition: color 0.3s ease;
+}
+
+.metadata-link:hover {
+  color: #c0392b;
+  text-decoration: underline;
+}
+
 .metadata-value-list {
   display: flex;
   flex-wrap: wrap;

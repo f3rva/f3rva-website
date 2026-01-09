@@ -169,7 +169,7 @@ const WorkoutScheduleTable: React.FC = () => {
                 {workoutData[activeTab].map((workout, index) => (
                   <tr key={index}>
                     <td><a href={workout.locationURL} target="_blank" rel="noopener noreferrer" className="content-link">{workout.location}</a></td>
-                    <td>{workout.name}</td>
+                    <td><a href={workout.tagURL} className="content-link">{workout.name}</a></td>
                     <td>{workout.dayOfWeek}</td>
                     <td>{workout.startTime}</td>
                     <td>{workout.endTime}</td>
