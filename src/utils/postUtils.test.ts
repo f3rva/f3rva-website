@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import { getPostExcerpt } from './postUtils';
+import { getPostExcerpt, sanitizeHtml } from './postUtils';
 
 describe('postUtils', () => {
   describe('getPostExcerpt', () => {
@@ -38,6 +38,34 @@ describe('postUtils', () => {
 
     it('should return an empty string if input is empty', () => {
       expect(getPostExcerpt('')).toBe('');
+    });
+  });
+
+  describe('sanitizeHtml', () => {
+    it('should remove dangerous scripts (XSS)', () => {
+      const dangerousInput = '<script>alert("XSS")</script><div>Safe content</div>';
+      const output = sanitizeHtml(dangerousInput);
+      expect(output).not.toContain('<script>');
+      expect(output).toContain('Safe content');
+    });
+
+    it('should add rel="noopener noreferrer" to links with target="_blank"', () => {
+      const input = '<a href="https://example.com" target="_blank">External Link</a>';
+      const output = sanitizeHtml(input);
+      expect(output).toContain('rel="noopener noreferrer"');
+      expect(output).toContain('target="_blank"');
+    });
+
+    it('should not modify links without target="_blank"', () => {
+      const input = '<a href="/internal">Internal Link</a>';
+      const output = sanitizeHtml(input);
+      expect(output).not.toContain('rel="noopener noreferrer"');
+    });
+
+    it('should preserve existing rel attributes and append noopener noreferrer', () => {
+      const input = '<a href="https://example.com" target="_blank" rel="nofollow">External Link</a>';
+      const output = sanitizeHtml(input);
+      expect(output).toContain('rel="nofollow noopener noreferrer"');
     });
   });
 });
