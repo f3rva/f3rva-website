@@ -1,11 +1,10 @@
 import React, { useState, useEffect } from 'react';
 import { useParams, Navigate } from 'react-router-dom';
 import { MdCalendarToday, MdPerson, MdGroup, MdLocationOn } from 'react-icons/md';
-import DOMPurify from 'dompurify';
 import { config } from '../../config';
 import { WorkoutPost } from '../../types/WorkoutPost';
 import { formatDisplayDate } from '../../utils/dateUtils';
-import { getPostExcerpt } from '../../utils/postUtils';
+import { getPostExcerpt, sanitizeHtml } from '../../utils/postUtils';
 import SEO from '../../components/SEO';
 import './ArchivePost.css';
 
@@ -181,7 +180,7 @@ const ArchivePost: React.FC = () => {
         <main className="post-content-section">
           <div
             className="post-rich-content"
-            dangerouslySetInnerHTML={{ __html: DOMPurify.sanitize(post.content) }}
+            dangerouslySetInnerHTML={{ __html: sanitizeHtml(post.content) }}
           />
         </main>
 
