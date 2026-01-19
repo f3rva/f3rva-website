@@ -1,6 +1,6 @@
 import { render, screen, fireEvent } from '@testing-library/react';
 import { describe, it, expect, vi, beforeEach } from 'vitest';
-import SchedulePage from './schedule.tsx';
+import SchedulePage from './schedule';
 
 // Mock SEO to avoid head side effects
 vi.mock('../../components/SEO', () => ({
