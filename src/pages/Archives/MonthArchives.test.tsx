@@ -18,7 +18,7 @@ const mockWorkoutPost: WorkoutPost = {
   workoutDate: '2024-03-15',
   backblastUrl: 'http://example.com',
   content: '<p>Great workout!</p>',
-  ao: [{ id: 1, description: 'Innsbrook' }],
+  ao: [{ id: 1, description: 'Innsbrook', slug: 'innsbrook' }],
   q: [{ memberId: 1, f3Name: 'Shocker' }],
   paxCount: 12
 };

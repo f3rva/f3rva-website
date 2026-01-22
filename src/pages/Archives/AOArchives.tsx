@@ -13,7 +13,7 @@ import './Archives.css';
  * Provides links to individual post pages using date-based URLs
  */
 const AOArchives: React.FC = () => {
-  const { ao } = useParams<{ ao: string }>();
+  const { ao } = useParams<{ ao: string }>(); // ao parameter is now the AO slug
 
   // State management for posts, loading, and errors
   const [posts, setPosts] = useState<WorkoutPost[]>([]);
@@ -38,8 +38,8 @@ const AOArchives: React.FC = () => {
         setError(null);
 
         // Construct the API URL for posts by AO with pagination
-        // Using encodeURIComponent to handle AO names with spaces or special characters
-        const apiUrl = `${config.apiBaseUrl}/api/v2/getWorkoutsByAO.php?name=${encodeURIComponent(ao)}&page=${currentPage}&results=${resultsPerPage}`;
+        // Using slug parameter instead of name to match updated API
+        const apiUrl = `${config.apiBaseUrl}/api/v2/getWorkoutsByAO.php?slug=${encodeURIComponent(ao)}&page=${currentPage}&results=${resultsPerPage}`;
 
         const response = await fetch(apiUrl, { signal: controller.signal });
 
@@ -107,8 +107,10 @@ const AOArchives: React.FC = () => {
     );
   }
 
-  // Decode AO name for display
-  const displayAO = decodeURIComponent(ao);
+  // Get AO description for display from first post, fallback to slug
+  const displayAO = posts.length > 0 && posts[0].ao.length > 0
+    ? posts[0].ao.find(aoItem => aoItem.slug === ao)?.description || decodeURIComponent(ao)
+    : decodeURIComponent(ao);
 
   return (
     <>
@@ -116,7 +118,7 @@ const AOArchives: React.FC = () => {
         title={`${displayAO} Archives - F3RVA Workout Backblasts`}
         description={`Browse workout backblasts from ${displayAO} at F3RVA. Read detailed accounts of workouts, QICs, PAX attendance, and workout locations.`}
         keywords={['f3', 'archives', 'backblasts', 'workouts', 'richmond', 'virginia', 'fitness', displayAO]}
-        url={`https://f3rva.org/archives/ao/${ao}`}
+        url={`https://f3rva.org/archives/ao/${encodeURIComponent(ao)}`}
         type="website"
       />
 

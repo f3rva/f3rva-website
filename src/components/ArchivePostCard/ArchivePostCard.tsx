@@ -67,8 +67,8 @@ const ArchivePostCard: React.FC<ArchivePostCardProps> = ({ post }) => {
                 <strong>AO{post.ao.length > 1 ? 's' : ''}:</strong>{' '}
                 {post.ao.map((ao, index) => (
                   <React.Fragment key={ao.id}>
-                    <Link 
-                      to={`/archives/ao/${encodeURIComponent(ao.description.toLowerCase())}`}
+                    <Link
+                      to={`/archives/ao/${encodeURIComponent(ao.slug)}`}
                       className="metadata-link-small"
                       onClick={handleLinkClick}
                     >

@@ -18,7 +18,7 @@ const mockWorkoutPost: WorkoutPost = {
   workoutDate: '2024-03-15',
   backblastUrl: 'http://example.com',
   content: '<p>Great workout!</p>',
-  ao: [{ id: 1, description: 'Innsbrook' }],
+  ao: [{ id: 1, description: 'Innsbrook', slug: 'innsbrook' }],
   q: [{ memberId: 1, f3Name: 'Shocker' }],
   paxCount: 12
 };
@@ -66,16 +66,16 @@ describe('AOArchives Page', () => {
       expect(screen.queryByText('Loading AO archives...')).not.toBeInTheDocument();
     });
 
-    // Verify header AO name (using regex to avoid matching breadcrumbs or other strings ambiguously)
-    const subtitle = screen.getByRole('heading', { name: 'innsbrook' });
+    // Verify header AO name (displays proper case from post data)
+    const subtitle = screen.getByRole('heading', { name: 'Innsbrook' });
     expect(subtitle).toBeInTheDocument();
 
     // Verify post title is rendered
     expect(screen.getByText('Crushing the Pyramid')).toBeInTheDocument();
-    
-    // Verify API was called with correct params
+
+    // Verify API was called with correct params (now uses slug parameter)
     expect(mockFetch).toHaveBeenCalledWith(
-      expect.stringContaining('name=innsbrook'),
+      expect.stringContaining('slug=innsbrook'),
       expect.any(Object)
     );
   });
@@ -109,26 +109,25 @@ describe('AOArchives Page', () => {
     expect(screen.getByText(/Network error/i)).toBeInTheDocument();
   });
 
-  it('decodes AO name in URL', async () => {
+  it('uses slug for API call and displays AO name from post data', async () => {
     const mockResponseData = [mockWorkoutPost];
     mockFetch.mockResolvedValue({
       ok: true,
       json: async () => mockResponseData,
     });
 
-    renderComponent('deep run');
+    renderComponent('innsbrook');
 
     await waitFor(() => {
       expect(screen.queryByText('Loading AO archives...')).not.toBeInTheDocument();
     });
 
-    // Should display decoded name
-    expect(screen.getByRole('heading', { name: 'deep run' })).toBeInTheDocument();
-    
-    // API call should use encoded name or be handled by browser/fetch automatically
-    // The test framework might pass encoded or decoded depending on setup, but the component calls encodeURIComponent
+    // Should display AO name from the post data
+    expect(screen.getByRole('heading', { name: 'Innsbrook' })).toBeInTheDocument();
+
+    // API call should use slug parameter instead of name
     expect(mockFetch).toHaveBeenCalledWith(
-      expect.stringContaining('name=deep%20run'),
+      expect.stringContaining('slug=innsbrook'),
       expect.any(Object)
     );
   });

@@ -18,7 +18,7 @@ const mockPost: WorkoutPost = {
   workoutDate: '2024-05-20',
   backblastUrl: 'https://f3rva.org/backblast/101',
   content: '<p>The <strong>PAX</strong> crushed it today.</p><ul><li>Burpees</li><li>Merkins</li></ul>',
-  ao: [{ id: 5, description: 'The Zoo' }],
+  ao: [{ id: 5, description: 'The Zoo', slug: 'thezoo' }],
   q: [{ memberId: 1, f3Name: 'Gomer Pyle' }],
   pax: [
     { memberId: 1, f3Name: 'Gomer Pyle' },
@@ -81,10 +81,10 @@ describe('ArchivePost Page', () => {
     const nameElements = screen.getAllByText('Gomer Pyle');
     expect(nameElements.length).toBeGreaterThanOrEqual(2);
 
-    // Verify AO link
+    // Verify AO link (now uses slug instead of encoded description)
     const aoLink = screen.getByRole('link', { name: 'The Zoo' });
     expect(aoLink).toBeInTheDocument();
-    expect(aoLink).toHaveAttribute('href', '/archives/ao/the%20zoo');
+    expect(aoLink).toHaveAttribute('href', '/archives/ao/thezoo');
 
     // Verify PAX count and names
     expect(screen.getByText(/PAX \(3\)/)).toBeInTheDocument();

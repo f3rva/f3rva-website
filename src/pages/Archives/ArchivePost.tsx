@@ -150,8 +150,8 @@ const ArchivePost: React.FC = () => {
                 <div className="metadata-value-list">
                   {post.ao.map((ao, index) => (
                     <React.Fragment key={ao.id}>
-                      <Link 
-                        to={`/archives/ao/${encodeURIComponent(ao.description.toLowerCase())}`}
+                      <Link
+                        to={`/archives/ao/${encodeURIComponent(ao.slug)}`}
                         className="metadata-link"
                       >
                         {ao.description}
