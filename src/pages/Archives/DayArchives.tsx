@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Link, useParams, Navigate } from 'react-router-dom';
+import { isValidYear, isValidMonth, isValidDay } from '../../utils/validation';
 import { config } from '../../config';
 import { formatDateDisplay } from '../../utils/dateUtils';
 import { WorkoutPost } from '../../types/WorkoutPost';
@@ -29,6 +30,12 @@ const DayArchives: React.FC = () => {
   // Fetch posts data from API with pagination
   useEffect(() => {
     if (!year || !month || !day) {
+      return;
+    }
+
+    if (!isValidYear(year) || !isValidMonth(month) || !isValidDay(day)) {
+      setError('Invalid date format');
+      setLoading(false);
       return;
     }
 

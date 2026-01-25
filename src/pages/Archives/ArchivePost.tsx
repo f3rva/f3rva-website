@@ -6,6 +6,7 @@ import { WorkoutPost } from '../../types/WorkoutPost';
 import { formatDisplayDate } from '../../utils/dateUtils';
 import { getPostExcerpt } from '../../utils/postUtils';
 import { sanitizeHtml } from '../../utils/sanitizer';
+import { isValidYear, isValidMonth, isValidDay, isValidSlug } from '../../utils/validation';
 import SEO from '../../components/SEO';
 import './ArchivePost.css';
 
@@ -35,6 +36,13 @@ const ArchivePost: React.FC = () => {
       console.log('Fetching post with params:', { year, month, day, slug });
       if (!year || !month || !day || !slug) {
         setError('Invalid URL parameters');
+        setLoading(false);
+        return;
+      }
+
+      // Input validation to prevent parameter injection
+      if (!isValidYear(year) || !isValidMonth(month) || !isValidDay(day) || !isValidSlug(slug)) {
+        setError('Invalid URL format');
         setLoading(false);
         return;
       }
