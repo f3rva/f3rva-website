@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Link, useParams, Navigate } from 'react-router-dom';
 import SEO from '../../components/SEO';
+import { isValidYear } from '../../utils/validation';
 import { config } from '../../config';
 import { WorkoutPost } from '../../types/WorkoutPost';
 import Pagination from '../../components/Pagination';
@@ -30,6 +31,13 @@ const YearArchives: React.FC = () => {
     if (!year) {
       return;
     }
+
+    if (!isValidYear(year)) {
+      setError('Invalid year format');
+      setLoading(false);
+      return;
+    }
+
     const controller = new AbortController();
 
     const fetchPosts = async () => {

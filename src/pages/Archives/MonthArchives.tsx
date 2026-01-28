@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Link, useParams, Navigate } from 'react-router-dom';
 import SEO from '../../components/SEO';
+import { isValidYear, isValidMonth } from '../../utils/validation';
 import { config } from '../../config';
 import { WorkoutPost } from '../../types/WorkoutPost';
 import { formatMonthName } from '../../utils/dateUtils';
@@ -31,6 +32,13 @@ const MonthArchives: React.FC = () => {
     if (!year || !month) {
       return;
     }
+
+    if (!isValidYear(year) || !isValidMonth(month)) {
+      setError('Invalid date format');
+      setLoading(false);
+      return;
+    }
+
     const controller = new AbortController();
 
     const fetchPosts = async () => {
