@@ -7,10 +7,13 @@ on:
     types: [ published ]          # deploy to production when a release is published
 
 jobs:
-  build:
+  deploy-dev:
+    environment: development
+    permissions:
+      contents: read
+      id-token: write
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
     runs-on: ubuntu-latest
-    outputs:
-      artifact-name: site
     steps:
       - name: Checkout
         uses: actions/checkout@v5
@@ -35,37 +38,12 @@ jobs:
         run: npm run build
         env:
           CI: false
-
-      - name: Upload build artifact
-        uses: actions/upload-artifact@v4
-        with:
-          name: site
-          path: build/
-
-  deploy-dev:
-    needs: build
-    environment: development
-    permissions:
-      contents: read
-      id-token: write
-    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
-    runs-on: ubuntu-latest
-    steps:
-      - name: Download build artifact
-        uses: actions/download-artifact@v4
-        with:
-          name: site
-          path: site
+          VITE_GOOGLE_ANALYTICS_ID: ${{ secrets.DEV_GOOGLE_ANALYTICS_ID }}
 
       - name: Use development robots.txt
         run: |
-          cp ./site/robots-dev.txt ./site/robots.txt
+          cp ./build/robots-dev.txt ./build/robots.txt
           echo "Using development robots.txt - blocking all crawlers"
-
-      - name: Configure Google Analytics for development
-        run: |
-          sed -i "s/G-XXXXXXXXXX/${{ secrets.DEV_GOOGLE_ANALYTICS_ID }}/g" ./site/index.html
-          echo "Configured Google Analytics ID for development"
 
       - name: Configure AWS credentials (OIDC / role for dev)
         uses: aws-actions/configure-aws-credentials@v4
@@ -75,7 +53,7 @@ jobs:
 
       - name: Sync build to Dev S3
         run: |
-          aws s3 sync site/ s3://${{ secrets.DEV_S3_BUCKET }}/ \
+          aws s3 sync build/ s3://${{ secrets.DEV_S3_BUCKET }}/ \
             --delete --no-progress
 
       - name: Invalidate CloudFront
@@ -85,7 +63,6 @@ jobs:
             --paths "/*"
   
   deploy-prod:
-    needs: build
     environment: production
     permissions:
       contents: read
@@ -93,21 +70,35 @@ jobs:
     if: github.event_name == 'release'
     runs-on: ubuntu-latest
     steps:
-      - name: Download build artifact
-        uses: actions/download-artifact@v4
+      - name: Checkout
+        uses: actions/checkout@v5
+
+      - name: Use Node.js 24
+        uses: actions/setup-node@v4
         with:
-          name: site
-          path: site
+          node-version: '24'
+
+      - name: Cache node modules
+        uses: actions/cache@v4
+        with:
+          path: ~/.npm
+          key: ${{ runner.os }}-node-${{ hashFiles('**/package-lock.json') }}
+          restore-keys: |
+            ${{ runner.os }}-node-
+
+      - name: Install dependencies
+        run: npm install
+
+      - name: Build
+        run: npm run build
+        env:
+          CI: false
+          VITE_GOOGLE_ANALYTICS_ID: ${{ secrets.PROD_GOOGLE_ANALYTICS_ID }}
 
       - name: Use production robots.txt
         run: |
-          cp ./site/robots-prod.txt ./site/robots.txt
+          cp ./build/robots-prod.txt ./build/robots.txt
           echo "Using production robots.txt - allowing crawlers"
-
-      - name: Configure Google Analytics for production
-        run: |
-          sed -i "s/G-XXXXXXXXXX/${{ secrets.PROD_GOOGLE_ANALYTICS_ID }}/g" ./site/index.html
-          echo "Configured Google Analytics ID for production"
 
       - name: Configure AWS credentials (OIDC / role for prod)
         uses: aws-actions/configure-aws-credentials@v4
@@ -117,7 +108,7 @@ jobs:
 
       - name: Sync build to Prod S3
         run: |
-          aws s3 sync site/ s3://${{ secrets.PROD_S3_BUCKET }}/ \
+          aws s3 sync build/ s3://${{ secrets.PROD_S3_BUCKET }}/ \
             --delete --no-progress
 
       - name: Invalidate CloudFront
