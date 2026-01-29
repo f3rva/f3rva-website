@@ -56,17 +56,12 @@
   box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
 }
 
-.post-card-link {
+.post-card-content-wrapper {
   text-decoration: none;
   color: inherit;
   display: flex;
   flex-direction: column;
   height: 100%;
-}
-
-.post-card-link:hover {
-  text-decoration: none;
-  color: inherit;
 }
 
 /* Card Header */
@@ -138,6 +133,20 @@
   font-weight: 600;
 }
 
+.metadata-link-small {
+  color: #e74c3c;
+  text-decoration: none;
+  font-weight: 600;
+  transition: color 0.3s ease;
+  position: relative;
+  z-index: 1;
+}
+
+.metadata-link-small:hover {
+  color: #c0392b;
+  text-decoration: underline;
+}
+
 /* Card Content */
 .card-content {
   padding: 0 1.5rem 1rem;
@@ -175,7 +184,7 @@
   transition: color 0.3s ease;
 }
 
-.post-card-link:hover .read-more-text {
+.archive-post-card:hover .read-more-text {
   color: #c0392b;
 }
 

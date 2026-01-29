@@ -12,6 +12,7 @@
 export interface WorkoutAO {
   id: number;
   description: string;
+  slug: string;
 }
 
 /**

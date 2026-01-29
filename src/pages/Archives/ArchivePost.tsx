@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { useParams, Navigate } from 'react-router-dom';
+import { useParams, Navigate, Link } from 'react-router-dom';
 import { MdCalendarToday, MdPerson, MdGroup, MdLocationOn } from 'react-icons/md';
 import { config } from '../../config';
 import { WorkoutPost } from '../../types/WorkoutPost';
@@ -157,10 +157,15 @@ const ArchivePost: React.FC = () => {
                 <span className="metadata-label">AO{post.ao.length > 1 ? 's' : ''}</span>
                 <div className="metadata-value-list">
                   {post.ao.map((ao, index) => (
-                    <span key={ao.id} className="metadata-value">
-                      {ao.description}
+                    <React.Fragment key={ao.id}>
+                      <Link
+                        to={`/archives/ao/${encodeURIComponent(ao.slug)}`}
+                        className="metadata-link"
+                      >
+                        {ao.description}
+                      </Link>
                       {index < post.ao.length - 1 && ', '}
-                    </span>
+                    </React.Fragment>
                   ))}
                 </div>
               </div>

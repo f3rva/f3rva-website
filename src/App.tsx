@@ -12,6 +12,7 @@ import YearArchives from './pages/Archives/YearArchives';
 import MonthArchives from './pages/Archives/MonthArchives';
 import DayArchives from './pages/Archives/DayArchives';
 import ArchivePost from './pages/Archives/ArchivePost';
+import AOArchives from './pages/Archives/AOArchives';
 import NotFoundPage from './pages/NotFound/notFound';
 import './App.css';
 
@@ -34,6 +35,7 @@ const App: React.FC = () => {
             <Route path="/schedule" element={<SchedulePage />} />
             <Route path="/new-guy" element={<NewGuyPage />} />
             <Route path="/archives" element={<Archives />} />
+            <Route path="/archives/ao/:ao" element={<AOArchives />} />
             <Route path="/:year" element={<YearArchives />} />
             <Route path="/:year/:month" element={<MonthArchives />} />
             <Route path="/:year/:month/:day" element={<DayArchives />} />
