@@ -1,11 +1,12 @@
 import React, { useState, useEffect } from 'react';
 import { useParams, Navigate, Link } from 'react-router-dom';
 import { MdCalendarToday, MdPerson, MdGroup, MdLocationOn } from 'react-icons/md';
-import DOMPurify from 'dompurify';
 import { config } from '../../config';
 import { WorkoutPost } from '../../types/WorkoutPost';
 import { formatDisplayDate } from '../../utils/dateUtils';
 import { getPostExcerpt } from '../../utils/postUtils';
+import { sanitizeHtml } from '../../utils/sanitizer';
+import { isValidYear, isValidMonth, isValidDay, isValidSlug } from '../../utils/validation';
 import SEO from '../../components/SEO';
 import './ArchivePost.css';
 
@@ -35,6 +36,13 @@ const ArchivePost: React.FC = () => {
       console.log('Fetching post with params:', { year, month, day, slug });
       if (!year || !month || !day || !slug) {
         setError('Invalid URL parameters');
+        setLoading(false);
+        return;
+      }
+
+      // Input validation to prevent parameter injection
+      if (!isValidYear(year) || !isValidMonth(month) || !isValidDay(day) || !isValidSlug(slug)) {
+        setError('Invalid URL format');
         setLoading(false);
         return;
       }
@@ -186,7 +194,7 @@ const ArchivePost: React.FC = () => {
         <main className="post-content-section">
           <div
             className="post-rich-content"
-            dangerouslySetInnerHTML={{ __html: DOMPurify.sanitize(post.content) }}
+            dangerouslySetInnerHTML={{ __html: sanitizeHtml(post.content) }}
           />
         </main>
 
