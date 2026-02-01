@@ -7,3 +7,8 @@
 **Vulnerability:** Potential for Parameter Injection/Pollution via URL parameters if backend is vulnerable.
 **Learning:** React Router extracts parameters as strings, but doesn't validate their format. Directly passing these to API calls can expose the backend to injection attacks.
 **Prevention:** Implemented strict regex-based validation in `src/utils/validation.ts` and applied it before API calls.
+
+## 2025-02-18 - [Content Security Policy Implementation]
+**Vulnerability:** XSS and data injection risks due to lack of restrictions on resource loading.
+**Learning:** Vite dev server requires `ws://localhost:*` for HMR and `'unsafe-inline'` for scripts/styles. CSP must account for this to avoid breaking the dev experience.
+**Prevention:** Added a strict-as-possible CSP in `index.html` via meta tag, whitelisting only known external domains and necessary development protocols.
