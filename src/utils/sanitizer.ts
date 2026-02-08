@@ -26,3 +26,14 @@ export const sanitizeHtml = (html: string): string => {
     ADD_ATTR: ['target'],
   });
 };
+
+/**
+ * Sanitizes JSON for safe embedding in <script> tags.
+ * Prevents XSS attacks via </script> injection in JSON-LD.
+ *
+ * @param data - The data to serialize.
+ * @returns The sanitized JSON string.
+ */
+export const sanitizeJSON = (data: unknown): string => {
+  return JSON.stringify(data).replace(/</g, '\\u003c').replace(/>/g, '\\u003e');
+};
