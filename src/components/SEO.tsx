@@ -1,4 +1,5 @@
 import React from 'react';
+import { sanitizeJSON } from '../utils/sanitizer';
 
 interface SEOProps {
   title?: string;
@@ -87,7 +88,7 @@ const SEO: React.FC<SEOProps> = ({
       {/* Structured Data */}
       {structuredData && (
         <script type="application/ld+json">
-          {JSON.stringify(structuredData)}
+          {sanitizeJSON(structuredData)}
         </script>
       )}
     </>

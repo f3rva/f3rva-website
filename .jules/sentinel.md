@@ -12,3 +12,8 @@
 **Vulnerability:** XSS and data injection risks due to lack of restrictions on resource loading.
 **Learning:** Vite dev server requires `ws://localhost:*` for HMR and `'unsafe-inline'` for scripts/styles. CSP must account for this to avoid breaking the dev experience.
 **Prevention:** Added a strict-as-possible CSP in `index.html` via meta tag, whitelisting only known external domains and necessary development protocols.
+
+## 2025-02-18 - [Secure JSON Embedding in Script Tags]
+**Vulnerability:** Cross-Site Scripting (XSS) via script injection in JSON-LD structured data. An attacker could inject `</script><script>...` to break out of the script context.
+**Learning:** Simply using `JSON.stringify` inside a `<script>` tag is unsafe. The browser parses `</script>` even inside strings.
+**Prevention:** Implemented `sanitizeJSON` in `src/utils/sanitizer.ts` which escapes `<` as `\u003c`, preventing the browser from interpreting script tags prematurely.
