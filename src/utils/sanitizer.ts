@@ -28,12 +28,12 @@ export const sanitizeHtml = (html: string): string => {
 };
 
 /**
- * Sanitizes JSON for safe embedding in <script> tags.
- * Prevents XSS attacks via </script> injection in JSON-LD.
+ * Sanitizes JSON data for safe embedding in <script> tags.
+ * Prevents XSS attacks by escaping characters that could break out of the script context.
  *
- * @param data - The data to serialize.
+ * @param data - The data to stringify.
  * @returns The sanitized JSON string.
  */
 export const sanitizeJSON = (data: unknown): string => {
-  return JSON.stringify(data).replace(/</g, '\\u003c').replace(/>/g, '\\u003e');
+  return JSON.stringify(data).replace(/</g, '\\u003c');
 };

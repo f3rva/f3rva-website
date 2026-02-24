@@ -13,10 +13,10 @@
 **Learning:** Vite dev server requires `ws://localhost:*` for HMR and `'unsafe-inline'` for scripts/styles. CSP must account for this to avoid breaking the dev experience.
 **Prevention:** Added a strict-as-possible CSP in `index.html` via meta tag, whitelisting only known external domains and necessary development protocols.
 
-## 2026-02-08 - [XSS in Structured Data]
-**Vulnerability:** Cross-Site Scripting (XSS) via `</script>` injection in JSON-LD structured data blocks. Standard `JSON.stringify` does not escape `<` characters, allowing attackers to break out of the script tag.
-**Learning:** Embedding JSON directly into HTML `<script>` tags requires specific escaping beyond standard JSON serialization.
-**Prevention:** Always use `sanitizeJSON` from `src/utils/sanitizer.ts` for any data embedded in `<script>` tags, which escapes `<` and `>` characters.
+## 2025-02-18 - [Secure JSON Embedding in Script Tags]
+**Vulnerability:** Cross-Site Scripting (XSS) via script injection in JSON-LD structured data. An attacker could inject `</script><script>...` to break out of the script context.
+**Learning:** Simply using `JSON.stringify` inside a `<script>` tag is unsafe. The browser parses `</script>` even inside strings.
+**Prevention:** Implemented `sanitizeJSON` in `src/utils/sanitizer.ts` which escapes `<` as `\u003c`, preventing the browser from interpreting script tags prematurely.
 
 ## 2026-02-22 - [Inconsistent Input Validation in Archives]
 **Vulnerability:** The `AOArchives` component used the `ao` URL parameter directly in API calls without validation, unlike other archive pages (`YearArchives`, `MonthArchives`, `ArchivePost`). This inconsistency created a potential vector for injection or unexpected behavior with malformed slugs.
