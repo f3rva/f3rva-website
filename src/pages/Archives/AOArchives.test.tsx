@@ -131,4 +131,25 @@ describe('AOArchives Page', () => {
       expect.any(Object)
     );
   });
+
+  it('shows error for invalid slug format', async () => {
+    // No mockFetch setup needed as it should return early
+
+    render(
+      <MemoryRouter initialEntries={['/archives/ao/invalid$slug']}>
+        <Routes>
+          <Route path="/archives/ao/:ao" element={<AOArchives />} />
+        </Routes>
+      </MemoryRouter>
+    );
+
+    await waitFor(() => {
+      expect(screen.queryByText('Loading AO archives...')).not.toBeInTheDocument();
+    });
+
+    expect(screen.getByText('Error loading AO archives')).toBeInTheDocument();
+    expect(screen.getByText('Invalid AO format')).toBeInTheDocument();
+
+    expect(mockFetch).not.toHaveBeenCalled();
+  });
 });

@@ -17,3 +17,8 @@
 **Vulnerability:** Cross-Site Scripting (XSS) via script injection in JSON-LD structured data. An attacker could inject `</script><script>...` to break out of the script context.
 **Learning:** Simply using `JSON.stringify` inside a `<script>` tag is unsafe. The browser parses `</script>` even inside strings.
 **Prevention:** Implemented `sanitizeJSON` in `src/utils/sanitizer.ts` which escapes `<` as `\u003c`, preventing the browser from interpreting script tags prematurely.
+
+## 2026-02-22 - [Inconsistent Input Validation in Archives]
+**Vulnerability:** The `AOArchives` component used the `ao` URL parameter directly in API calls without validation, unlike other archive pages (`YearArchives`, `MonthArchives`, `ArchivePost`). This inconsistency created a potential vector for injection or unexpected behavior with malformed slugs.
+**Learning:** Even when security patterns exist (like `isValidSlug`), they must be applied consistently across all similar components. Code duplication (copy-pasting `useEffect` logic) often leads to missed security checks if the original didn't have them or if one copy missed it.
+**Prevention:** Added explicit `isValidSlug` validation in `src/pages/Archives/AOArchives.tsx` before initiating API calls.
