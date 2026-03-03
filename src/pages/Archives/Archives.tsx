@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import SEO from '../../components/SEO';
 import { config } from '../../config';
 import { WorkoutPost } from '../../types/WorkoutPost';
@@ -64,14 +64,14 @@ const Archives: React.FC = () => {
   }, [currentPage, resultsPerPage]);
 
   // Pagination handlers
-  const handlePageChange = (newPage: number) => {
+  const handlePageChange = useCallback((newPage: number) => {
     setCurrentPage(newPage);
-  };
+  }, []);
 
-  const handleResultsPerPageChange = (newResultsPerPage: number) => {
+  const handleResultsPerPageChange = useCallback((newResultsPerPage: number) => {
     setResultsPerPage(newResultsPerPage);
     setCurrentPage(1); // Reset to first page when changing results per page
-  };
+  }, []);
 
   // Loading state
   if (loading) {
