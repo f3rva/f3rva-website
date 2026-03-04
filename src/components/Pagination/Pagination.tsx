@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useCallback } from 'react';
 import { MdNavigateNext, MdNavigateBefore } from 'react-icons/md';
 import './Pagination.css';
 
@@ -29,7 +29,7 @@ export interface PaginationProps {
  * Reusable pagination component for archive pages
  * Provides navigation controls and results per page selection
  */
-const Pagination: React.FC<PaginationProps> = ({
+const Pagination: React.FC<PaginationProps> = React.memo(({
   currentPage,
   resultsPerPage,
   hasMoreResults,
@@ -37,26 +37,29 @@ const Pagination: React.FC<PaginationProps> = ({
   onPageChange,
   onResultsPerPageChange,
 }) => {
+  const handleNextPage = useCallback(() => {
+    if (hasMoreResults) {
+      onPageChange(currentPage + 1);
+    }
+  }, [hasMoreResults, currentPage, onPageChange]);
+
+  const handlePreviousPage = useCallback(() => {
+    if (currentPage > 1) {
+      onPageChange(currentPage - 1);
+    }
+  }, [currentPage, onPageChange]);
+
+  const handleResultsPerPageChange = useCallback(
+    (e: React.ChangeEvent<HTMLSelectElement>) => {
+      onResultsPerPageChange(Number(e.target.value));
+    },
+    [onResultsPerPageChange]
+  );
+
   // Don't render pagination while loading
   if (loading) {
     return null;
   }
-
-  const handleNextPage = () => {
-    if (hasMoreResults) {
-      onPageChange(currentPage + 1);
-    }
-  };
-
-  const handlePreviousPage = () => {
-    if (currentPage > 1) {
-      onPageChange(currentPage - 1);
-    }
-  };
-
-  const handleResultsPerPageChange = (newResultsPerPage: number) => {
-    onResultsPerPageChange(newResultsPerPage);
-  };
 
   return (
     <div className="pagination-controls">
@@ -65,7 +68,7 @@ const Pagination: React.FC<PaginationProps> = ({
         <select
           id="results-per-page-select"
           value={resultsPerPage}
-          onChange={(e) => handleResultsPerPageChange(Number(e.target.value))}
+          onChange={handleResultsPerPageChange}
           className="results-per-page-select"
         >
           <option value={10}>10</option>
@@ -99,6 +102,6 @@ const Pagination: React.FC<PaginationProps> = ({
       </div>
     </div>
   );
-};
+});
 
 export default Pagination;
