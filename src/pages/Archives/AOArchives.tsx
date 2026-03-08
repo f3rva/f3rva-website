@@ -39,6 +39,8 @@ const AOArchives: React.FC = () => {
     }
 
     const controller = new AbortController();
+    // 🛡️ Sentinel: Add timeout to prevent long-hanging external API requests
+    const timeoutId = setTimeout(() => controller.abort('timeout'), 10000);
 
     const fetchPosts = async () => {
       try {
@@ -62,11 +64,19 @@ const AOArchives: React.FC = () => {
         // If we get fewer results than requested, we've reached the end
         setHasMoreResults(postsData.length === resultsPerPage);
       } catch (err) {
-        if (err instanceof Error && err.name !== 'AbortError') {
-          setError(err.message || 'Failed to fetch posts');
+        if (err instanceof Error) {
+          if (err.name !== 'AbortError') {
+            setError(err.message || 'Failed to fetch posts');
+          } else if (controller.signal.reason === 'timeout') {
+            setError('Request timed out. Please try again.');
+          }
+        } else {
+          setError('Failed to fetch posts');
         }
       } finally {
-        setLoading(false);
+        if (controller.signal.reason !== 'unmount') {
+          setLoading(false);
+        }
       }
     };
 
@@ -74,7 +84,8 @@ const AOArchives: React.FC = () => {
 
     // Cleanup function
     return () => {
-      controller.abort();
+      clearTimeout(timeoutId);
+      controller.abort('unmount');
     };
   }, [ao, currentPage, resultsPerPage]);
 
