@@ -32,7 +32,7 @@ const ArchivePost: React.FC = () => {
   useEffect(() => {
     const controller = new AbortController();
     // 🛡️ Sentinel: Add timeout to prevent long-hanging external API requests
-    const timeoutId = setTimeout(() => controller.abort('timeout'), 10000);
+    const timeoutId = setTimeout(() => controller.abort('timeout'), config.apiTimeoutMs);
     
     const fetchPost = async () => {
       console.log('Fetching post with params:', { year, month, day, slug });

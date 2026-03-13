@@ -40,7 +40,7 @@ const YearArchives: React.FC = () => {
 
     const controller = new AbortController();
     // 🛡️ Sentinel: Add timeout to prevent long-hanging external API requests
-    const timeoutId = setTimeout(() => controller.abort('timeout'), 10000);
+    const timeoutId = setTimeout(() => controller.abort('timeout'), config.apiTimeoutMs);
 
     const fetchPosts = async () => {
       try {

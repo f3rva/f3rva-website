@@ -10,10 +10,13 @@
 interface Config {
   /** Base URL for API endpoints */
   apiBaseUrl: string;
+  /** Timeout for external API requests in milliseconds */
+  apiTimeoutMs: number;
 }
 
 export const config: Config = {
   apiBaseUrl: import.meta.env.VITE_API_BASE_URL || 'http://localhost:9000',
+  apiTimeoutMs: 10000,
 };
 
 // Validate required environment variables in development
