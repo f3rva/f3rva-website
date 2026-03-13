@@ -31,6 +31,8 @@ const ArchivePost: React.FC = () => {
   // Fetch post data from API
   useEffect(() => {
     const controller = new AbortController();
+    // 🛡️ Sentinel: Add timeout to prevent long-hanging external API requests
+    const timeoutId = setTimeout(() => controller.abort('timeout'), config.apiTimeoutMs);
     
     const fetchPost = async () => {
       console.log('Fetching post with params:', { year, month, day, slug });
@@ -54,7 +56,7 @@ const ArchivePost: React.FC = () => {
         // Construct the API URL based on parameters
         const apiUrl = `${config.apiBaseUrl}/api/v2/getWorkoutByDateSlug.php?year=${year}&month=${month}&day=${day}&slug=${slug}`;
         
-        const response = await fetch(apiUrl);
+        const response = await fetch(apiUrl, { signal: controller.signal });
 
         if (!response.ok) {
           throw new Error(`HTTP error! status: ${response.status}`);
@@ -63,9 +65,20 @@ const ArchivePost: React.FC = () => {
         const postData: WorkoutPost = await response.json();
         setPost(postData);
       } catch (err) {
-        setError(err instanceof Error ? err.message : 'Failed to fetch post');
+        if (err instanceof Error) {
+          if (err.name !== 'AbortError') {
+            setError(err.message || 'Failed to fetch post');
+          } else if (controller.signal.reason === 'timeout') {
+            setError('Request timed out. Please try again.');
+          }
+        } else {
+          setError('Failed to fetch post');
+        }
       } finally {
-        setLoading(false);
+        // Only stop loading if it wasn't a standard unmount abort
+        if (controller.signal.reason !== 'unmount') {
+          setLoading(false);
+        }
       }
     };
 
@@ -73,7 +86,8 @@ const ArchivePost: React.FC = () => {
 
     // Cleanup function
     return () => {
-      controller.abort();
+      clearTimeout(timeoutId);
+      controller.abort('unmount');
     };
   }, [year, month, day, slug]);
 
