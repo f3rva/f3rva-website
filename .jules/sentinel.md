@@ -22,3 +22,7 @@
 **Vulnerability:** The `AOArchives` component used the `ao` URL parameter directly in API calls without validation, unlike other archive pages (`YearArchives`, `MonthArchives`, `ArchivePost`). This inconsistency created a potential vector for injection or unexpected behavior with malformed slugs.
 **Learning:** Even when security patterns exist (like `isValidSlug`), they must be applied consistently across all similar components. Code duplication (copy-pasting `useEffect` logic) often leads to missed security checks if the original didn't have them or if one copy missed it.
 **Prevention:** Added explicit `isValidSlug` validation in `src/pages/Archives/AOArchives.tsx` before initiating API calls.
+## 2026-03-15 - [Secure Iframe Embeds]
+**Vulnerability:** Embedded iframes from third-party sources (Vimeo, f3nation.com map) lacked the `sandbox` attribute, potentially exposing the application to malicious actions if the external sources were compromised (e.g., executing arbitrary scripts, navigating the top-level window, or presenting malicious popups).
+**Learning:** By default, iframes grant full permissions to embedded content. Implementing the `sandbox` attribute restricts these capabilities, enforcing a principle of least privilege.
+**Prevention:** Always apply the `sandbox` attribute to `<iframe>` elements, explicitly allowing only the necessary features (e.g., `allow-scripts`, `allow-same-origin`, `allow-presentation`, `allow-popups`) required for the embedded content to function correctly.

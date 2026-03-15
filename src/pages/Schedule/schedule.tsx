@@ -86,6 +86,7 @@ const SchedulePage: React.FC = () => {
             height="650" 
             allow="geolocation"
             title="F3 Workout Locations Map"
+            sandbox="allow-scripts allow-same-origin allow-popups"
           />
         </div>
       </section>

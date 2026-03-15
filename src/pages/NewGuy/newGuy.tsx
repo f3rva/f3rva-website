@@ -67,6 +67,7 @@ const NewGuyPage: React.FC = () => {
                   referrerPolicy="strict-origin-when-cross-origin"
                   style={{ position: 'absolute', top: 0, left: 0, width: '100%', height: '100%' }}
                   title="What is F3?"
+                  sandbox="allow-scripts allow-same-origin allow-presentation"
                 ></iframe>
               <script src="https://player.vimeo.com/api/player.js"></script>
             </div>
