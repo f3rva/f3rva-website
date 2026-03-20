@@ -84,6 +84,11 @@ scripts/                 # Build and maintenance scripts (sitemap, robots.txt)
 3.  Register the new route in `src/App.tsx`.
 4.  Add a navigation link in `src/components/Header.tsx` if needed.
 
+## 8.  DevOps conventions
+1.  All new features should be developed in branches that start with feature/<name of feature here>.  All features should be developed in these feature branches and PRd for merging to main.  e.g. feature/remove-ao
+2.  Bugs should follow branch naming conventions of bug/<name of bug>
+3.  Jules bot branches should be located in bot/<name of feature>
+
 ### Updating Workout Data
 1.  Navigate to `src/data/` or `src/pages/Schedule/workoutData.json`.
 2.  Update the static JSON/TS structure.
