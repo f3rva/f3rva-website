@@ -26,3 +26,8 @@
 **Vulnerability:** Embedded iframes from third-party sources (Vimeo, f3nation.com map) lacked the `sandbox` attribute, potentially exposing the application to malicious actions if the external sources were compromised (e.g., executing arbitrary scripts, navigating the top-level window, or presenting malicious popups).
 **Learning:** By default, iframes grant full permissions to embedded content. Implementing the `sandbox` attribute restricts these capabilities, enforcing a principle of least privilege.
 **Prevention:** Always apply the `sandbox` attribute to `<iframe>` elements, explicitly allowing only the necessary features (e.g., `allow-scripts`, `allow-same-origin`, `allow-presentation`, `allow-popups`) required for the embedded content to function correctly.
+
+## 2026-03-22 - [Environment Variable Injection Mitigation]
+**Vulnerability:** Potential for script injection/XSS through malicious modification or misconfiguration of the `VITE_GOOGLE_ANALYTICS_ID` environment variable. Since it's directly injected into a script tag `src`, an attacker controlling build environment variables could inject arbitrary scripts.
+**Learning:** External IDs passed via environment variables that are used to build script URLs or injected directly into HTML must be strictly validated. Never implicitly trust environment variables for external integration identifiers.
+**Prevention:** Implemented strict regex validation (`/^(G-[A-Z0-9]+|UA-\d+-\d+)$/`) for the `VITE_GOOGLE_ANALYTICS_ID` before it's used to construct the script tag in `src/config/analytics.js`.
