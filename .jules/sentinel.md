@@ -26,3 +26,8 @@
 **Vulnerability:** Embedded iframes from third-party sources (Vimeo, f3nation.com map) lacked the `sandbox` attribute, potentially exposing the application to malicious actions if the external sources were compromised (e.g., executing arbitrary scripts, navigating the top-level window, or presenting malicious popups).
 **Learning:** By default, iframes grant full permissions to embedded content. Implementing the `sandbox` attribute restricts these capabilities, enforcing a principle of least privilege.
 **Prevention:** Always apply the `sandbox` attribute to `<iframe>` elements, explicitly allowing only the necessary features (e.g., `allow-scripts`, `allow-same-origin`, `allow-presentation`, `allow-popups`) required for the embedded content to function correctly.
+
+## 2025-02-28 - [DOM Injection via Unvalidated Env Vars]
+**Vulnerability:** XSS vulnerability in `GoogleAnalytics.tsx` resulting from injecting `VITE_GOOGLE_ANALYTICS_ID` into the DOM via a `script.src` tag template without any format validation.
+**Learning:** Environment variables cannot be inherently trusted, especially if they are injected directly into DOM script elements.
+**Prevention:** Enforce strict validation via regex of all environment variables before they are used in sensitive contexts like DOM node creation or external script sourcing.
