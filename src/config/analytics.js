@@ -10,6 +10,13 @@ export const getAnalyticsConfig = () => {
     return null;
   }
 
+  // 🛡️ Sentinel: Validate trackingId to prevent script injection
+  const isValidTrackingId = /^(G-[A-Z0-9]+|UA-\d+-\d+)$/.test(trackingId);
+  if (!isValidTrackingId) {
+    console.error('Invalid Google Analytics ID format');
+    return null;
+  }
+
   return {
     trackingId,
     enabled: true
