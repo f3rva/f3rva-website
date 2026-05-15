@@ -22,6 +22,7 @@
 **Vulnerability:** The `AOArchives` component used the `ao` URL parameter directly in API calls without validation, unlike other archive pages (`YearArchives`, `MonthArchives`, `ArchivePost`). This inconsistency created a potential vector for injection or unexpected behavior with malformed slugs.
 **Learning:** Even when security patterns exist (like `isValidSlug`), they must be applied consistently across all similar components. Code duplication (copy-pasting `useEffect` logic) often leads to missed security checks if the original didn't have them or if one copy missed it.
 **Prevention:** Added explicit `isValidSlug` validation in `src/pages/Archives/AOArchives.tsx` before initiating API calls.
+
 ## 2026-03-15 - [Secure Iframe Embeds]
 **Vulnerability:** Embedded iframes from third-party sources (Vimeo, f3nation.com map) lacked the `sandbox` attribute, potentially exposing the application to malicious actions if the external sources were compromised (e.g., executing arbitrary scripts, navigating the top-level window, or presenting malicious popups).
 **Learning:** By default, iframes grant full permissions to embedded content. Implementing the `sandbox` attribute restricts these capabilities, enforcing a principle of least privilege.
@@ -31,3 +32,8 @@
 **Vulnerability:** Potential for script injection/XSS through malicious modification or misconfiguration of the `VITE_GOOGLE_ANALYTICS_ID` environment variable. Since it's directly injected into a script tag `src`, an attacker controlling build environment variables could inject arbitrary scripts.
 **Learning:** External IDs passed via environment variables that are used to build script URLs or injected directly into HTML must be strictly validated. Never implicitly trust environment variables for external integration identifiers.
 **Prevention:** Implemented strict regex validation (`/^(G-[A-Z0-9]+|UA-\d+-\d+)$/`) for the `VITE_GOOGLE_ANALYTICS_ID` before it's used to construct the script tag in `src/config/analytics.js`.
+
+## 2025-03-29 - [Cookie Consent Memory Cache & Centralized Updates]
+**Vulnerability:** The cookie consent module repeatedly accessed `localStorage` and performed `JSON.parse` on every read (e.g., during page tracking hooks). Uncached parsing of `localStorage` strings could introduce performance bottlenecks or a sync DoS vector if manipulated by a cross-site script. Additionally, updating `localStorage` directly bypassed state synchronization across tabs.
+**Learning:** `localStorage` data should be cached in memory to avoid redundant parsing. Centralized update functions (e.g., `setConsentData`) should be used over direct `localStorage.setItem` to ensure the memory cache and events stay synchronized.
+**Prevention:** Implemented an in-memory cache variable in `src/utils/cookieConsent.ts`, updated all read functions to check the cache, added a `setConsentData` function to centralize writes, and added a `storage` event listener for cross-tab cache invalidation.

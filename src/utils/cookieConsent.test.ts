@@ -4,6 +4,8 @@ import {
   hasDeclinedCookies,
   hasConsentChoice,
   getConsentData,
+  setConsentData,
+  resetConsentCache,
   CONSENT_KEY,
   CONSENT_VERSION
 } from './cookieConsent';
@@ -11,6 +13,7 @@ import {
 describe('cookieConsent utility', () => {
   beforeEach(() => {
     localStorage.clear();
+    resetConsentCache();
     vi.clearAllMocks();
   });
 
@@ -114,6 +117,62 @@ describe('cookieConsent utility', () => {
       };
       localStorage.setItem(CONSENT_KEY, JSON.stringify(data));
       expect(getConsentData()).toBeNull();
+    });
+  });
+
+  describe('setConsentData', () => {
+    it('should set consent data to accepted and update cache', () => {
+      const dispatchEventSpy = vi.spyOn(window, 'dispatchEvent');
+      const data = setConsentData(true);
+      expect(data.accepted).toBe(true);
+      expect(data.version).toBe(CONSENT_VERSION);
+      expect(hasAcceptedCookies()).toBe(true);
+
+      const stored = localStorage.getItem(CONSENT_KEY);
+      expect(stored).toBeTruthy();
+      expect(JSON.parse(stored as string).accepted).toBe(true);
+
+      expect(dispatchEventSpy).toHaveBeenCalledWith(expect.any(Event));
+      expect(dispatchEventSpy.mock.calls[0][0].type).toBe('cookieConsentAccepted');
+    });
+
+    it('should set consent data to declined and update cache', () => {
+      const dispatchEventSpy = vi.spyOn(window, 'dispatchEvent');
+      const data = setConsentData(false);
+      expect(data.accepted).toBe(false);
+      expect(data.version).toBe(CONSENT_VERSION);
+      expect(hasDeclinedCookies()).toBe(true);
+
+      const stored = localStorage.getItem(CONSENT_KEY);
+      expect(stored).toBeTruthy();
+      expect(JSON.parse(stored as string).accepted).toBe(false);
+
+      expect(dispatchEventSpy).not.toHaveBeenCalled();
+    });
+  });
+
+  describe('cache invalidation on storage event', () => {
+    it('should invalidate cache when storage event occurs', () => {
+      setConsentData(true);
+      expect(hasAcceptedCookies()).toBe(true);
+
+      // Simulate storage event from another tab updating consent to false
+      const data = {
+        accepted: false,
+        timestamp: new Date().toISOString(),
+        version: CONSENT_VERSION
+      };
+      localStorage.setItem(CONSENT_KEY, JSON.stringify(data));
+
+      const event = new StorageEvent('storage', {
+        key: CONSENT_KEY,
+        newValue: JSON.stringify(data)
+      });
+      window.dispatchEvent(event);
+
+      // Cache should be invalidated and read the new value from localStorage
+      expect(hasAcceptedCookies()).toBe(false);
+      expect(hasDeclinedCookies()).toBe(true);
     });
   });
 });

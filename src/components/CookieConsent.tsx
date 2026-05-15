@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { hasConsentChoice, CONSENT_KEY, CONSENT_VERSION } from '../utils/cookieConsent';
+import { hasConsentChoice, setConsentData } from '../utils/cookieConsent';
 import './CookieConsent.css';
 
 /**
@@ -22,28 +22,13 @@ const CookieConsent: React.FC = () => {
 
   const handleAccept = () => {
     // Store consent with timestamp and version
-    const consentData = {
-      accepted: true,
-      timestamp: new Date().toISOString(),
-      version: CONSENT_VERSION
-    };
-
-    localStorage.setItem(CONSENT_KEY, JSON.stringify(consentData));
+    setConsentData(true);
     setShowBanner(false);
-
-    // Dispatch custom event to notify GoogleAnalytics component
-    window.dispatchEvent(new Event('cookieConsentAccepted'));
   };
 
   const handleDecline = () => {
     // Store declined consent
-    const consentData = {
-      accepted: false,
-      timestamp: new Date().toISOString(),
-      version: CONSENT_VERSION
-    };
-
-    localStorage.setItem(CONSENT_KEY, JSON.stringify(consentData));
+    setConsentData(false);
     setShowBanner(false);
   };
 
