@@ -28,6 +28,11 @@
 **Learning:** By default, iframes grant full permissions to embedded content. Implementing the `sandbox` attribute restricts these capabilities, enforcing a principle of least privilege.
 **Prevention:** Always apply the `sandbox` attribute to `<iframe>` elements, explicitly allowing only the necessary features (e.g., `allow-scripts`, `allow-same-origin`, `allow-presentation`, `allow-popups`) required for the embedded content to function correctly.
 
+## 2026-03-15 - [Secure Environment Variable Validation]
+**Vulnerability:** The Google Analytics Measurement ID (`VITE_GOOGLE_ANALYTICS_ID`) was loaded directly from the environment without validation in `src/config/analytics.js`. If the environment variable was maliciously modified or incorrectly configured (e.g., to contain a script or unexpected payload), it could lead to script injection or XSS since it's directly appended to the external Google Tag Manager script URL in `src/components/GoogleAnalytics.tsx`.
+**Learning:** Environment variables used in sensitive contexts (like constructing URLs for external scripts) should never be trusted blindly. Even though Vite limits exposure to `VITE_` prefixed variables, validating their format adds a crucial layer of defense in depth against configuration errors or potential CI/CD pipeline compromises.
+**Prevention:** Added strict regex validation in `src/config/analytics.js` (`/^(G-[A-Z0-9]+|UA-\d+-\d+)$/`) to ensure the `trackingId` strictly matches expected Google Analytics formats before returning the configuration. If the format is invalid, it securely fails by returning `null`, preventing the external script from loading.
+
 ## 2026-03-22 - [Environment Variable Injection Mitigation]
 **Vulnerability:** Potential for script injection/XSS through malicious modification or misconfiguration of the `VITE_GOOGLE_ANALYTICS_ID` environment variable. Since it's directly injected into a script tag `src`, an attacker controlling build environment variables could inject arbitrary scripts.
 **Learning:** External IDs passed via environment variables that are used to build script URLs or injected directly into HTML must be strictly validated. Never implicitly trust environment variables for external integration identifiers.
