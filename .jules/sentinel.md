@@ -28,6 +28,11 @@
 **Learning:** By default, iframes grant full permissions to embedded content. Implementing the `sandbox` attribute restricts these capabilities, enforcing a principle of least privilege.
 **Prevention:** Always apply the `sandbox` attribute to `<iframe>` elements, explicitly allowing only the necessary features (e.g., `allow-scripts`, `allow-same-origin`, `allow-presentation`, `allow-popups`) required for the embedded content to function correctly.
 
+## 2026-03-24 - [Environment Variable Validation]
+**Vulnerability:** The Google Analytics ID is injected from the environment variable `VITE_GOOGLE_ANALYTICS_ID` and used directly in script source generation, which could lead to an XSS injection if the environment variable is compromised or maliciously crafted.
+**Learning:** Even internal configuration injected at build time via environment variables should be treated as untrusted input when used in security-sensitive contexts like script tag URLs.
+**Prevention:** Added a strict regex validation for `VITE_GOOGLE_ANALYTICS_ID` (`/^(G-[A-Z0-9]+|UA-\d+-\d+)$/`) before using it in the application.
+
 ## 2025-02-28 - [DOM Injection via Unvalidated Env Vars]
 **Vulnerability:** XSS vulnerability in `GoogleAnalytics.tsx` resulting from injecting `VITE_GOOGLE_ANALYTICS_ID` into the DOM via a `script.src` tag template without any format validation.
 **Learning:** Environment variables cannot be inherently trusted, especially if they are injected directly into DOM script elements.
