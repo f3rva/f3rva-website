@@ -26,3 +26,8 @@
 **Vulnerability:** Embedded iframes from third-party sources (Vimeo, f3nation.com map) lacked the `sandbox` attribute, potentially exposing the application to malicious actions if the external sources were compromised (e.g., executing arbitrary scripts, navigating the top-level window, or presenting malicious popups).
 **Learning:** By default, iframes grant full permissions to embedded content. Implementing the `sandbox` attribute restricts these capabilities, enforcing a principle of least privilege.
 **Prevention:** Always apply the `sandbox` attribute to `<iframe>` elements, explicitly allowing only the necessary features (e.g., `allow-scripts`, `allow-same-origin`, `allow-presentation`, `allow-popups`) required for the embedded content to function correctly.
+
+## 2025-03-29 - [Cookie Consent Memory Cache & Centralized Updates]
+**Vulnerability:** The cookie consent module repeatedly accessed `localStorage` and performed `JSON.parse` on every read (e.g., during page tracking hooks). Uncached parsing of `localStorage` strings could introduce performance bottlenecks or a sync DoS vector if manipulated by a cross-site script. Additionally, updating `localStorage` directly bypassed state synchronization across tabs.
+**Learning:** `localStorage` data should be cached in memory to avoid redundant parsing. Centralized update functions (e.g., `setConsentData`) should be used over direct `localStorage.setItem` to ensure the memory cache and events stay synchronized.
+**Prevention:** Implemented an in-memory cache variable in `src/utils/cookieConsent.ts`, updated all read functions to check the cache, added a `setConsentData` function to centralize writes, and added a `storage` event listener for cross-tab cache invalidation.
