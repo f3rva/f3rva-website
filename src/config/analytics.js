@@ -5,8 +5,14 @@ export const getAnalyticsConfig = () => {
   // Vite exposes env variables here
   const trackingId = import.meta.env.VITE_GOOGLE_ANALYTICS_ID;
 
-  // Don't initialize if the ID is not set
+  // 🛡️ Sentinel: Validate GA tracking ID format to prevent script injection
+  // Expected formats: G-XXXXXXX or UA-XXXXXXX-X
+  const isValidId = trackingId && /^(G-[A-Z0-9]+|UA-\d+-\d+)$/.test(trackingId);
+
   if (!trackingId) {
+    return null;
+  } else if (!isValidId) {
+    console.warn('Invalid Google Analytics ID format detected. Analytics disabled.');
     return null;
   }
 
