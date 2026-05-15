@@ -28,6 +28,11 @@
 **Learning:** By default, iframes grant full permissions to embedded content. Implementing the `sandbox` attribute restricts these capabilities, enforcing a principle of least privilege.
 **Prevention:** Always apply the `sandbox` attribute to `<iframe>` elements, explicitly allowing only the necessary features (e.g., `allow-scripts`, `allow-same-origin`, `allow-presentation`, `allow-popups`) required for the embedded content to function correctly.
 
+## 2025-02-28 - [DOM Injection via Unvalidated Env Vars]
+**Vulnerability:** XSS vulnerability in `GoogleAnalytics.tsx` resulting from injecting `VITE_GOOGLE_ANALYTICS_ID` into the DOM via a `script.src` tag template without any format validation.
+**Learning:** Environment variables cannot be inherently trusted, especially if they are injected directly into DOM script elements.
+**Prevention:** Enforce strict validation via regex of all environment variables before they are used in sensitive contexts like DOM node creation or external script sourcing.
+
 ## 2026-03-15 - [Secure Environment Variable Validation]
 **Vulnerability:** The Google Analytics Measurement ID (`VITE_GOOGLE_ANALYTICS_ID`) was loaded directly from the environment without validation in `src/config/analytics.js`. If the environment variable was maliciously modified or incorrectly configured (e.g., to contain a script or unexpected payload), it could lead to script injection or XSS since it's directly appended to the external Google Tag Manager script URL in `src/components/GoogleAnalytics.tsx`.
 **Learning:** Environment variables used in sensitive contexts (like constructing URLs for external scripts) should never be trusted blindly. Even though Vite limits exposure to `VITE_` prefixed variables, validating their format adds a crucial layer of defense in depth against configuration errors or potential CI/CD pipeline compromises.
