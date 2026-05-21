@@ -47,7 +47,7 @@ export function useFetch<T>(
 
         setData(result);
       } catch (err: unknown) {
-        if (controller.signal.aborted) return;
+        if (controller.signal.aborted && controller.signal.reason !== 'timeout') return;
 
         const errorName = err instanceof Error ? err.name : '';
         const errorMessage = err instanceof Error ? err.message : 'Failed to fetch';
@@ -58,7 +58,7 @@ export function useFetch<T>(
           setError(errorMessage);
         }
       } finally {
-        if (!controller.signal.aborted) {
+        if (!controller.signal.aborted || controller.signal.reason === 'timeout') {
           setLoading(false);
         }
       }
