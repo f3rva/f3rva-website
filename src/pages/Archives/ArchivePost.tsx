@@ -64,20 +64,20 @@ const ArchivePost: React.FC = () => {
         }
 
         const postData: WorkoutPost = await response.json();
+        
+        if (controller.signal.aborted) return; // 🛡️ Guard: Ignore success if aborted
+
         setPost(postData);
-      } catch (err) {
-        if (err instanceof Error) {
-          if (err.name !== 'AbortError') {
-            setError(err.message || 'Failed to fetch post');
-          } else if (controller.signal.reason === 'timeout') {
-            setError('Request timed out. Please try again.');
-          }
+      } catch (err: any) {
+        if (controller.signal.aborted) return; // 🛡️ Guard: Ignore error if aborted
+
+        if (err.name === 'timeout' || controller.signal.reason === 'timeout') {
+          setError('Request timed out. Please try again.');
         } else {
-          setError('Failed to fetch post');
+          setError(err.message || 'Failed to fetch post');
         }
       } finally {
-        // Only stop loading if it wasn't a standard unmount abort
-        if (controller.signal.reason !== 'unmount') {
+        if (!controller.signal.aborted) {      // 🛡️ Guard: Only toggle loading if not aborted
           setLoading(false);
         }
       }
