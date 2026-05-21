@@ -1,0 +1,149 @@
+/* Modern Loading Spinner CSS for F3 RVA website */
+
+.f3-spinner-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 3rem 1.5rem;
+  width: 100%;
+  box-sizing: border-box;
+}
+
+/* Fullscreen Overlay Mode */
+.f3-spinner-container.fullscreen {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(26, 26, 26, 0.9);
+  z-index: 9999;
+}
+
+/* Size Modifiers */
+.f3-spinner-container.size-small .f3-spinner-visual {
+  width: 32px;
+  height: 32px;
+}
+.f3-spinner-container.size-medium .f3-spinner-visual {
+  width: 54px;
+  height: 54px;
+}
+.f3-spinner-container.size-large .f3-spinner-visual {
+  width: 80px;
+  height: 80px;
+}
+
+/* Spinner Visual Block & Central Glow */
+.f3-spinner-visual {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.f3-spinner-svg {
+  width: 100%;
+  height: 100%;
+  animation: f3-spin-rotation 1.4s cubic-bezier(0.4, 0, 0.2, 1) infinite;
+  transform-origin: center center;
+}
+
+/* Background track ring */
+.f3-spinner-track {
+  stroke: #e9ecef;
+  /* subtle visual contrast against the dark background when in dark mode */
+}
+
+/* Add support for dark pages/headers */
+.main-navigation-header .f3-spinner-track,
+.f3-spinner-container.fullscreen .f3-spinner-track {
+  stroke: rgba(255, 255, 255, 0.08);
+}
+
+/* The spinning arc head */
+.f3-spinner-head {
+  stroke: #e74c3c; /* F3 brand red */
+  stroke-dasharray: 80, 200;
+  stroke-dashoffset: 0;
+  animation: f3-spinner-dash 1.4s ease-in-out infinite;
+}
+
+/* A glowing pulsing core inside the spinner */
+.f3-spinner-center-glow {
+  position: absolute;
+  width: 30%;
+  height: 30%;
+  background-color: rgba(231, 76, 60, 0.15);
+  border-radius: 50%;
+  animation: f3-spinner-glow 1.4s ease-in-out infinite;
+  pointer-events: none;
+}
+
+/* Pulsing text message below the spinner */
+.f3-spinner-message {
+  margin-top: 1.25rem;
+  font-family: inherit;
+  font-weight: 600;
+  color: #2c3e50; /* deep blue-grey */
+  font-size: 1.05rem;
+  letter-spacing: 0.025em;
+  text-align: center;
+  animation: f3-text-pulse 2s ease-in-out infinite;
+}
+
+/* Support dark/header overlays */
+.f3-spinner-container.fullscreen .f3-spinner-message {
+  color: #f8f9fa;
+}
+
+/* Keyframes for rotation */
+@keyframes f3-spin-rotation {
+  0% {
+    transform: rotate(0deg);
+  }
+  100% {
+    transform: rotate(360deg);
+  }
+}
+
+/* Keyframes for changing circular arc length */
+@keyframes f3-spinner-dash {
+  0% {
+    stroke-dasharray: 1, 200;
+    stroke-dashoffset: 0;
+  }
+  50% {
+    stroke-dasharray: 89, 200;
+    stroke-dashoffset: -35px;
+  }
+  100% {
+    stroke-dasharray: 89, 200;
+    stroke-dashoffset: -124px;
+  }
+}
+
+/* Keyframes for the center glow pulse */
+@keyframes f3-spinner-glow {
+  0%, 100% {
+    transform: scale(0.85);
+    background-color: rgba(231, 76, 60, 0.1);
+  }
+  50% {
+    transform: scale(1.2);
+    background-color: rgba(231, 76, 60, 0.35);
+  }
+}
+
+/* Keyframes for the loading text pulse */
+@keyframes f3-text-pulse {
+  0%, 100% {
+    opacity: 0.6;
+    transform: scale(0.99);
+  }
+  50% {
+    opacity: 1;
+    transform: scale(1.01);
+  }
+}

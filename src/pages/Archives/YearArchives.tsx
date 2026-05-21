@@ -6,6 +6,7 @@ import { config } from '../../config';
 import { WorkoutPost } from '../../types/WorkoutPost';
 import Pagination from '../../components/Pagination';
 import ArchivePostCard from '../../components/ArchivePostCard';
+import LoadingSpinner from '../../components/LoadingSpinner/LoadingSpinner';
 import './Archives.css';
 
 /**
@@ -108,7 +109,7 @@ const YearArchives: React.FC = () => {
   if (loading) {
     return (
       <div className="archives-container">
-        <div className="loading-spinner">Loading year archives...</div>
+        <LoadingSpinner message="Loading year archives..." />
       </div>
     );
   }

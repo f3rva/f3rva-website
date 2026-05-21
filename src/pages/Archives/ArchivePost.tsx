@@ -8,6 +8,7 @@ import { getPostExcerpt } from '../../utils/postUtils';
 import { sanitizeHtml } from '../../utils/sanitizer';
 import { isValidYear, isValidMonth, isValidDay, isValidSlug } from '../../utils/validation';
 import SEO from '../../components/SEO';
+import LoadingSpinner from '../../components/LoadingSpinner/LoadingSpinner';
 import './ArchivePost.css';
 
 /**
@@ -95,7 +96,7 @@ const ArchivePost: React.FC = () => {
   if (loading) {
     return (
       <div className="archive-post-container">
-        <div className="loading-spinner">Loading post...</div>
+        <LoadingSpinner message="Loading post..." />
       </div>
     );
   }

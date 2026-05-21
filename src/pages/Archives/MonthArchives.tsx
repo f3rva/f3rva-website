@@ -7,6 +7,7 @@ import { WorkoutPost } from '../../types/WorkoutPost';
 import { formatMonthName } from '../../utils/dateUtils';
 import Pagination from '../../components/Pagination';
 import ArchivePostCard from '../../components/ArchivePostCard';
+import LoadingSpinner from '../../components/LoadingSpinner/LoadingSpinner';
 import './Archives.css';
 
 /**
@@ -109,7 +110,7 @@ const MonthArchives: React.FC = () => {
   if (loading) {
     return (
       <div className="archives-container">
-        <div className="loading-spinner">Loading month archives...</div>
+        <LoadingSpinner message="Loading month archives..." />
       </div>
     );
   }
