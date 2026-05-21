@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React from 'react';
 import { useParams, Navigate, Link } from 'react-router-dom';
 import { MdCalendarToday, MdPerson, MdGroup, MdLocationOn } from 'react-icons/md';
 import { config } from '../../config';
@@ -8,6 +8,8 @@ import { getPostExcerpt } from '../../utils/postUtils';
 import { sanitizeHtml } from '../../utils/sanitizer';
 import { isValidYear, isValidMonth, isValidDay, isValidSlug } from '../../utils/validation';
 import SEO from '../../components/SEO';
+import LoadingSpinner from '../../components/LoadingSpinner/LoadingSpinner';
+import { useFetch } from '../../hooks/useFetch';
 import './ArchivePost.css';
 
 /**
@@ -23,79 +25,27 @@ const ArchivePost: React.FC = () => {
     slug: string;
   }>();
 
-  // State management for post data, loading, and errors
-  const [post, setPost] = useState<WorkoutPost | null>(null);
-  const [loading, setLoading] = useState<boolean>(true);
-  const [error, setError] = useState<string | null>(null);
+  // Validate parameters and format
+  const isValidParams = year && month && day && slug;
+  const isValidFormat = isValidParams && isValidYear(year) && isValidMonth(month) && isValidDay(day) && isValidSlug(slug);
 
-  // Fetch post data from API
-  useEffect(() => {
-    const controller = new AbortController();
-    // 🛡️ Sentinel: Add timeout to prevent long-hanging external API requests
-    const timeoutId = setTimeout(() => controller.abort('timeout'), config.apiTimeoutMs);
-    
-    const fetchPost = async () => {
-      console.log('Fetching post with params:', { year, month, day, slug });
-      if (!year || !month || !day || !slug) {
-        setError('Invalid URL parameters');
-        setLoading(false);
-        return;
-      }
+  // Construct dynamic API URL
+  const apiUrl = isValidFormat
+    ? `${config.apiBaseUrl}/api/v2/getWorkoutByDateSlug.php?year=${year}&month=${month}&day=${day}&slug=${slug}`
+    : null;
 
-      // Input validation to prevent parameter injection
-      if (!isValidYear(year) || !isValidMonth(month) || !isValidDay(day) || !isValidSlug(slug)) {
-        setError('Invalid URL format');
-        setLoading(false);
-        return;
-      }
+  // Use the type-safe fetch hook
+  const { data: post, loading: fetchLoading, error: fetchError } = useFetch<WorkoutPost>(apiUrl);
 
-      try {
-        setLoading(true);
-        setError(null);
-
-        // Construct the API URL based on parameters
-        const apiUrl = `${config.apiBaseUrl}/api/v2/getWorkoutByDateSlug.php?year=${year}&month=${month}&day=${day}&slug=${slug}`;
-        
-        const response = await fetch(apiUrl, { signal: controller.signal });
-
-        if (!response.ok) {
-          throw new Error(`HTTP error! status: ${response.status}`);
-        }
-
-        const postData: WorkoutPost = await response.json();
-        setPost(postData);
-      } catch (err) {
-        if (err instanceof Error) {
-          if (err.name !== 'AbortError') {
-            setError(err.message || 'Failed to fetch post');
-          } else if (controller.signal.reason === 'timeout') {
-            setError('Request timed out. Please try again.');
-          }
-        } else {
-          setError('Failed to fetch post');
-        }
-      } finally {
-        // Only stop loading if it wasn't a standard unmount abort
-        if (controller.signal.reason !== 'unmount') {
-          setLoading(false);
-        }
-      }
-    };
-
-    fetchPost();
-
-    // Cleanup function
-    return () => {
-      clearTimeout(timeoutId);
-      controller.abort('unmount');
-    };
-  }, [year, month, day, slug]);
+  // Derive consolidated states
+  const loading = isValidFormat ? fetchLoading : false;
+  const error = !isValidParams ? 'Invalid URL parameters' : !isValidFormat ? 'Invalid URL format' : fetchError;
 
   // Loading state
   if (loading) {
     return (
       <div className="archive-post-container">
-        <div className="loading-spinner">Loading post...</div>
+        <LoadingSpinner message="Loading post..." />
       </div>
     );
   }

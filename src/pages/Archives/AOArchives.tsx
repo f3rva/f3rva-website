@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import { Link, useParams, Navigate } from 'react-router-dom';
 import SEO from '../../components/SEO';
 import { isValidSlug } from '../../utils/validation';
@@ -6,6 +6,8 @@ import { config } from '../../config';
 import { WorkoutPost } from '../../types/WorkoutPost';
 import Pagination from '../../components/Pagination';
 import ArchivePostCard from '../../components/ArchivePostCard';
+import LoadingSpinner from '../../components/LoadingSpinner/LoadingSpinner';
+import { useFetch } from '../../hooks/useFetch';
 import './Archives.css';
 
 /**
@@ -16,78 +18,27 @@ import './Archives.css';
 const AOArchives: React.FC = () => {
   const { ao } = useParams<{ ao: string }>(); // ao parameter is now the AO slug
 
-  // State management for posts, loading, and errors
-  const [posts, setPosts] = useState<WorkoutPost[]>([]);
-  const [loading, setLoading] = useState<boolean>(true);
-  const [error, setError] = useState<string | null>(null);
-
   // Pagination state
   const [currentPage, setCurrentPage] = useState<number>(1);
   const [resultsPerPage, setResultsPerPage] = useState<number>(10);
-  const [hasMoreResults, setHasMoreResults] = useState<boolean>(true);
 
-  // Fetch posts data from API with pagination
-  useEffect(() => {
-    if (!ao) {
-      return;
-    }
+  // Validate parameters and format
+  const isValidParams = !!ao;
+  const isValidFormat = isValidParams && isValidSlug(ao);
 
-    if (!isValidSlug(ao)) {
-      setError('Invalid AO format');
-      setLoading(false);
-      return;
-    }
+  // Construct dynamic API URL
+  const apiUrl = isValidFormat
+    ? `${config.apiBaseUrl}/api/v2/getWorkoutsByAO.php?slug=${encodeURIComponent(ao)}&page=${currentPage}&results=${resultsPerPage}`
+    : null;
 
-    const controller = new AbortController();
-    // 🛡️ Sentinel: Add timeout to prevent long-hanging external API requests
-    const timeoutId = setTimeout(() => controller.abort('timeout'), config.apiTimeoutMs);
+  // Use the type-safe fetch hook
+  const { data: postsData, loading: fetchLoading, error: fetchError } = useFetch<WorkoutPost[]>(apiUrl);
 
-    const fetchPosts = async () => {
-      try {
-        setLoading(true);
-        setError(null);
-
-        // Construct the API URL for posts by AO with pagination
-        // Using slug parameter instead of name to match updated API
-        const apiUrl = `${config.apiBaseUrl}/api/v2/getWorkoutsByAO.php?slug=${encodeURIComponent(ao)}&page=${currentPage}&results=${resultsPerPage}`;
-
-        const response = await fetch(apiUrl, { signal: controller.signal });
-
-        if (!response.ok) {
-          throw new Error(`HTTP error! status: ${response.status}`);
-        }
-
-        const postsData: WorkoutPost[] = await response.json();
-        setPosts(postsData);
-
-        // Determine if there are more results based on returned data length
-        // If we get fewer results than requested, we've reached the end
-        setHasMoreResults(postsData.length === resultsPerPage);
-      } catch (err) {
-        if (err instanceof Error) {
-          if (err.name !== 'AbortError') {
-            setError(err.message || 'Failed to fetch posts');
-          } else if (controller.signal.reason === 'timeout') {
-            setError('Request timed out. Please try again.');
-          }
-        } else {
-          setError('Failed to fetch posts');
-        }
-      } finally {
-        if (controller.signal.reason !== 'unmount') {
-          setLoading(false);
-        }
-      }
-    };
-
-    fetchPosts();
-
-    // Cleanup function
-    return () => {
-      clearTimeout(timeoutId);
-      controller.abort('unmount');
-    };
-  }, [ao, currentPage, resultsPerPage]);
+  // Derive consolidated states
+  const posts = postsData || [];
+  const loading = isValidFormat ? fetchLoading : false;
+  const error = !isValidParams ? null : !isValidFormat ? 'Invalid AO format' : fetchError;
+  const hasMoreResults = postsData ? postsData.length === resultsPerPage : true;
 
   // Return early if invalid parameters
   if (!ao) {
@@ -109,7 +60,7 @@ const AOArchives: React.FC = () => {
   if (loading) {
     return (
       <div className="archives-container">
-        <div className="loading-spinner">Loading AO archives...</div>
+        <LoadingSpinner message="Loading AO archives..." />
       </div>
     );
   }

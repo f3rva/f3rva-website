@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import { Link, useParams, Navigate } from 'react-router-dom';
 import { isValidYear, isValidMonth, isValidDay } from '../../utils/validation';
 import { config } from '../../config';
@@ -7,6 +7,8 @@ import { WorkoutPost } from '../../types/WorkoutPost';
 import ArchivePostCard from '../../components/ArchivePostCard';
 import Pagination from '../../components/Pagination';
 import SEO from '../../components/SEO';
+import LoadingSpinner from '../../components/LoadingSpinner/LoadingSpinner';
+import { useFetch } from '../../hooks/useFetch';
 import './Archives.css';
 
 /**
@@ -17,77 +19,27 @@ import './Archives.css';
 const DayArchives: React.FC = () => {
   const { year, month, day } = useParams<{ year: string; month: string; day: string }>();
 
-  // State management for posts, loading, and errors
-  const [posts, setPosts] = useState<WorkoutPost[]>([]);
-  const [loading, setLoading] = useState<boolean>(true);
-  const [error, setError] = useState<string | null>(null);
-
   // Pagination state
   const [currentPage, setCurrentPage] = useState<number>(1);
   const [resultsPerPage, setResultsPerPage] = useState<number>(10);
-  const [hasMoreResults, setHasMoreResults] = useState<boolean>(true);
 
-  // Fetch posts data from API with pagination
-  useEffect(() => {
-    if (!year || !month || !day) {
-      return;
-    }
+  // Validate parameters and format
+  const isValidParams = year && month && day;
+  const isValidFormat = isValidParams && isValidYear(year) && isValidMonth(month) && isValidDay(day);
 
-    if (!isValidYear(year) || !isValidMonth(month) || !isValidDay(day)) {
-      setError('Invalid date format');
-      setLoading(false);
-      return;
-    }
+  // Construct dynamic API URL
+  const apiUrl = isValidFormat
+    ? `${config.apiBaseUrl}/api/v2/getWorkoutsByDate.php?year=${year}&month=${month}&day=${day}&page=${currentPage}&results=${resultsPerPage}`
+    : null;
 
-    const controller = new AbortController();
-    // 🛡️ Sentinel: Add timeout to prevent long-hanging external API requests
-    const timeoutId = setTimeout(() => controller.abort('timeout'), config.apiTimeoutMs);
+  // Use the type-safe fetch hook
+  const { data: postsData, loading: fetchLoading, error: fetchError } = useFetch<WorkoutPost[]>(apiUrl);
 
-    const fetchPosts = async () => {
-      try {
-        setLoading(true);
-        setError(null);
-
-        // Construct the API URL for posts by date with pagination
-        const apiUrl = `${config.apiBaseUrl}/api/v2/getWorkoutsByDate.php?year=${year}&month=${month}&day=${day}&page=${currentPage}&results=${resultsPerPage}`;
-
-        const response = await fetch(apiUrl, { signal: controller.signal });
-
-        if (!response.ok) {
-          throw new Error(`HTTP error! status: ${response.status}`);
-        }
-
-        const postsData: WorkoutPost[] = await response.json();
-        setPosts(postsData);
-
-        // Determine if there are more results based on returned data length
-        // If we get fewer results than requested, we've reached the end
-        setHasMoreResults(postsData.length === resultsPerPage);
-      } catch (err) {
-        if (err instanceof Error) {
-          if (err.name !== 'AbortError') {
-            setError(err.message || 'Failed to fetch posts');
-          } else if (controller.signal.reason === 'timeout') {
-            setError('Request timed out. Please try again.');
-          }
-        } else {
-          setError('Failed to fetch posts');
-        }
-      } finally {
-        if (controller.signal.reason !== 'unmount') {
-          setLoading(false);
-        }
-      }
-    };
-
-    fetchPosts();
-
-    // Cleanup function
-    return () => {
-      clearTimeout(timeoutId);
-      controller.abort('unmount');
-    };
-  }, [year, month, day, currentPage, resultsPerPage]);
+  // Derive consolidated states
+  const posts = postsData || [];
+  const loading = isValidFormat ? fetchLoading : false;
+  const error = !isValidParams ? null : !isValidFormat ? 'Invalid date format' : fetchError;
+  const hasMoreResults = postsData ? postsData.length === resultsPerPage : true;
 
   // Return early if invalid parameters
   if (!year || !month || !day) {
@@ -109,7 +61,7 @@ const DayArchives: React.FC = () => {
   if (loading) {
     return (
       <div className="archives-container">
-        <div className="loading-spinner">Loading day archives...</div>
+        <LoadingSpinner message="Loading day archives..." />
       </div>
     );
   }

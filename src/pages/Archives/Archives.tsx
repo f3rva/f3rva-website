@@ -1,9 +1,11 @@
-import React, { useState, useEffect, useCallback } from 'react';
+import React, { useState, useCallback } from 'react';
 import SEO from '../../components/SEO';
 import { config } from '../../config';
 import { WorkoutPost } from '../../types/WorkoutPost';
 import Pagination from '../../components/Pagination';
 import ArchivePostCard from '../../components/ArchivePostCard';
+import LoadingSpinner from '../../components/LoadingSpinner/LoadingSpinner';
+import { useFetch } from '../../hooks/useFetch';
 import './Archives.css';
 
 /**
@@ -12,67 +14,19 @@ import './Archives.css';
  * Provides links to individual post pages using date-based URLs
  */
 const Archives: React.FC = () => {
-  // State management for posts, loading, and errors
-  const [posts, setPosts] = useState<WorkoutPost[]>([]);
-  const [loading, setLoading] = useState<boolean>(true);
-  const [error, setError] = useState<string | null>(null);
-
   // Pagination state
   const [currentPage, setCurrentPage] = useState<number>(1);
   const [resultsPerPage, setResultsPerPage] = useState<number>(10);
-  const [hasMoreResults, setHasMoreResults] = useState<boolean>(true);
 
-  // Fetch posts data from API with pagination
-  useEffect(() => {
-    const controller = new AbortController();
-    // 🛡️ Sentinel: Add timeout to prevent long-hanging external API requests
-    const timeoutId = setTimeout(() => controller.abort('timeout'), config.apiTimeoutMs);
+  // Construct dynamic API URL
+  const apiUrl = `${config.apiBaseUrl}/api/v2/getWorkouts.php?page=${currentPage}&results=${resultsPerPage}`;
 
-    const fetchPosts = async () => {
-      try {
-        setLoading(true);
-        setError(null);
+  // Use the type-safe fetch hook
+  const { data: postsData, loading, error } = useFetch<WorkoutPost[]>(apiUrl);
 
-        // Construct the API URL with pagination parameters
-        const apiUrl = `${config.apiBaseUrl}/api/v2/getWorkouts.php?page=${currentPage}&results=${resultsPerPage}`;
-
-        const response = await fetch(apiUrl, { signal: controller.signal });
-
-        if (!response.ok) {
-          throw new Error(`HTTP error! status: ${response.status}`);
-        }
-
-        const postsData: WorkoutPost[] = await response.json();
-        setPosts(postsData);
-
-        // Determine if there are more results based on returned data length
-        // If we get fewer results than requested, we've reached the end
-        setHasMoreResults(postsData.length === resultsPerPage);
-      } catch (err) {
-        if (err instanceof Error) {
-          if (err.name !== 'AbortError') {
-            setError(err.message || 'Failed to fetch posts');
-          } else if (controller.signal.reason === 'timeout') {
-            setError('Request timed out. Please try again.');
-          }
-        } else {
-          setError('Failed to fetch posts');
-        }
-      } finally {
-        if (controller.signal.reason !== 'unmount') {
-          setLoading(false);
-        }
-      }
-    };
-
-    fetchPosts();
-
-    // Cleanup function
-    return () => {
-      clearTimeout(timeoutId);
-      controller.abort('unmount');
-    };
-  }, [currentPage, resultsPerPage]);
+  // Derive consolidated states
+  const posts = postsData || [];
+  const hasMoreResults = postsData ? postsData.length === resultsPerPage : true;
 
   // Pagination handlers
   const handlePageChange = useCallback((newPage: number) => {
@@ -88,7 +42,7 @@ const Archives: React.FC = () => {
   if (loading) {
     return (
       <div className="archives-container">
-        <div className="loading-spinner">Loading archives...</div>
+        <LoadingSpinner message="Loading archives..." />
       </div>
     );
   }
