@@ -73,45 +73,12 @@ describe('SchedulePage', () => {
   });
 
   describe('WorkoutScheduleTable', () => {
-    it('renders the 1stF tab by default', () => {
+    it('renders the workout schedule table', () => {
       render(<SchedulePage />);
-      
-      // Check for tab button active state
-      const tab1 = screen.getByRole('button', { name: '1st F' });
-      expect(tab1).toHaveClass('active');
 
-      // Check for 1stF data
+      // Check for 1stF workout data
       expect(screen.getByText('Test Workout 1')).toBeInTheDocument();
       expect(screen.getByText('TestQ1')).toBeInTheDocument();
-
-      // Ensure 2ndF data is NOT present
-      expect(screen.queryByText('Test Event 2')).not.toBeInTheDocument();
-    });
-
-    it('switches to 2ndF tab when clicked', () => {
-      render(<SchedulePage />);
-      
-      const tab2 = screen.getByRole('button', { name: '2nd F' });
-      fireEvent.click(tab2);
-
-      // Check active class
-      expect(tab2).toHaveClass('active');
-      expect(screen.getByRole('button', { name: '1st F' })).not.toHaveClass('active');
-
-      // Check content updated
-      expect(screen.getByText('Test Event 2')).toBeInTheDocument();
-      expect(screen.queryByText('Test Workout 1')).not.toBeInTheDocument();
-    });
-
-    it('switches to 3rdF tab when clicked', () => {
-      render(<SchedulePage />);
-      
-      const tab3 = screen.getByRole('button', { name: '3rd F' });
-      fireEvent.click(tab3);
-
-      expect(tab3).toHaveClass('active');
-      // 3rdF is empty in our mock, so checking for absence of previous data is enough
-      expect(screen.queryByText('Test Workout 1')).not.toBeInTheDocument();
     });
   });
 });

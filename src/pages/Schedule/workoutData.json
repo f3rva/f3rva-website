@@ -492,29 +492,5 @@
       "siteQ": "PETA",
       "notes": "Open to F3 and all friends & family of F3 (men - women - children). Parking right next to trailhead."
     }
-  ],
-  "2ndF": [
-    {
-      "location": "See Slack",
-      "name": "",
-      "dayOfWeek": "",
-      "startTime": "",
-      "endTime": "",
-      "workoutStyle": "",
-      "siteQ": "",
-      "notes": ""
-    }
-  ],
-  "3rdF": [
-    {
-      "location": "See Slack",
-      "name": "",
-      "dayOfWeek": "",
-      "startTime": "",
-      "endTime": "",
-      "workoutStyle": "",
-      "siteQ": "",
-      "notes": ""
-    }
   ]
 }

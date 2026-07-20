@@ -97,12 +97,9 @@ const SchedulePage: React.FC = () => {
 };
 
 /**
- * WorkoutScheduleTable component with tabbed interface for 1st F, 2nd F, and 3rd F workouts
- * Displays workout information in a structured table format
+ * WorkoutScheduleTable component displaying workout information in a structured table format
  */
 const WorkoutScheduleTable: React.FC = () => {
-  const [activeTab, setActiveTab] = useState<'1stF' | '2ndF' | '3rdF'>('1stF');
-
   // Typed workout data imported from external JSON
   type Workout = {
     location: string;
@@ -119,38 +116,16 @@ const WorkoutScheduleTable: React.FC = () => {
 
   type WorkoutData = {
     '1stF': Workout[];
-    '2ndF': Workout[];
-    '3rdF': Workout[];
   };
 
   const workoutData: WorkoutData = workoutDataJson as unknown as WorkoutData;
+  const workouts = workoutData['1stF'] || [];
 
   return (
     <section className="workout-schedule-section">
       <h3 className="section-main-title">Workout List</h3>
       
       <div className="tab-container">
-        <div className="tab-buttons">
-          <button 
-            className={`tab-button ${activeTab === '1stF' ? 'active' : ''}`}
-            onClick={() => setActiveTab('1stF')}
-          >
-            1st F
-          </button>
-          <button 
-            className={`tab-button ${activeTab === '2ndF' ? 'active' : ''}`}
-            onClick={() => setActiveTab('2ndF')}
-          >
-            2nd F
-          </button>
-          <button 
-            className={`tab-button ${activeTab === '3rdF' ? 'active' : ''}`}
-            onClick={() => setActiveTab('3rdF')}
-          >
-            3rd F
-          </button>
-        </div>
-
         <div className="tab-content">
           <div className="table-container">
             <table className="workout-table">
@@ -167,7 +142,7 @@ const WorkoutScheduleTable: React.FC = () => {
                 </tr>
               </thead>
               <tbody>
-                {workoutData[activeTab].map((workout, index) => (
+                {workouts.map((workout, index) => (
                   <tr key={index}>
                     <td><a href={workout.locationURL} target="_blank" rel="noopener noreferrer" className="content-link">{workout.location}</a></td>
                     <td><a href={workout.tagURL} className="content-link">{workout.name}</a></td>
