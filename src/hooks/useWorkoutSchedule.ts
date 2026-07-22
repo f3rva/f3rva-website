@@ -25,7 +25,12 @@ export function useWorkoutSchedule(): UseWorkoutScheduleResult {
   const [error, setError] = useState<Error | null>(null);
 
   useEffect(() => {
-    const apiUrl = import.meta.env.VITE_SCHEDULE_API_URL || 'https://api.dev.f3rva.org/schedule';
+    const apiUrl = import.meta.env.VITE_SCHEDULE_API_URL;
+    if (!apiUrl || apiUrl === 'undefined') {
+      setError(new Error('VITE_SCHEDULE_API_URL is not defined in environment variables'));
+      setIsLoading(false);
+      return;
+    }
     let isMounted = true;
 
     async function fetchSchedule() {

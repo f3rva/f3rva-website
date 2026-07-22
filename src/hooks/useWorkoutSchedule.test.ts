@@ -5,12 +5,17 @@ import { useWorkoutSchedule } from './useWorkoutSchedule';
 describe('useWorkoutSchedule', () => {
   const originalFetch = globalThis.fetch;
 
+  let originalEnv: string | undefined;
+
   beforeEach(() => {
     vi.restoreAllMocks();
+    originalEnv = import.meta.env.VITE_SCHEDULE_API_URL;
+    (import.meta.env as any).VITE_SCHEDULE_API_URL = 'https://api.test.f3rva.org/schedule';
   });
 
   afterEach(() => {
     globalThis.fetch = originalFetch;
+    (import.meta.env as any).VITE_SCHEDULE_API_URL = originalEnv;
   });
 
   it('fetches schedule successfully and returns workouts', async () => {
@@ -76,5 +81,18 @@ describe('useWorkoutSchedule', () => {
     expect(result.current.error).toBeInstanceOf(Error);
     expect(result.current.error?.message).toBe('Network error');
     expect(result.current.workouts).toEqual([]);
+  });
+
+  it('sets error state when VITE_SCHEDULE_API_URL is missing', async () => {
+    (import.meta.env as any).VITE_SCHEDULE_API_URL = undefined;
+
+    const { result } = renderHook(() => useWorkoutSchedule());
+
+    await waitFor(() => {
+      expect(result.current.isLoading).toBe(false);
+    });
+
+    expect(result.current.error).toBeInstanceOf(Error);
+    expect(result.current.error?.message).toBe('VITE_SCHEDULE_API_URL is not defined in environment variables');
   });
 });
