@@ -200,6 +200,18 @@
   line-height: 1.4;
 }
 
+.schedule-status-message {
+  padding: 3rem 2rem;
+  text-align: center;
+  font-size: 1.1rem;
+  color: #495057;
+}
+
+.schedule-error-message {
+  color: #dc3545;
+  font-weight: 500;
+}
+
 
 /* Responsive design for smaller screens */
 @media (max-width: 768px) {
