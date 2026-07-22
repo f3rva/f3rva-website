@@ -1,8 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import SEO from '../../components/SEO';
 import { generateBreadcrumbSchema } from '../../utils/structuredData';
+import { useWorkoutSchedule } from '../../hooks/useWorkoutSchedule';
 import './schedule.css';
-import workoutDataJson from './workoutData.json';
 
 // Custom hook to detect mobile breakpoint (e.g., < 768px)
 function useIsMobile(breakpoint = 768) {
@@ -100,26 +100,7 @@ const SchedulePage: React.FC = () => {
  * WorkoutScheduleTable component displaying workout information in a structured table format
  */
 const WorkoutScheduleTable: React.FC = () => {
-  // Typed workout data imported from external JSON
-  type Workout = {
-    location: string;
-    locationURL: string;
-    name: string;
-    tagURL: string;
-    dayOfWeek: string;
-    startTime: string;
-    endTime: string;
-    workoutStyle: string;
-    siteQ: string;
-    notes: string;
-  };
-
-  type WorkoutData = {
-    '1stF': Workout[];
-  };
-
-  const workoutData: WorkoutData = workoutDataJson as unknown as WorkoutData;
-  const workouts = workoutData['1stF'] || [];
+  const { workouts, isLoading, error } = useWorkoutSchedule();
 
   return (
     <section className="workout-schedule-section">
@@ -127,36 +108,42 @@ const WorkoutScheduleTable: React.FC = () => {
       
       <div className="tab-container">
         <div className="tab-content">
-          <div className="table-container">
-            <table className="workout-table">
-              <thead>
-                <tr>
-                  <th>Location</th>
-                  <th>Name</th>
-                  <th>Day of Week</th>
-                  <th>Start Time</th>
-                  <th>End Time</th>
-                  <th>Workout Style</th>
-                  <th>Site Q</th>
-                  <th>Notes</th>
-                </tr>
-              </thead>
-              <tbody>
-                {workouts.map((workout, index) => (
-                  <tr key={index}>
-                    <td><a href={workout.locationURL} target="_blank" rel="noopener noreferrer" className="content-link">{workout.location}</a></td>
-                    <td><a href={workout.tagURL} className="content-link">{workout.name}</a></td>
-                    <td>{workout.dayOfWeek}</td>
-                    <td>{workout.startTime}</td>
-                    <td>{workout.endTime}</td>
-                    <td>{workout.workoutStyle}</td>
-                    <td>{workout.siteQ}</td>
-                    <td className="notes-column">{workout.notes}</td>
+          {isLoading ? (
+            <div className="schedule-status-message">Loading workout schedule...</div>
+          ) : error ? (
+            <div className="schedule-status-message schedule-error-message">
+              Unable to load workout schedule. Please try again later.
+            </div>
+          ) : (
+            <div className="table-container">
+              <table className="workout-table">
+                <thead>
+                  <tr>
+                    <th>Location</th>
+                    <th>Name</th>
+                    <th>Day of Week</th>
+                    <th>Start Time</th>
+                    <th>End Time</th>
+                    <th>Workout Style</th>
+                    <th>Notes</th>
                   </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
+                </thead>
+                <tbody>
+                  {workouts.map((workout, index) => (
+                    <tr key={index}>
+                      <td><a href={workout.locationURL} target="_blank" rel="noopener noreferrer" className="content-link">{workout.location}</a></td>
+                      <td><a href={workout.tagURL} className="content-link">{workout.name}</a></td>
+                      <td>{workout.dayOfWeek}</td>
+                      <td>{workout.startTime}</td>
+                      <td>{workout.endTime}</td>
+                      <td>{workout.workoutStyle}</td>
+                      <td className="notes-column">{workout.notes}</td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          )}
         </div>
       </div>
     </section>

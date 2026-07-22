@@ -18,7 +18,7 @@
     <meta name="msapplication-TileColor" content="#343a40" />
 
     <!-- Security Headers -->
-    <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline' https://www.googletagmanager.com https://player.vimeo.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; img-src 'self' data: https:; font-src 'self' https://fonts.gstatic.com; connect-src 'self' https://www.google-analytics.com https://region1.google-analytics.com https://stats.g.doubleclick.net https://bigdata.brianbischoff.com http://localhost:* ws://localhost:*; frame-src 'self' https://player.vimeo.com https://map.f3nation.com; object-src 'none'; base-uri 'self';">
+    <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline' https://www.googletagmanager.com https://player.vimeo.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; img-src 'self' data: https:; font-src 'self' https://fonts.gstatic.com; connect-src 'self' https://www.google-analytics.com https://region1.google-analytics.com https://stats.g.doubleclick.net %VITE_API_BASE_URL% %VITE_SCHEDULE_API_URL% http://localhost:* ws://localhost:*; frame-src 'self' https://player.vimeo.com https://map.f3nation.com; object-src 'none'; base-uri 'self';">
     <meta name="referrer" content="strict-origin-when-cross-origin" />
     
     <!-- Favicons and Icons -->
@@ -27,8 +27,7 @@
     <link rel="manifest" href="/manifest.json" />
     
     <!-- Preload Critical Resources -->
-    <link rel="preload" href="/images/dogpile-flag-1024x1024.jpg" as="image" type="image/jpeg" />
-    <link rel="preload" href="/images/f3-logo.webp" as="image" type="image/webp" />
+    <link rel="preload" href="/images/f3rva-logo-v1-white.svg" as="image" type="image/svg+xml" />
     
     <!-- DNS Prefetch for External Resources -->
     <link rel="dns-prefetch" href="//fonts.googleapis.com" />

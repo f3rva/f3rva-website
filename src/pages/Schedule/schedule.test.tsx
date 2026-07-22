@@ -1,52 +1,46 @@
 import { render, screen, fireEvent } from '@testing-library/react';
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import SchedulePage from './schedule';
+import * as workoutScheduleHook from '../../hooks/useWorkoutSchedule';
 
 // Mock SEO to avoid head side effects
 vi.mock('../../components/SEO', () => ({
   default: () => null,
 }));
 
-// Mock the JSON data import
-vi.mock('./workoutData.json', () => ({
-  default: {
-    '1stF': [
-      {
-        location: 'Test Location 1',
-        locationURL: 'http://maps.google.com/1',
-        name: 'Test Workout 1',
-        tagURL: '/tag/test1',
-        dayOfWeek: 'Monday',
-        startTime: '0530',
-        endTime: '0615',
-        workoutStyle: 'Bootcamp',
-        siteQ: 'TestQ1',
-        notes: 'Test Notes 1'
-      }
-    ],
-    '2ndF': [
-      {
-        location: 'Test Location 2',
-        locationURL: 'http://maps.google.com/2',
-        name: 'Test Event 2',
-        tagURL: '/tag/test2',
-        dayOfWeek: 'Tuesday',
-        startTime: '1800',
-        endTime: '1900',
-        workoutStyle: 'Social',
-        siteQ: 'TestQ2',
-        notes: 'Test Notes 2'
-      }
-    ],
-    '3rdF': []
-  }
+// Mock the useWorkoutSchedule hook
+vi.mock('../../hooks/useWorkoutSchedule', () => ({
+  useWorkoutSchedule: vi.fn(),
 }));
 
 describe('SchedulePage', () => {
+  const mockWorkouts = [
+    {
+      location: 'Test Location 1',
+      locationURL: 'http://maps.google.com/1',
+      name: 'Test Workout 1',
+      tagURL: '/tag/test1',
+      dayOfWeek: 'Monday',
+      startTime: '0530',
+      endTime: '0615',
+      workoutStyle: 'Bootcamp',
+      siteQ: 'TestQ1',
+      notes: 'Test Notes 1',
+    },
+  ];
+
   beforeEach(() => {
+    vi.clearAllMocks();
     // Reset window width for desktop view by default
     globalThis.innerWidth = 1024;
     fireEvent(window, new Event('resize'));
+
+    // Default mock implementation
+    vi.mocked(workoutScheduleHook.useWorkoutSchedule).mockReturnValue({
+      workouts: mockWorkouts,
+      isLoading: false,
+      error: null,
+    });
   });
 
   it('renders the main heading and description', () => {
@@ -73,12 +67,32 @@ describe('SchedulePage', () => {
   });
 
   describe('WorkoutScheduleTable', () => {
-    it('renders the workout schedule table', () => {
+    it('renders the loading state when isLoading is true', () => {
+      vi.mocked(workoutScheduleHook.useWorkoutSchedule).mockReturnValue({
+        workouts: [],
+        isLoading: true,
+        error: null,
+      });
+
+      render(<SchedulePage />);
+      expect(screen.getByText(/Loading workout schedule.../i)).toBeInTheDocument();
+    });
+
+    it('renders the error state when error is present', () => {
+      vi.mocked(workoutScheduleHook.useWorkoutSchedule).mockReturnValue({
+        workouts: [],
+        isLoading: false,
+        error: new Error('API error'),
+      });
+
+      render(<SchedulePage />);
+      expect(screen.getByText(/Unable to load workout schedule/i)).toBeInTheDocument();
+    });
+
+    it('renders the workout schedule table when data is loaded', () => {
       render(<SchedulePage />);
 
-      // Check for 1stF workout data
       expect(screen.getByText('Test Workout 1')).toBeInTheDocument();
-      expect(screen.getByText('TestQ1')).toBeInTheDocument();
     });
   });
 });
