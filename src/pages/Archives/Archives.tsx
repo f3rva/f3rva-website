@@ -19,7 +19,7 @@ const Archives: React.FC = () => {
   const [resultsPerPage, setResultsPerPage] = useState<number>(10);
 
   // Construct dynamic API URL
-  const apiUrl = `${config.apiBaseUrl}/api/v2/getWorkouts.php?page=${currentPage}&results=${resultsPerPage}`;
+  const apiUrl = `${config.apiBaseUrl}/v2/workouts?page=${currentPage}&results=${resultsPerPage}`;
 
   // Use the type-safe fetch hook
   const { data: postsData, loading, error } = useFetch<WorkoutPost[]>(apiUrl);

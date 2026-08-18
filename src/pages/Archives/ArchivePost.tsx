@@ -31,7 +31,7 @@ const ArchivePost: React.FC = () => {
 
   // Construct dynamic API URL
   const apiUrl = isValidFormat
-    ? `${config.apiBaseUrl}/api/v2/getWorkoutByDateSlug.php?year=${year}&month=${month}&day=${day}&slug=${slug}`
+    ? `${config.apiBaseUrl}/v2/workouts/by-date-slug?year=${year}&month=${month}&day=${day}&slug=${slug}`
     : null;
 
   // Use the type-safe fetch hook

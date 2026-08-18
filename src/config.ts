@@ -15,7 +15,7 @@ interface Config {
 }
 
 export const config: Config = {
-  apiBaseUrl: import.meta.env.VITE_API_BASE_URL || 'http://localhost:9000',
+  apiBaseUrl: import.meta.env.VITE_API_BASE_URL || 'http://localhost:8000',
   apiTimeoutMs: 10000,
 };
 

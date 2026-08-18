@@ -73,9 +73,9 @@ describe('AOArchives Page', () => {
     // Verify post title is rendered
     expect(screen.getByText('Crushing the Pyramid')).toBeInTheDocument();
 
-    // Verify API was called with correct params (now uses slug parameter)
+    // Verify API was called with correct path
     expect(mockFetch).toHaveBeenCalledWith(
-      expect.stringContaining('slug=innsbrook'),
+      expect.stringContaining('/v2/workouts/ao/innsbrook'),
       expect.any(Object)
     );
   });
@@ -125,9 +125,9 @@ describe('AOArchives Page', () => {
     // Should display AO name from the post data
     expect(screen.getByRole('heading', { name: 'Innsbrook' })).toBeInTheDocument();
 
-    // API call should use slug parameter instead of name
+    // API call should use slug in path
     expect(mockFetch).toHaveBeenCalledWith(
-      expect.stringContaining('slug=innsbrook'),
+      expect.stringContaining('/v2/workouts/ao/innsbrook'),
       expect.any(Object)
     );
   });

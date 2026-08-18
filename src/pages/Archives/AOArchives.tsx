@@ -28,7 +28,7 @@ const AOArchives: React.FC = () => {
 
   // Construct dynamic API URL
   const apiUrl = isValidFormat
-    ? `${config.apiBaseUrl}/api/v2/getWorkoutsByAO.php?slug=${encodeURIComponent(ao)}&page=${currentPage}&results=${resultsPerPage}`
+    ? `${config.apiBaseUrl}/v2/workouts/ao/${encodeURIComponent(ao)}?page=${currentPage}&results=${resultsPerPage}`
     : null;
 
   // Use the type-safe fetch hook

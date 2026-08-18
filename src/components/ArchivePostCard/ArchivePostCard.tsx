@@ -92,11 +92,13 @@ const ArchivePostCard: React.FC<ArchivePostCardProps> = ({ post }) => {
         </div>
 
         {/* Card Content Preview */}
-        <div className="card-content">
-          <p className="card-excerpt">
-            {getPostExcerpt(post.content)}
-          </p>
-        </div>
+        {post.content ? (
+          <div className="card-content">
+            <p className="card-excerpt">
+              {getPostExcerpt(post.content)}
+            </p>
+          </div>
+        ) : null}
 
         {/* Card Footer */}
         <footer className="card-footer">

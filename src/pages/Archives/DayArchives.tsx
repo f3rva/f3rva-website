@@ -29,7 +29,7 @@ const DayArchives: React.FC = () => {
 
   // Construct dynamic API URL
   const apiUrl = isValidFormat
-    ? `${config.apiBaseUrl}/api/v2/getWorkoutsByDate.php?year=${year}&month=${month}&day=${day}&page=${currentPage}&results=${resultsPerPage}`
+    ? `${config.apiBaseUrl}/v2/workouts/by-date?year=${year}&month=${month}&day=${day}&page=${currentPage}&results=${resultsPerPage}`
     : null;
 
   // Use the type-safe fetch hook

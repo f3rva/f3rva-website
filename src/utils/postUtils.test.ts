@@ -39,5 +39,10 @@ describe('postUtils', () => {
     it('should return an empty string if input is empty', () => {
       expect(getPostExcerpt('')).toBe('');
     });
+
+    it('should return an empty string if input is null or undefined', () => {
+      expect(getPostExcerpt(null)).toBe('');
+      expect(getPostExcerpt(undefined)).toBe('');
+    });
   });
 });

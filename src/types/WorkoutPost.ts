@@ -60,7 +60,7 @@ export interface WorkoutPost {
   workoutDate: string;
 
   /** Rich text content of the backblast post */
-  content: string;
+  content?: string | null;
 }
 
 /**
