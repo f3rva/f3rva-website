@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react';
+import { config } from '../config';
 
 export type Workout = {
   location: string;
@@ -25,12 +26,7 @@ export function useWorkoutSchedule(): UseWorkoutScheduleResult {
   const [error, setError] = useState<Error | null>(null);
 
   useEffect(() => {
-    const apiUrl = import.meta.env.VITE_SCHEDULE_API_URL;
-    if (!apiUrl || apiUrl === 'undefined') {
-      setError(new Error('VITE_SCHEDULE_API_URL is not defined in environment variables'));
-      setIsLoading(false);
-      return;
-    }
+    const apiUrl = `${config.apiBaseUrl}/schedule`;
     let isMounted = true;
 
     async function fetchSchedule() {

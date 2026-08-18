@@ -5,11 +5,14 @@
 
 /**
  * Create excerpt from HTML content by stripping tags and truncating
- * @param content - HTML content string
+ * @param content - HTML content string or null/undefined
  * @param maxLength - Maximum length of excerpt (default: 200)
  * @returns Plain text excerpt with ellipsis if truncated
  */
-export const getPostExcerpt = (content: string, maxLength: number = 200): string => {
+export const getPostExcerpt = (content?: string | null, maxLength: number = 200): string => {
+  if (!content) {
+    return '';
+  }
   const textContent = content.replace(/<[^>]*>/g, '');
   return textContent.length > maxLength
     ? textContent.substring(0, maxLength).trim() + '...'

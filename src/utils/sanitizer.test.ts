@@ -27,6 +27,12 @@ describe('sanitizeHtml', () => {
     const clean = sanitizeHtml(dirty);
     expect(clean).toContain('class="btn"');
   });
+
+  it('should return empty string for null, undefined, or empty input', () => {
+    expect(sanitizeHtml('')).toBe('');
+    expect(sanitizeHtml(null)).toBe('');
+    expect(sanitizeHtml(undefined)).toBe('');
+  });
 });
 
 describe('sanitizeJSON', () => {

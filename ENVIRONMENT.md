@@ -16,9 +16,9 @@ The following environment files are used (in order of precedence):
 ### `VITE_API_BASE_URL`
 Base URL for API endpoints.
 
-- **Local**: `http://localhost:9000` (default fallback)
-- **Development**: `https://bigdata.brianbischoff.com`
-- **Production**: `https://bigdata.brianbischoff.com`
+- **Local**: `http://localhost:8000` (default fallback)
+- **Development**: `https://api.dev.f3rva.org`
+- **Production**: `https://api.f3rva.org`
 
 ## Usage
 

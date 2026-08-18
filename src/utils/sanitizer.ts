@@ -17,10 +17,13 @@ DOMPurify.addHook('afterSanitizeAttributes', (node) => {
  * Enforces rel="noopener noreferrer" on external links to prevent
  * reverse tabnabbing attacks.
  *
- * @param html - The potentially unsafe HTML string.
+ * @param html - The potentially unsafe HTML string, null, or undefined.
  * @returns The sanitized HTML string.
  */
-export const sanitizeHtml = (html: string): string => {
+export const sanitizeHtml = (html?: string | null): string => {
+  if (!html) {
+    return '';
+  }
   // By default DOMPurify might strip 'target', so we explicitly allow it.
   return DOMPurify.sanitize(html, {
     ADD_ATTR: ['target'],
