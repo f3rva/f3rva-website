@@ -1,0 +1,144 @@
+/* Area of Operations (AO) styles for F3 RVA Big Data */
+
+/* Timeframe filter pills bar */
+.ao-timeframe-bar {
+  display: flex;
+  gap: 0.5rem;
+  flex-wrap: wrap;
+  align-items: center;
+}
+
+/* 3-Column Leaderboard Grid */
+.ao-leaderboard-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 1.5rem;
+  margin-bottom: 2rem;
+}
+
+@media (max-width: 960px) {
+  .ao-leaderboard-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+.ao-leaderboard-card {
+  background: #ffffff;
+  border: 1px solid #e2e8f0;
+  border-radius: 12px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+  padding: 1.25rem;
+  display: flex;
+  flex-direction: column;
+}
+
+.ao-leaderboard-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  border-bottom: 1px solid #f1f5f9;
+  padding-bottom: 0.75rem;
+  margin-bottom: 0.75rem;
+}
+
+.ao-leaderboard-title {
+  font-size: 1.05rem;
+  font-weight: 700;
+  color: #1e293b;
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  margin: 0;
+}
+
+.ao-leaderboard-list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.ao-leaderboard-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0.5rem 0.65rem;
+  border-radius: 6px;
+  background: #f8fafc;
+  border: 1px solid #f1f5f9;
+  transition: all 0.15s ease;
+}
+
+.ao-leaderboard-item:hover {
+  background: #f1f5f9;
+  border-color: #cbd5e1;
+}
+
+.ao-rank-badge {
+  width: 22px;
+  height: 22px;
+  border-radius: 50%;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.75rem;
+  font-weight: 700;
+  margin-right: 0.6rem;
+  background: #e2e8f0;
+  color: #475569;
+  flex-shrink: 0;
+}
+
+.ao-rank-1 {
+  background: #fef08a;
+  color: #854d0e;
+  box-shadow: 0 0 0 1px #facc15;
+}
+
+.ao-rank-2 {
+  background: #e2e8f0;
+  color: #334155;
+  box-shadow: 0 0 0 1px #cbd5e1;
+}
+
+.ao-rank-3 {
+  background: #fed7aa;
+  color: #9a3412;
+  box-shadow: 0 0 0 1px #fb923c;
+}
+
+.ao-leaderboard-name {
+  font-weight: 600;
+  color: #1e293b;
+  text-decoration: none;
+  flex-grow: 1;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.ao-leaderboard-name:hover {
+  color: #b45309;
+}
+
+.ao-leaderboard-count {
+  font-weight: 700;
+  font-size: 0.9rem;
+  color: #047857;
+  padding: 0.15rem 0.5rem;
+  background: #ecfdf5;
+  border-radius: 6px;
+  flex-shrink: 0;
+}
+
+.ao-leaderboard-count.q-count {
+  color: #b45309;
+  background: #fef3c7;
+}
+
+.ao-leaderboard-count.streak-count {
+  color: #dc2626;
+  background: #fee2e2;
+}
