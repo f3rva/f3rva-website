@@ -24,45 +24,56 @@ export const BigDataHub: React.FC = () => {
 
   // Fetch 30-day AO attendance metrics
   const aoUrl = `${config.apiBaseUrl}/v2/reports/ao?startDate=${startDate30}&endDate=${endDateToday}`;
-  const { data: ao30Data } = useFetch<AOAttendanceSummary[]>(aoUrl);
+  const { data: ao30Data, loading: aoLoading } = useFetch<AOAttendanceSummary[]>(aoUrl);
 
-  // Fetch Day of Week trends
-  const { data: dowData } = useFetch<DayOfWeekAttendance[]>(`${config.apiBaseUrl}/v2/reports/day-of-week`);
+  // Fetch Day of Week trends for the past 30 days
+  const dowUrl = `${config.apiBaseUrl}/v2/reports/day-of-week?startDate=${startDate30}&endDate=${endDateToday}`;
+  const { data: dowData, loading: dowLoading } = useFetch<DayOfWeekAttendance[]>(dowUrl);
 
   // Calculate 30-day Region KPI Metrics
   const metrics = useMemo(() => {
-    if (!ao30Data || ao30Data.length === 0) {
+    if (aoLoading || !ao30Data) {
       return {
-        avgPax: '11.8',
-        activeAos: '24',
-        topAoName: 'The Foundry',
-        topAoAvg: '18.5',
+        avgPax: '--',
+        activeAos: '--',
+        topAoName: '--',
+        topAoAvg: '--',
+      };
+    }
+
+    if (ao30Data.length === 0) {
+      return {
+        avgPax: '0.0',
+        activeAos: '0',
+        topAoName: 'N/A',
+        topAoAvg: '0.0',
       };
     }
 
     const totalW = ao30Data.reduce((acc, curr) => acc + (curr.totalWorkouts || 0), 0);
     const totalP = ao30Data.reduce((acc, curr) => acc + (curr.totalPax || 0), 0);
-    const activeCount = ao30Data.filter((ao) => (ao.totalWorkouts || 0) > 0).length || ao30Data.length;
-    const avg = totalW > 0 ? (totalP / totalW).toFixed(1) : '11.8';
+    const activeCount = ao30Data.filter((ao) => (ao.totalWorkouts || 0) > 0).length;
+    const avg = totalW > 0 ? (totalP / totalW).toFixed(1) : '0.0';
 
     // Find top AO by average PAX
     const sortedAos = [...ao30Data].sort((a, b) => (b.averagePax || 0) - (a.averagePax || 0));
-    const topAo = sortedAos[0] || { description: 'The Foundry', averagePax: 18.5 };
+    const topAo = sortedAos[0];
 
     return {
       avgPax: avg,
       activeAos: activeCount.toString(),
-      topAoName: topAo.description,
-      topAoAvg: topAo.averagePax?.toFixed(1) || '18.5',
+      topAoName: topAo?.description || 'N/A',
+      topAoAvg: topAo?.averagePax?.toFixed(1) || '0.0',
     };
-  }, [ao30Data]);
+  }, [ao30Data, aoLoading]);
 
   // Find most active workout day
   const topDay = useMemo(() => {
-    if (!dowData || dowData.length === 0) return 'Saturday';
+    if (dowLoading || !dowData) return '--';
+    if (dowData.length === 0) return 'N/A';
     const sorted = [...dowData].sort((a, b) => b.totalPax - a.totalPax);
-    return sorted[0]?.dayName || 'Saturday';
-  }, [dowData]);
+    return sorted[0]?.dayName || 'N/A';
+  }, [dowData, dowLoading]);
 
   return (
     <>
@@ -75,8 +86,8 @@ export const BigDataHub: React.FC = () => {
 
       <div className="bigdata-page-container">
         <BigDataPageHeader
-          title="F3 RVA Big Data Dashboard"
-          description="Region-wide workout analytics, attendance leaderboards, Area of Operations metrics, and member statistics."
+          title="Big Data Dashboard"
+          description="Region-wide workout analytics, attendance leaderboards, AO metrics, and member statistics."
           category="DASHBOARD"
         />
 

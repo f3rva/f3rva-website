@@ -26,22 +26,24 @@ export const AttendanceLeaderboard: React.FC = () => {
   const queryParams = useMemo(() => {
     const today = new Date();
     const formatDate = (d: Date) => d.toISOString().split('T')[0];
-    let dateParams = '';
 
     if (timeframe === 'ytd') {
       const startOfYear = new Date(today.getFullYear(), 0, 1);
-      dateParams = `?startDate=${formatDate(startOfYear)}&endDate=${formatDate(today)}`;
-    } else if (timeframe === '12m') {
+      return `?startDate=${formatDate(startOfYear)}&endDate=${formatDate(today)}`;
+    }
+    if (timeframe === '12m') {
       const start12m = new Date();
       start12m.setFullYear(today.getFullYear() - 1);
-      dateParams = `?startDate=${formatDate(start12m)}&endDate=${formatDate(today)}`;
-    } else if (timeframe === '30d') {
+      return `?startDate=${formatDate(start12m)}&endDate=${formatDate(today)}`;
+    }
+    if (timeframe === '30d') {
       const start30d = new Date();
       start30d.setDate(today.getDate() - 30);
-      dateParams = `?startDate=${formatDate(start30d)}&endDate=${formatDate(today)}`;
+      return `?startDate=${formatDate(start30d)}&endDate=${formatDate(today)}`;
     }
 
-    return dateParams;
+    // All-time: explicit from region inception (2014-01-01) to today
+    return `?startDate=2014-01-01&endDate=${formatDate(today)}`;
   }, [timeframe]);
 
   const apiUrl = `${config.apiBaseUrl}/v2/reports/attendance${queryParams}`;
@@ -49,14 +51,14 @@ export const AttendanceLeaderboard: React.FC = () => {
 
   // Timeframe Baseline KPIs (Constant across all metric tabs for this time period)
   const timeframeKpis = useMemo(() => {
-    if (!rawLeaderboard || rawLeaderboard.length === 0) {
+    if (loading || !rawLeaderboard) {
       return {
-        topPaxName: 'N/A',
-        topPaxPosts: 0,
-        topQName: 'N/A',
-        topQCount: 0,
-        totalActiveMembers: 0,
-        totalPosts: 0,
+        topPaxName: '--',
+        topPaxPosts: '--',
+        topQName: '--',
+        topQCount: '--',
+        totalActiveMembers: '--',
+        totalPosts: '--',
       };
     }
 
@@ -67,11 +69,11 @@ export const AttendanceLeaderboard: React.FC = () => {
     if (sanitized.length === 0) {
       return {
         topPaxName: 'N/A',
-        topPaxPosts: 0,
+        topPaxPosts: '0',
         topQName: 'N/A',
-        topQCount: 0,
-        totalActiveMembers: 0,
-        totalPosts: 0,
+        topQCount: '0',
+        totalActiveMembers: '0',
+        totalPosts: '0',
       };
     }
 
@@ -91,13 +93,13 @@ export const AttendanceLeaderboard: React.FC = () => {
 
     return {
       topPaxName: topPax.f3Name,
-      topPaxPosts: topPax.numWorkouts,
+      topPaxPosts: topPax.numWorkouts.toString(),
       topQName: topQ.f3Name,
-      topQCount: topQ.numQs,
-      totalActiveMembers: sanitized.length,
-      totalPosts,
+      topQCount: topQ.numQs.toString(),
+      totalActiveMembers: sanitized.length.toString(),
+      totalPosts: totalPosts.toLocaleString(),
     };
-  }, [rawLeaderboard]);
+  }, [rawLeaderboard, loading]);
 
   // Processed and sorted leaderboard (Filtered by metric, Q-ratio threshold, and search query)
   const processedLeaderboard = useMemo(() => {
@@ -199,15 +201,15 @@ export const AttendanceLeaderboard: React.FC = () => {
   return (
     <>
       <SEO
-        title="Attendance Leaderboard - F3 RVA Big Data"
-        description="F3 Richmond member attendance leaderboard, Q leadership rankings, and posting statistics across the region."
+        title="Leaderboard - F3 RVA Big Data"
+        description="F3 Richmond attendance leaderboard, Q rankings, and posting statistics across the region."
         url="https://f3rva.org/bigdata/attendance"
         type="website"
       />
 
       <div className="bigdata-page-container">
         <BigDataPageHeader
-          title="🏆 Member Attendance & Leadership Leaderboard"
+          title="Attendance & Q Leaderboard"
           description="Track posting consistency, gloom milestones, and Q leadership across Richmond."
           category="LEADERBOARDS"
           actions={

@@ -34,7 +34,8 @@ export const AOReport: React.FC = () => {
       start.setFullYear(today.getFullYear() - 1);
       return `?startDate=${formatDate(start)}&endDate=${formatDate(today)}`;
     }
-    return '';
+    // All-time: explicit from region inception (2014-01-01) to today
+    return `?startDate=2014-01-01&endDate=${formatDate(today)}`;
   }, [timeframe]);
 
   const apiUrl = `${config.apiBaseUrl}/v2/reports/ao${queryParams}`;
@@ -42,11 +43,22 @@ export const AOReport: React.FC = () => {
 
   // Compute aggregate KPI stats across all AOs in the selected period
   const kpis = useMemo(() => {
-    if (!aoList || aoList.length === 0) {
+    if (loading || !aoList) {
       return {
-        activeAos: 0,
-        totalWorkouts: 0,
-        totalPax: 0,
+        activeAos: '--',
+        totalWorkouts: '--',
+        totalPax: '--',
+        regionAvg: '--',
+        topAoName: '--',
+        topAoAvg: '--',
+      };
+    }
+
+    if (aoList.length === 0) {
+      return {
+        activeAos: '0',
+        totalWorkouts: '0',
+        totalPax: '0',
         regionAvg: '0.0',
         topAoName: 'N/A',
         topAoAvg: '0.0',
@@ -68,14 +80,14 @@ export const AOReport: React.FC = () => {
     const regionAvg = workoutsSum > 0 ? (paxSum / workoutsSum).toFixed(1) : '0.0';
 
     return {
-      activeAos: aoList.length,
-      totalWorkouts: workoutsSum,
-      totalPax: paxSum,
+      activeAos: aoList.length.toString(),
+      totalWorkouts: workoutsSum.toLocaleString(),
+      totalPax: paxSum.toLocaleString(),
       regionAvg,
       topAoName: topAo?.description || 'N/A',
       topAoAvg: topAo?.averagePax?.toFixed(1) || '0.0',
     };
-  }, [aoList]);
+  }, [aoList, loading]);
 
   // Filter and sort AO list
   const filteredAndSortedAos = useMemo(() => {
@@ -119,7 +131,7 @@ export const AOReport: React.FC = () => {
   return (
     <>
       <SEO
-        title="AO Attendance Analytics - F3 RVA Area of Operations"
+        title="AO Attendance Analytics - F3 RVA AOs"
         description="Performance metrics, attendance volume, and workout health averages across all F3 RVA Areas of Operations."
         url="https://f3rva.org/bigdata/ao"
         type="website"
@@ -128,7 +140,7 @@ export const AOReport: React.FC = () => {
       <div className="bigdata-page-container">
         <BigDataPageHeader
           title="AO Attendance & Health Analytics"
-          description="Performance metrics, turnout volume, and attendance trends across all Richmond Areas of Operation."
+          description="Performance metrics, turnout volume, and attendance trends across all Richmond AOs."
           category="AREAS OF OPERATION"
           actions={
             <div className="ao-timeframe-bar" role="tablist" aria-label="Timeframe presets">
@@ -192,9 +204,9 @@ export const AOReport: React.FC = () => {
           <div className="bigdata-kpi-card">
             <span className="bigdata-kpi-label">Total Workouts Conducted</span>
             <span className="bigdata-kpi-value" style={{ color: '#2c3e50' }}>
-              {kpis.totalWorkouts.toLocaleString()}
+              {kpis.totalWorkouts}
             </span>
-            <span className="bigdata-kpi-subtext">Total PAX: {kpis.totalPax.toLocaleString()}</span>
+            <span className="bigdata-kpi-subtext">Total PAX: {kpis.totalPax}</span>
           </div>
         </div>
 
@@ -202,7 +214,7 @@ export const AOReport: React.FC = () => {
         <div className="bigdata-card">
           <div className="bigdata-card-header">
             <div>
-              <h2 className="bigdata-card-title">📍 Area of Operations Performance</h2>
+              <h2 className="bigdata-card-title">📍 AO Performance</h2>
               <span style={{ fontSize: '0.85rem', color: '#64748b' }}>
                 Showing {filteredAndSortedAos.length} location{filteredAndSortedAos.length !== 1 ? 's' : ''}
               </span>

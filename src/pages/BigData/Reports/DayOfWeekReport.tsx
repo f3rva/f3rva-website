@@ -73,14 +73,29 @@ export const DayOfWeekReport: React.FC = () => {
 
   // Aggregate KPI Stats
   const kpis = useMemo(() => {
+    if (loading || !rawDayData) {
+      return {
+        peakDay: '--',
+        peakDayPax: '--',
+        highestAvgDay: '--',
+        highestAvg: '--',
+        totalWorkouts: '--',
+        totalPax: '--',
+        rawTotalPax: 0,
+        rawPeakDayPax: 0,
+      };
+    }
+
     if (!dayData || dayData.length === 0) {
       return {
         peakDay: 'N/A',
-        peakDayPax: 0,
+        peakDayPax: '0',
         highestAvgDay: 'N/A',
         highestAvg: '0.0',
-        totalWorkouts: 0,
-        totalPax: 0,
+        totalWorkouts: '0',
+        totalPax: '0',
+        rawTotalPax: 0,
+        rawPeakDayPax: 0,
       };
     }
 
@@ -103,26 +118,28 @@ export const DayOfWeekReport: React.FC = () => {
 
     return {
       peakDay: peakDay?.dayName || 'N/A',
-      peakDayPax: peakDay?.totalPax || 0,
+      peakDayPax: (peakDay?.totalPax || 0).toLocaleString(),
       highestAvgDay: highestAvgDay?.dayName || 'N/A',
       highestAvg: highestAvgDay?.averagePax ? highestAvgDay.averagePax.toFixed(1) : '0.0',
-      totalWorkouts,
-      totalPax,
+      totalWorkouts: totalWorkouts.toLocaleString(),
+      totalPax: totalPax.toLocaleString(),
+      rawTotalPax: totalPax,
+      rawPeakDayPax: peakDay?.totalPax || 0,
     };
-  }, [dayData]);
+  }, [dayData, rawDayData, loading]);
 
   return (
     <>
       <SEO
-        title="Day of Week Attendance - F3 RVA Analytics"
-        description="Workout volume, attendance trends, and average turnout breakdown across each day of the week in Richmond."
+        title="Day of Week Attendance Analytics - F3 RVA Big Data"
+        description="Explore F3 Richmond workout attendance trends and PAX participation breakdown by day of the week."
         url="https://f3rva.org/bigdata/day-of-week"
         type="website"
       />
 
       <div className="bigdata-page-container">
         <BigDataPageHeader
-          title="📅 Day of Week Attendance Analytics"
+          title="Day of Week Attendance Analytics"
           description="Analyze workout frequency, aggregate turnout, and average attendance by weekday."
           category="ANALYTICAL REPORTS"
           actions={
@@ -166,7 +183,7 @@ export const DayOfWeekReport: React.FC = () => {
               {kpis.peakDay}
             </span>
             <span className="bigdata-kpi-subtext">
-              {kpis.peakDayPax.toLocaleString()} total PAX posted
+              {kpis.peakDayPax} total PAX posted
             </span>
           </div>
 
@@ -181,7 +198,7 @@ export const DayOfWeekReport: React.FC = () => {
           <div className="bigdata-kpi-card">
             <span className="bigdata-kpi-label">Total Regional Workouts</span>
             <span className="bigdata-kpi-value" style={{ color: '#2c3e50' }}>
-              {kpis.totalWorkouts.toLocaleString()}
+              {kpis.totalWorkouts}
             </span>
             <span className="bigdata-kpi-subtext">Across all 7 weekdays</span>
           </div>
@@ -189,7 +206,7 @@ export const DayOfWeekReport: React.FC = () => {
           <div className="bigdata-kpi-card">
             <span className="bigdata-kpi-label">Total PAX Turnout</span>
             <span className="bigdata-kpi-value" style={{ color: '#b45309' }}>
-              {kpis.totalPax.toLocaleString()}
+              {kpis.totalPax}
             </span>
             <span className="bigdata-kpi-subtext">Cumulative participants</span>
           </div>
@@ -198,8 +215,8 @@ export const DayOfWeekReport: React.FC = () => {
         {/* 7-Day Regional Breakdown Cards Grid */}
         <div className="day-cards-grid">
           {dayData.map((d) => {
-            const isPeak = d.dayName === kpis.peakDay && kpis.peakDayPax > 0;
-            const pctShare = kpis.totalPax > 0 ? ((d.totalPax / kpis.totalPax) * 100).toFixed(1) : '0';
+            const isPeak = d.dayName === kpis.peakDay && kpis.rawPeakDayPax > 0;
+            const pctShare = kpis.rawTotalPax > 0 ? ((d.totalPax / kpis.rawTotalPax) * 100).toFixed(1) : '0.0';
 
             return (
               <div key={`day-card-${d.dayName}`} className={`day-card ${isPeak ? 'day-card-peak' : ''}`}>
@@ -321,8 +338,8 @@ export const DayOfWeekReport: React.FC = () => {
                   </thead>
                   <tbody>
                     {dayData.map((d) => {
-                      const isPeak = d.dayName === kpis.peakDay && kpis.peakDayPax > 0;
-                      const pctShare = kpis.totalPax > 0 ? ((d.totalPax / kpis.totalPax) * 100).toFixed(1) : '0.0';
+                      const isPeak = d.dayName === kpis.peakDay && kpis.rawPeakDayPax > 0;
+                      const pctShare = kpis.rawTotalPax > 0 ? ((d.totalPax / kpis.rawTotalPax) * 100).toFixed(1) : '0.0';
 
                       return (
                         <tr key={`row-${d.dayName}`}>
@@ -359,8 +376,8 @@ export const DayOfWeekReport: React.FC = () => {
               {/* Mobile Card-List View */}
               <div className="mobile-only-view">
                 {dayData.map((d) => {
-                  const isPeak = d.dayName === kpis.peakDay && kpis.peakDayPax > 0;
-                  const pctShare = kpis.totalPax > 0 ? ((d.totalPax / kpis.totalPax) * 100).toFixed(1) : '0.0';
+                  const isPeak = d.dayName === kpis.peakDay && kpis.rawPeakDayPax > 0;
+                  const pctShare = kpis.rawTotalPax > 0 ? ((d.totalPax / kpis.rawTotalPax) * 100).toFixed(1) : '0.0';
 
                   return (
                     <div key={`m-row-${d.dayName}`} className="bigdata-workout-mobile-card">
