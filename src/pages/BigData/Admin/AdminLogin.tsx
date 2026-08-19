@@ -1,9 +1,41 @@
-import React from 'react';
+import React, { useState } from 'react';
+import { useNavigate, useLocation, Link } from 'react-router-dom';
+import { useAuth } from '../../../hooks/useAuth';
 import BigDataPageHeader from '../../../components/BigDataPageHeader';
 import SEO from '../../../components/SEO';
 import '../BigData.css';
+import './Admin.css';
 
-const AdminLogin: React.FC = () => {
+export const AdminLogin: React.FC = () => {
+  const { isAuthenticated, adminUsername, login, logout, error: authError } = useAuth();
+  const [username, setUsername] = useState<string>('');
+  const [password, setPassword] = useState<string>('');
+  const [loading, setLoading] = useState<boolean>(false);
+  const [localError, setLocalError] = useState<string | null>(null);
+
+  const navigate = useNavigate();
+  const location = useLocation();
+
+  const from = (location.state as { from?: { pathname: string } })?.from?.pathname || '/bigdata/admin/alias-requests';
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setLocalError(null);
+
+    if (!username.trim() || !password) {
+      setLocalError('Please enter both username and password.');
+      return;
+    }
+
+    setLoading(true);
+    const success = await login(username.trim(), password);
+    setLoading(false);
+
+    if (success) {
+      navigate(from, { replace: true });
+    }
+  };
+
   return (
     <>
       <SEO
@@ -17,9 +49,103 @@ const AdminLogin: React.FC = () => {
           title="Administrator Login"
           description="Sign in with your administrator credentials to review alias claims and manage PAX records."
           category="ADMIN"
+          actions={
+            <div style={{ display: 'flex', gap: '0.75rem' }}>
+              <Link
+                to="/bigdata"
+                className="bigdata-pill q-pill"
+                style={{ padding: '0.45rem 0.9rem', textDecoration: 'none' }}
+              >
+                Big Data Hub ↗
+              </Link>
+            </div>
+          }
         />
-        <div className="bigdata-card" style={{ maxWidth: '500px', margin: '0 auto' }}>
-          <p style={{ color: '#a0a0a0', margin: 0 }}>Admin login form loading...</p>
+
+        <div className="admin-login-card">
+          {isAuthenticated ? (
+            <div style={{ textAlign: 'center' }}>
+              <div style={{ fontSize: '2.5rem', marginBottom: '0.5rem' }}>🔒</div>
+              <h2 className="admin-login-title">Already Authenticated</h2>
+              <p className="admin-login-subtitle">
+                You are currently signed in as <strong>{adminUsername || 'admin'}</strong>.
+              </p>
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '0.75rem', marginTop: '1.5rem' }}>
+                <Link
+                  to="/bigdata/admin/alias-requests"
+                  className="admin-form-submit"
+                  style={{ textAlign: 'center', textDecoration: 'none' }}
+                >
+                  Go to Admin Portal →
+                </Link>
+                <button
+                  type="button"
+                  onClick={logout}
+                  className="pax-chip-clear-btn"
+                  style={{ alignSelf: 'center', padding: '0.5rem 1rem' }}
+                >
+                  Log Out
+                </button>
+              </div>
+            </div>
+          ) : (
+            <form onSubmit={handleSubmit}>
+              <h2 className="admin-login-title">Sign In</h2>
+              <p className="admin-login-subtitle">
+                Enter your credentials to manage F3 RVA Big Data.
+              </p>
+
+              {(localError || authError) && (
+                <div
+                  className="claim-alias-alert alert-error"
+                  style={{ marginBottom: '1.25rem', padding: '0.75rem 1rem' }}
+                >
+                  <span>⚠️</span>
+                  <span>{localError || authError}</span>
+                </div>
+              )}
+
+              <div className="admin-form-group">
+                <label htmlFor="admin-username" className="admin-form-label">
+                  Username
+                </label>
+                <input
+                  id="admin-username"
+                  type="text"
+                  className="admin-form-input"
+                  value={username}
+                  onChange={(e) => setUsername(e.target.value)}
+                  placeholder="Enter admin username"
+                  autoComplete="username"
+                  disabled={loading}
+                />
+              </div>
+
+              <div className="admin-form-group">
+                <label htmlFor="admin-password" className="admin-form-label">
+                  Password
+                </label>
+                <input
+                  id="admin-password"
+                  type="password"
+                  className="admin-form-input"
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
+                  placeholder="••••••••••••"
+                  autoComplete="current-password"
+                  disabled={loading}
+                />
+              </div>
+
+              <button
+                type="submit"
+                className="admin-form-submit"
+                disabled={loading}
+              >
+                {loading ? 'Authenticating...' : 'Sign In'}
+              </button>
+            </form>
+          )}
         </div>
       </div>
     </>
