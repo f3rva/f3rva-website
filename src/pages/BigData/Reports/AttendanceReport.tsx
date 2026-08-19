@@ -1,11 +1,28 @@
 import React from 'react';
+import BigDataPageHeader from '../../../components/BigDataPageHeader';
+import SEO from '../../../components/SEO';
+import '../BigData.css';
 
 const AttendanceReport: React.FC = () => {
   return (
-    <div style={{ maxWidth: '1200px', margin: '0 auto', padding: '2rem 1rem' }}>
-      <h1>Attendance Leaderboard</h1>
-      <p style={{ color: '#888' }}>Rankings by workouts attended, Qs led, and Q ratio.</p>
-    </div>
+    <>
+      <SEO
+        title="Attendance Leaderboard - F3 RVA Big Data"
+        description="F3 RVA member attendance and workout leader rankings."
+        url="https://f3rva.org/bigdata/attendance"
+        type="website"
+      />
+      <div className="bigdata-page-container">
+        <BigDataPageHeader
+          title="Attendance Leaderboard"
+          description="Member rankings by total workouts attended, Qs led, and Q leadership ratio."
+          category="LEADERBOARDS"
+        />
+        <div className="bigdata-card">
+          <p style={{ color: '#a0a0a0', margin: 0 }}>Attendance leaderboard component loading...</p>
+        </div>
+      </div>
+    </>
   );
 };
 

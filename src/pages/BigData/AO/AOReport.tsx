@@ -1,11 +1,28 @@
 import React from 'react';
+import BigDataPageHeader from '../../../components/BigDataPageHeader';
+import SEO from '../../../components/SEO';
+import '../BigData.css';
 
 const AOReport: React.FC = () => {
   return (
-    <div style={{ maxWidth: '1200px', margin: '0 auto', padding: '2rem 1rem' }}>
-      <h1>AO Analytics & Averages</h1>
-      <p style={{ color: '#888' }}>Overview of all Areas of Operations in F3 RVA.</p>
-    </div>
+    <>
+      <SEO
+        title="AO Analytics & Health - F3 RVA Big Data"
+        description="Performance benchmarks, attendance averages, and workout history across all Areas of Operations in Richmond."
+        url="https://f3rva.org/bigdata/ao"
+        type="website"
+      />
+      <div className="bigdata-page-container">
+        <BigDataPageHeader
+          title="Area of Operations (AO) Analytics"
+          description="Performance benchmarks, attendance averages, and workout volume across all workout locations in Richmond."
+          category="LOCATIONS"
+        />
+        <div className="bigdata-card">
+          <p style={{ color: '#a0a0a0', margin: 0 }}>AO directory and averages component loading...</p>
+        </div>
+      </div>
+    </>
   );
 };
 

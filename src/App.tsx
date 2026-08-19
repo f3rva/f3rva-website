@@ -70,6 +70,7 @@ const App: React.FC = () => {
 
               {/* Big Data Public Routes */}
               <Route path="/bigdata" element={<BigDataHub />} />
+              <Route path="/bigdata/workouts" element={<Navigate to="/bigdata" replace />} />
               <Route path="/bigdata/attendance" element={<AttendanceReport />} />
               <Route path="/bigdata/day-of-week" element={<DayOfWeekReport />} />
               <Route path="/bigdata/ao" element={<AOReport />} />
@@ -77,6 +78,7 @@ const App: React.FC = () => {
               <Route path="/bigdata/pax/:id" element={<MemberDetail />} />
               <Route path="/bigdata/workout/:id" element={<WorkoutDetail />} />
               <Route path="/bigdata/claim-alias" element={<ClaimAlias />} />
+
 
               {/* Shorthand / Direct Entity Links */}
               <Route path="/pax/:id" element={<PaxRedirect />} />

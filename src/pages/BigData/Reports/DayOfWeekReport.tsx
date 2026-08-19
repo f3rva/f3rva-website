@@ -1,11 +1,28 @@
 import React from 'react';
+import BigDataPageHeader from '../../../components/BigDataPageHeader';
+import SEO from '../../../components/SEO';
+import '../BigData.css';
 
 const DayOfWeekReport: React.FC = () => {
   return (
-    <div style={{ maxWidth: '1200px', margin: '0 auto', padding: '2rem 1rem' }}>
-      <h1>Day of Week Breakdown</h1>
-      <p style={{ color: '#888' }}>Workout frequency and attendance distribution by day of week.</p>
-    </div>
+    <>
+      <SEO
+        title="Day of Week Breakdown - F3 RVA Big Data"
+        description="Regional workout frequency and attendance distribution by day of week."
+        url="https://f3rva.org/bigdata/day-of-week"
+        type="website"
+      />
+      <div className="bigdata-page-container">
+        <BigDataPageHeader
+          title="Day of Week Breakdown"
+          description="Analyze workout volume and regional PAX distribution across each day of the week."
+          category="REPORTS"
+        />
+        <div className="bigdata-card">
+          <p style={{ color: '#a0a0a0', margin: 0 }}>Day of week analytics component loading...</p>
+        </div>
+      </div>
+    </>
   );
 };
 
