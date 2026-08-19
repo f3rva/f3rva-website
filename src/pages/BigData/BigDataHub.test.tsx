@@ -9,7 +9,7 @@ describe('BigDataHub Component', () => {
     vi.restoreAllMocks();
   });
 
-  it('renders dashboard title, breadcrumbs, search, and navigation cards', async () => {
+  it('renders dashboard title, breadcrumbs, search, and 30-day KPI cards', async () => {
     vi.spyOn(global, 'fetch').mockImplementation((url) => {
       const urlStr = url.toString();
       if (urlStr.includes('/v2/reports/ao')) {
@@ -62,8 +62,7 @@ describe('BigDataHub Component', () => {
     expect(screen.getByText('Peak Workout Day')).toBeInTheDocument();
 
     await waitFor(() => {
-      expect(screen.getByText('Morning Beatdown')).toBeInTheDocument();
+      expect(screen.getAllByText('Morning Beatdown').length).toBeGreaterThan(0);
     });
   });
 });
-

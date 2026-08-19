@@ -363,6 +363,15 @@
   pointer-events: none;
 }
 
+/* Desktop vs Mobile Responsive Table Views */
+.desktop-only-view {
+  display: block;
+}
+
+.mobile-only-view {
+  display: none;
+}
+
 /* Empty State */
 .bigdata-empty-state {
   text-align: center;
@@ -375,22 +384,86 @@
   margin-bottom: 0.5rem;
 }
 
-/* Responsive adjustments */
+/* Responsive adjustments for Mobile (< 768px) */
 @media (max-width: 768px) {
   .bigdata-page-container {
-    padding: 1.5rem 1rem;
+    padding: 1.25rem 0.85rem;
   }
 
   .bigdata-page-title {
-    font-size: 1.85rem;
+    font-size: 1.75rem;
+  }
+
+  .bigdata-card {
+    padding: 1.25rem 1rem;
   }
 
   .bigdata-card-header {
     flex-direction: column;
-    align-items: flex-start;
+    align-items: stretch;
+    gap: 0.75rem;
   }
 
   .bigdata-search-container {
     max-width: 100%;
   }
+
+  .desktop-only-view {
+    display: none;
+  }
+
+  .mobile-only-view {
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+  }
+
+  .bigdata-workout-mobile-card {
+    background: #f8fafc;
+    border: 1px solid #e2e8f0;
+    border-radius: 10px;
+    padding: 0.9rem 1rem;
+    display: flex;
+    flex-direction: column;
+    gap: 0.45rem;
+    box-shadow: 0 1px 4px rgba(0, 0, 0, 0.04);
+    transition: transform 0.15s ease, border-color 0.15s ease;
+  }
+
+  .bigdata-workout-mobile-card:hover {
+    border-color: #cbd5e1;
+    transform: translateY(-1px);
+  }
+
+  .bigdata-workout-mobile-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+
+  .bigdata-workout-mobile-date {
+    font-size: 0.85rem;
+    font-weight: 600;
+    color: #64748b;
+  }
+
+  .bigdata-workout-mobile-title {
+    font-size: 1.05rem;
+    font-weight: 700;
+    color: #1e293b;
+    text-decoration: none;
+    line-height: 1.35;
+  }
+
+  .bigdata-workout-mobile-title:hover {
+    color: #b45309;
+  }
+
+  .bigdata-workout-mobile-meta {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.35rem;
+    margin-top: 0.15rem;
+  }
 }
+

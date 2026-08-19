@@ -77,7 +77,8 @@ export const BigDataWorkouts: React.FC = () => {
 
       {!loading && !error && (
         <>
-          <div className="bigdata-table-wrapper">
+          {/* Desktop Table View */}
+          <div className="bigdata-table-wrapper desktop-only-view">
             <table className="bigdata-table">
               <thead>
                 <tr>
@@ -90,7 +91,7 @@ export const BigDataWorkouts: React.FC = () => {
               </thead>
               <tbody>
                 {filteredWorkouts.map((workout) => (
-                  <tr key={workout.workoutId}>
+                  <tr key={`desktop-${workout.workoutId}`}>
                     <td style={{ whiteSpace: 'nowrap', color: '#64748b', fontSize: '0.9rem', fontWeight: 500 }}>
                       {workout.workoutDate}
                     </td>
@@ -155,6 +156,65 @@ export const BigDataWorkouts: React.FC = () => {
               </tbody>
             </table>
           </div>
+
+          {/* Mobile Card-List View (Zero Horizontal Scroll on Small Screens) */}
+          <div className="mobile-only-view">
+            {filteredWorkouts.map((workout) => (
+              <div key={`mobile-${workout.workoutId}`} className="bigdata-workout-mobile-card">
+                <div className="bigdata-workout-mobile-header">
+                  <span className="bigdata-workout-mobile-date">📅 {workout.workoutDate}</span>
+                  <Link
+                    to={`/bigdata/workout/${workout.workoutId}`}
+                    className="bigdata-pill count-pill"
+                    title="View workout attendees"
+                  >
+                    👥 {workout.paxCount ?? 0} PAX
+                  </Link>
+                </div>
+
+                <Link
+                  to={`/bigdata/workout/${workout.workoutId}`}
+                  className="bigdata-workout-mobile-title"
+                >
+                  {workout.title}
+                </Link>
+
+                <div className="bigdata-workout-mobile-meta">
+                  {workout.ao && workout.ao.length > 0 ? (
+                    workout.ao.map((ao) => (
+                      <Link
+                        key={`m-ao-${workout.workoutId}-${ao.id}`}
+                        to={`/bigdata/ao/${ao.id}`}
+                        className="bigdata-pill ao-pill"
+                      >
+                        📍 {ao.description}
+                      </Link>
+                    ))
+                  ) : null}
+
+                  {workout.q && workout.q.length > 0 ? (
+                    workout.q.map((qic) => (
+                      <Link
+                        key={`m-q-${workout.workoutId}-${qic.memberId}`}
+                        to={`/bigdata/pax/${qic.memberId}`}
+                        className="bigdata-pill q-pill"
+                      >
+                        👑 {qic.f3Name}
+                      </Link>
+                    ))
+                  ) : null}
+                </div>
+              </div>
+            ))}
+
+            {filteredWorkouts.length === 0 && (
+              <div className="bigdata-empty-state">
+                <h3>No workouts match your filter</h3>
+                <p>Try clearing your filter or navigating to another page.</p>
+              </div>
+            )}
+          </div>
+
 
           <div style={{ marginTop: '1.25rem' }}>
             <Pagination
