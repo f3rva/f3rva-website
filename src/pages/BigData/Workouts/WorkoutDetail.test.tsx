@@ -25,7 +25,7 @@ describe('WorkoutDetail Component', () => {
   });
 
   it('renders loading state initially', () => {
-    vi.spyOn(global, 'fetch').mockImplementation(() => new Promise(() => {}));
+    vi.spyOn(globalThis, 'fetch').mockImplementation(() => new Promise(() => {}));
 
     render(
       <MemoryRouter initialEntries={['/bigdata/workout/42']}>
@@ -39,7 +39,7 @@ describe('WorkoutDetail Component', () => {
   });
 
   it('renders workout metadata, attendee roster, and archive backblast button', async () => {
-    vi.spyOn(global, 'fetch').mockResolvedValueOnce({
+    vi.spyOn(globalThis, 'fetch').mockResolvedValueOnce({
       ok: true,
       json: async () => mockWorkoutDetail,
     } as Response);
@@ -64,7 +64,7 @@ describe('WorkoutDetail Component', () => {
   });
 
   it('renders not found error state when fetch fails', async () => {
-    vi.spyOn(global, 'fetch').mockResolvedValueOnce({
+    vi.spyOn(globalThis, 'fetch').mockResolvedValueOnce({
       ok: false,
       status: 404,
       json: async () => ({ errorCode: 1001, errorMessage: 'Workout not found' }),

@@ -6,6 +6,7 @@ import { useFetch } from '../../../hooks/useFetch';
 import LoadingSpinner from '../../../components/LoadingSpinner/LoadingSpinner';
 import BigDataPageHeader from '../../../components/BigDataPageHeader';
 import SEO from '../../../components/SEO';
+import { formatFullDisplayDate } from '../../../utils/dateUtils';
 import '../BigData.css';
 
 export const WorkoutDetail: React.FC = () => {
@@ -86,8 +87,8 @@ export const WorkoutDetail: React.FC = () => {
         <div className="bigdata-kpi-grid">
           <div className="bigdata-kpi-card">
             <span className="bigdata-kpi-label">Workout Date</span>
-            <span className="bigdata-kpi-value" style={{ fontSize: '1.4rem' }}>
-              {workout.workoutDate}
+            <span className="bigdata-kpi-value" style={{ fontSize: '1.25rem' }}>
+              {formatFullDisplayDate(workout.workoutDate)}
             </span>
           </div>
 

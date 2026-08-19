@@ -1,7 +1,8 @@
 import React from 'react';
 import { render, screen, fireEvent, waitFor } from '@testing-library/react';
 import { describe, it, expect, beforeEach, vi } from 'vitest';
-import { AuthProvider, useAuth } from './AuthContext';
+import { AuthProvider } from './AuthContext';
+import { useAuth } from '../hooks/useAuth';
 
 const TestAuthConsumer: React.FC = () => {
   const { isAuthenticated, adminUsername, token, error, login, logout, getAuthHeaders } = useAuth();
@@ -39,7 +40,7 @@ describe('AuthContext & useAuth', () => {
   });
 
   it('successfully logs in with valid credentials and sets token in localStorage', async () => {
-    vi.spyOn(global, 'fetch').mockResolvedValueOnce({
+    vi.spyOn(globalThis, 'fetch').mockResolvedValueOnce({
       ok: true,
       json: async () => ({
         accessToken: 'mock-jwt-token-xyz',
@@ -67,7 +68,7 @@ describe('AuthContext & useAuth', () => {
   });
 
   it('handles login failure and exposes error message', async () => {
-    vi.spyOn(global, 'fetch').mockResolvedValueOnce({
+    vi.spyOn(globalThis, 'fetch').mockResolvedValueOnce({
       ok: false,
       status: 401,
       json: async () => ({
@@ -92,7 +93,7 @@ describe('AuthContext & useAuth', () => {
   });
 
   it('logs out and clears localStorage', async () => {
-    vi.spyOn(global, 'fetch').mockResolvedValueOnce({
+    vi.spyOn(globalThis, 'fetch').mockResolvedValueOnce({
       ok: true,
       json: async () => ({
         accessToken: 'mock-jwt-token-xyz',

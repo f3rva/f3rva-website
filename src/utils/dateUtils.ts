@@ -30,6 +30,23 @@ export const formatDisplayDate = (dateString: string): string => {
 };
 
 /**
+ * Format date string in YYYY-MM-DD format to full date with weekday in parentheses
+ * @param dateString - Date string in YYYY-MM-DD format
+ * @returns Formatted date string (e.g., "October 17, 2015 (Saturday)")
+ */
+export const formatFullDisplayDate = (dateString: string | null | undefined): string => {
+  if (!dateString || !/^\d{4}-\d{2}-\d{2}$/.test(dateString)) return dateString || 'N/A';
+  const date = getDateFromString(dateString);
+  const monthDayYear = date.toLocaleDateString('en-US', {
+    month: 'long',
+    day: 'numeric',
+    year: 'numeric'
+  });
+  const weekday = date.toLocaleDateString('en-US', { weekday: 'long' });
+  return `${monthDayYear} (${weekday})`;
+};
+
+/**
  * Format date string for URL construction
  * @param dateString - Date string in YYYY-MM-DD format
  * @returns Object with year, month, day strings formatted for URLs

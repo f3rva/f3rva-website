@@ -20,7 +20,7 @@ describe('BigDataSearch Universal Component', () => {
   });
 
   it('renders search input', async () => {
-    vi.spyOn(global, 'fetch').mockResolvedValueOnce({
+    vi.spyOn(globalThis, 'fetch').mockResolvedValueOnce({
       ok: true,
       json: async () => mockAos,
     } as Response);
@@ -38,7 +38,7 @@ describe('BigDataSearch Universal Component', () => {
 
 
   it('searches and displays suggestions for matching query', async () => {
-    vi.spyOn(global, 'fetch').mockImplementation((url) => {
+    vi.spyOn(globalThis, 'fetch').mockImplementation((url) => {
       const urlStr = url.toString();
       if (urlStr.includes('/v2/reports/ao')) {
         return Promise.resolve({
@@ -71,7 +71,7 @@ describe('BigDataSearch Universal Component', () => {
   });
 
   it('navigates to member profile when clicked', async () => {
-    vi.spyOn(global, 'fetch').mockImplementation((url) => {
+    vi.spyOn(globalThis, 'fetch').mockImplementation((url) => {
       const urlStr = url.toString();
       if (urlStr.includes('/v2/reports/ao')) {
         return Promise.resolve({

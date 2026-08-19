@@ -1,3 +1,4 @@
+/* eslint-disable react-refresh/only-export-components */
 import React, { createContext, useState, useEffect, useCallback, useMemo } from 'react';
 import { config } from '../config';
 import { TokenResponse, ApiErrorResponse } from '../types/bigdata';
@@ -14,14 +15,6 @@ export interface AuthContextType {
 }
 
 export const AuthContext = createContext<AuthContextType | undefined>(undefined);
-
-export function useAuth(): AuthContextType {
-  const context = React.useContext(AuthContext);
-  if (!context) {
-    throw new Error('useAuth must be used within an AuthProvider');
-  }
-  return context;
-}
 
 
 const TOKEN_STORAGE_KEY = 'f3rva_admin_token';

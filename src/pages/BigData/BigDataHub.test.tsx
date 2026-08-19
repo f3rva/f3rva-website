@@ -10,7 +10,7 @@ describe('BigDataHub Component', () => {
   });
 
   it('renders dashboard title, breadcrumbs, search, and 30-day KPI cards', async () => {
-    vi.spyOn(global, 'fetch').mockImplementation((url) => {
+    vi.spyOn(globalThis, 'fetch').mockImplementation((url) => {
       const urlStr = url.toString();
       if (urlStr.includes('/v2/reports/ao')) {
         return Promise.resolve({

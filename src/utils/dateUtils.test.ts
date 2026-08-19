@@ -2,6 +2,7 @@ import { describe, it, expect } from 'vitest';
 import {
   getDateFromString,
   formatDisplayDate,
+  formatFullDisplayDate,
   formatDateForUrl,
   formatDateDisplay,
   formatMonthName
@@ -42,6 +43,18 @@ describe('dateUtils', () => {
     it('should format a weekend date correctly', () => {
       const formatted = formatDisplayDate('2024-01-20'); // Saturday
       expect(formatted).toBe('Sat, Jan 20, 2024');
+    });
+  });
+
+  describe('formatFullDisplayDate', () => {
+    it('should format a date string to full text with day of week in parentheses', () => {
+      const formatted = formatFullDisplayDate('2015-10-17');
+      expect(formatted).toBe('October 17, 2015 (Saturday)');
+    });
+
+    it('should handle invalid or null dates gracefully', () => {
+      expect(formatFullDisplayDate(null)).toBe('N/A');
+      expect(formatFullDisplayDate('')).toBe('N/A');
     });
   });
 

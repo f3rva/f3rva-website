@@ -31,7 +31,7 @@ describe('BigDataWorkouts Explorer Component', () => {
   });
 
   it('renders table headers, workout rows, and responsive cards', async () => {
-    vi.spyOn(global, 'fetch').mockResolvedValueOnce({
+    vi.spyOn(globalThis, 'fetch').mockResolvedValueOnce({
       ok: true,
       json: async () => mockWorkouts,
     } as Response);
@@ -53,7 +53,7 @@ describe('BigDataWorkouts Explorer Component', () => {
   });
 
   it('filters workouts by query text on the current page', async () => {
-    vi.spyOn(global, 'fetch').mockResolvedValueOnce({
+    vi.spyOn(globalThis, 'fetch').mockResolvedValueOnce({
       ok: true,
       json: async () => mockWorkouts,
     } as Response);
@@ -76,7 +76,7 @@ describe('BigDataWorkouts Explorer Component', () => {
   });
 
   it('displays empty state when no matching results', async () => {
-    vi.spyOn(global, 'fetch').mockResolvedValueOnce({
+    vi.spyOn(globalThis, 'fetch').mockResolvedValueOnce({
       ok: true,
       json: async () => mockWorkouts,
     } as Response);
