@@ -195,7 +195,7 @@ export const WorkoutDetail: React.FC = () => {
                     </div>
                     <div style={{ overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
                       <span style={{ fontWeight: 600, fontSize: '0.95rem', color: '#1e293b' }}>{pax.f3Name}</span>
-                      {isQ && <span style={{ fontSize: '0.75rem', color: '#b45309', display: 'block', fontWeight: 600 }}>QIC Leader</span>}
+                      {isQ && <span style={{ fontSize: '0.75rem', color: '#b45309', display: 'block', fontWeight: 600 }}>QIC</span>}
                     </div>
                   </Link>
                 );

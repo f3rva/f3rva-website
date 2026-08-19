@@ -44,10 +44,7 @@ export const BigDataWorkouts: React.FC = () => {
     <div className="bigdata-card">
       <div className="bigdata-card-header">
         <div>
-          <h2 className="bigdata-card-title">🏃 Recent Workouts Explorer</h2>
-          <span style={{ fontSize: '0.85rem', color: '#64748b' }}>
-            Browse backblasts, leading QICs, and attendee counts across the region
-          </span>
+          <h2 className="bigdata-card-title">Recent Workouts Explorer</h2>
         </div>
 
         <div className="bigdata-search-container">
