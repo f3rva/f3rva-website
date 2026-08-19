@@ -1,5 +1,2 @@
-/**
- * Re-export all types for easier importing
- */
-
 export * from './WorkoutPost';
+export * from './bigdata';
