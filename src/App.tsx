@@ -18,9 +18,8 @@ import ArchivePost from './pages/Archives/ArchivePost';
 import AOArchives from './pages/Archives/AOArchives';
 import NotFoundPage from './pages/NotFound/notFound';
 
-// Big Data Pages
 import BigDataHub from './pages/BigData/BigDataHub';
-import AttendanceReport from './pages/BigData/Reports/AttendanceReport';
+import AttendanceLeaderboard from './pages/BigData/Attendance/AttendanceLeaderboard';
 import DayOfWeekReport from './pages/BigData/Reports/DayOfWeekReport';
 import AOReport from './pages/BigData/AO/AOReport';
 import AODetail from './pages/BigData/AO/AODetail';
@@ -71,7 +70,7 @@ const App: React.FC = () => {
               {/* Big Data Public Routes */}
               <Route path="/bigdata" element={<BigDataHub />} />
               <Route path="/bigdata/workouts" element={<Navigate to="/bigdata" replace />} />
-              <Route path="/bigdata/attendance" element={<AttendanceReport />} />
+              <Route path="/bigdata/attendance" element={<AttendanceLeaderboard />} />
               <Route path="/bigdata/day-of-week" element={<DayOfWeekReport />} />
               <Route path="/bigdata/ao" element={<AOReport />} />
               <Route path="/bigdata/ao/:id" element={<AODetail />} />

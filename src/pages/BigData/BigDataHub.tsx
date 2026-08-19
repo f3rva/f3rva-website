@@ -81,7 +81,7 @@ export const BigDataHub: React.FC = () => {
         />
 
         {/* Universal Fast Search Bar */}
-        <BigDataSearch placeholder="Search any PAX or AO (e.g., 'Shakedown', 'Forge', 'Drip')..." />
+        <BigDataSearch placeholder="Search any PAX or AO (e.g., 'E.F. Hutton', 'GridIron', 'Rosie')..." />
 
         {/* 30-Day Region KPI Summary Cards */}
         <div className="bigdata-kpi-grid">

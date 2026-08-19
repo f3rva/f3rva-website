@@ -1,0 +1,181 @@
+/* Attendance Leaderboard & Day-of-Week Styles */
+
+/* Visual Podium for Top 3 */
+.podium-container {
+  display: flex;
+  justify-content: center;
+  align-items: flex-end;
+  gap: 1rem;
+  margin: 1.5rem 0 2.5rem;
+  padding: 1.5rem 1rem 0;
+  background: linear-gradient(180deg, #f8fafc 0%, #edf2f7 100%);
+  border: 1px solid #e2e8f0;
+  border-radius: 16px;
+}
+
+@media (max-width: 640px) {
+  .podium-container {
+    gap: 0.5rem;
+    padding: 1rem 0.5rem 0;
+  }
+}
+
+.podium-step {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  flex: 1;
+  max-width: 220px;
+  text-align: center;
+}
+
+.podium-avatar {
+  width: 56px;
+  height: 56px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.75rem;
+  margin-bottom: 0.5rem;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+  position: relative;
+}
+
+.podium-medal {
+  position: absolute;
+  top: -8px;
+  right: -8px;
+  font-size: 1.25rem;
+}
+
+.podium-name {
+  font-size: 1.05rem;
+  font-weight: 700;
+  color: #1e293b;
+  text-decoration: none;
+  margin-bottom: 0.25rem;
+  max-width: 100%;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.podium-name:hover {
+  color: #b45309;
+}
+
+.podium-score {
+  font-size: 0.9rem;
+  font-weight: 700;
+  color: #047857;
+  background: #ecfdf5;
+  padding: 0.2rem 0.6rem;
+  border-radius: 20px;
+  margin-bottom: 0.75rem;
+}
+
+.podium-subtext {
+  font-size: 0.75rem;
+  color: #64748b;
+  margin-bottom: 0.5rem;
+}
+
+.podium-block {
+  width: 100%;
+  border-top-left-radius: 12px;
+  border-top-right-left-radius: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.5rem;
+  font-weight: 800;
+  color: #ffffff;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+}
+
+.podium-1 .podium-block {
+  height: 120px;
+  background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);
+  border-top: 3px solid #fbbf24;
+}
+
+.podium-2 .podium-block {
+  height: 90px;
+  background: linear-gradient(135deg, #94a3b8 0%, #64748b 100%);
+  border-top: 3px solid #cbd5e1;
+}
+
+.podium-3 .podium-block {
+  height: 65px;
+  background: linear-gradient(135deg, #ea580c 0%, #c2410c 100%);
+  border-top: 3px solid #fdba74;
+}
+
+/* Day of Week Cards Grid */
+.day-cards-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+  gap: 1rem;
+  margin-bottom: 2rem;
+}
+
+.day-card {
+  background: #ffffff;
+  border: 1px solid #e2e8f0;
+  border-radius: 12px;
+  padding: 1rem;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.04);
+  display: flex;
+  flex-direction: column;
+  transition: transform 0.15s ease, box-shadow 0.15s ease;
+}
+
+.day-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+}
+
+.day-card-peak {
+  border-color: #fbbf24;
+  background: linear-gradient(180deg, #fffbeb 0%, #ffffff 100%);
+  box-shadow: 0 4px 12px rgba(245, 158, 11, 0.12);
+}
+
+.day-card-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 0.5rem;
+}
+
+.day-card-name {
+  font-size: 1rem;
+  font-weight: 700;
+  color: #1e293b;
+}
+
+.day-card-badge {
+  font-size: 0.7rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  padding: 0.15rem 0.4rem;
+  border-radius: 4px;
+  background: #fef3c7;
+  color: #b45309;
+}
+
+.day-card-stat {
+  font-size: 1.35rem;
+  font-weight: 800;
+  color: #2563eb;
+  margin-bottom: 0.25rem;
+}
+
+.day-card-meta {
+  font-size: 0.8rem;
+  color: #64748b;
+  display: flex;
+  flex-direction: column;
+  gap: 0.15rem;
+}
