@@ -139,7 +139,7 @@ export const DayOfWeekReport: React.FC = () => {
 
       <div className="bigdata-page-container">
         <BigDataPageHeader
-          title="Day of Week Attendance Analytics"
+          title="📅 Day of Week Attendance Analytics"
           description="Analyze workout frequency, aggregate turnout, and average attendance by weekday."
           category="ANALYTICAL REPORTS"
           actions={

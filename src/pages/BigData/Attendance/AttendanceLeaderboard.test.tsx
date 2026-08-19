@@ -44,7 +44,7 @@ describe('AttendanceLeaderboard Component', () => {
       expect(screen.getAllByText('Bischoff').length).toBeGreaterThan(0);
     });
 
-    expect(screen.getByText(/Member Attendance & Leadership Leaderboard/i)).toBeInTheDocument();
+    expect(screen.getByText(/Attendance & Q Leaderboard/i)).toBeInTheDocument();
     expect(screen.getAllByText('Lockjaw').length).toBeGreaterThan(0);
     expect(screen.getAllByText('Drip').length).toBeGreaterThan(0);
     expect(screen.getAllByText('Biscuits').length).toBeGreaterThan(0);

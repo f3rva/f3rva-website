@@ -54,7 +54,7 @@ describe('BigDataHub Component', () => {
       </MemoryRouter>
     );
 
-    expect(screen.getByText('F3 RVA Big Data Dashboard')).toBeInTheDocument();
+    expect(screen.getByText('Big Data Dashboard')).toBeInTheDocument();
     expect(screen.getByPlaceholderText(/Search any PAX or AO/i)).toBeInTheDocument();
     expect(screen.getByText('30-Day Region Average')).toBeInTheDocument();
     expect(screen.getByText('Active AOs (30 Days)')).toBeInTheDocument();
