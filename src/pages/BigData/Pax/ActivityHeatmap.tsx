@@ -251,7 +251,7 @@ export const ActivityHeatmap: React.FC<ActivityHeatmapProps> = ({
           <span>More</span>
           <span style={{ marginLeft: '1rem', display: 'inline-flex', alignItems: 'center', gap: '0.35rem' }}>
             <div className="pax-legend-box" style={{ background: '#f59e0b', border: '1px solid #d97706' }} />
-            <strong>👑 QIC Led</strong>
+            <strong>QIC</strong>
           </span>
         </div>
       </div>
