@@ -3,6 +3,7 @@ import { useNavigate, useLocation, Link } from 'react-router-dom';
 import { useAuth } from '../../../hooks/useAuth';
 import BigDataPageHeader from '../../../components/BigDataPageHeader';
 import SEO from '../../../components/SEO';
+import { sanitizeRedirectPath } from '../../../utils/validation';
 import '../BigData.css';
 import './Admin.css';
 
@@ -16,7 +17,8 @@ export const AdminLogin: React.FC = () => {
   const navigate = useNavigate();
   const location = useLocation();
 
-  const from = (location.state as { from?: { pathname: string } })?.from?.pathname || '/bigdata/admin/alias-requests';
+  const rawFrom = (location.state as { from?: { pathname: string } })?.from?.pathname;
+  const from = sanitizeRedirectPath(rawFrom);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();

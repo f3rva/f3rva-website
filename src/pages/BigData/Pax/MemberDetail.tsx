@@ -18,7 +18,8 @@ export const MemberDetail: React.FC = () => {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
 
-  const apiUrl = id ? `${config.apiBaseUrl}/v2/members/${id}` : null;
+  const isValidId = Boolean(id && /^\d+$/.test(id));
+  const apiUrl = isValidId ? `${config.apiBaseUrl}/v2/members/${id}` : null;
   const { data: member, loading, error } = useFetch<MemberDetailType>(apiUrl);
 
   // Tabs for history explorer

@@ -71,6 +71,32 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     }
   }, [logout]);
 
+  // Periodic token expiration verification and window focus check
+  useEffect(() => {
+    if (!token || !expiresAt) return;
+
+    const checkExpiration = () => {
+      if (Date.now() >= expiresAt) {
+        logout();
+      }
+    };
+
+    // Immediate check on visibility change (e.g. returning to an idle tab)
+    const handleVisibilityChange = () => {
+      if (document.visibilityState === 'visible') {
+        checkExpiration();
+      }
+    };
+
+    document.addEventListener('visibilitychange', handleVisibilityChange);
+    const interval = setInterval(checkExpiration, 30000);
+
+    return () => {
+      document.removeEventListener('visibilitychange', handleVisibilityChange);
+      clearInterval(interval);
+    };
+  }, [token, expiresAt, logout]);
+
   const login = useCallback(async (username: string, password: string): Promise<boolean> => {
     setLoading(true);
     setError(null);

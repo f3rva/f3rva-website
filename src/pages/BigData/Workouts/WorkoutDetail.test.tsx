@@ -83,4 +83,19 @@ describe('WorkoutDetail Component', () => {
       expect(screen.getByText('← Back to Big Data Dashboard')).toBeInTheDocument();
     });
   });
+
+  it('handles invalid non-numeric workout ID safely without API calls', async () => {
+    const fetchSpy = vi.spyOn(globalThis, 'fetch');
+
+    render(
+      <MemoryRouter initialEntries={['/bigdata/workout/not-a-number']}>
+        <Routes>
+          <Route path="/bigdata/workout/:id" element={<WorkoutDetail />} />
+        </Routes>
+      </MemoryRouter>
+    );
+
+    expect(screen.getByText(/Workout Not Found/i)).toBeInTheDocument();
+    expect(fetchSpy).not.toHaveBeenCalled();
+  });
 });

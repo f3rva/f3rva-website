@@ -135,4 +135,19 @@ describe('MemberDetail Component', () => {
     expect(screen.queryByText('Foundry Convergence')).not.toBeInTheDocument();
     expect(screen.getAllByText('Gridiron Sprints').length).toBeGreaterThan(0);
   });
+
+  it('handles invalid non-numeric member ID safely without API calls', async () => {
+    const fetchSpy = vi.spyOn(globalThis, 'fetch');
+
+    render(
+      <MemoryRouter initialEntries={['/bigdata/pax/invalid-id']}>
+        <Routes>
+          <Route path="/bigdata/pax/:id" element={<MemberDetail />} />
+        </Routes>
+      </MemoryRouter>
+    );
+
+    expect(screen.getByText(/Member Not Found/i)).toBeInTheDocument();
+    expect(fetchSpy).not.toHaveBeenCalled();
+  });
 });

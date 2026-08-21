@@ -121,6 +121,16 @@ describe('Admin Portal Components', () => {
         expect(screen.getByText('Invalid username or password.')).toBeInTheDocument();
       });
     });
+
+    it('sanitizes open redirect attempts safely', async () => {
+      const { sanitizeRedirectPath } = await import('../../../utils/validation');
+      expect(sanitizeRedirectPath('https://malicious.com')).toBe('/bigdata/admin/alias-requests');
+      expect(sanitizeRedirectPath('//malicious.com')).toBe('/bigdata/admin/alias-requests');
+      expect(sanitizeRedirectPath('javascript:alert(1)')).toBe('/bigdata/admin/alias-requests');
+      expect(sanitizeRedirectPath(null)).toBe('/bigdata/admin/alias-requests');
+      expect(sanitizeRedirectPath(undefined)).toBe('/bigdata/admin/alias-requests');
+      expect(sanitizeRedirectPath('/bigdata/admin/manage-pax')).toBe('/bigdata/admin/manage-pax');
+    });
   });
 
   describe('AdminAliasRequests Component', () => {

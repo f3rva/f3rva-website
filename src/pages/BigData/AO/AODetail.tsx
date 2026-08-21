@@ -17,8 +17,10 @@ export const AODetail: React.FC = () => {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
 
+  const isValidId = Boolean(id && /^\d+$/.test(id));
+
   // 1. Fetch AO Leaderboard (Top Qs, Top PAX, Streakers)
-  const leaderboardUrl = id ? `${config.apiBaseUrl}/v2/reports/ao/${id}/leaderboard` : null;
+  const leaderboardUrl = isValidId ? `${config.apiBaseUrl}/v2/reports/ao/${id}/leaderboard` : null;
   const { data: leaderboard, loading: loadingLeaderboard, error: errorLeaderboard } = useFetch<AOLeaderboardResponse>(leaderboardUrl);
 
   // 2. Fetch AO Workouts History specifically for this AO (/v2/workouts/ao/:id)
@@ -27,7 +29,10 @@ export const AODetail: React.FC = () => {
   const [errorWorkouts, setErrorWorkouts] = useState<string | null>(null);
 
   useEffect(() => {
-    if (!id) return;
+    if (!isValidId) {
+      setLoadingWorkouts(false);
+      return;
+    }
     let isMounted = true;
     setLoadingWorkouts(true);
     setErrorWorkouts(null);
@@ -82,7 +87,7 @@ export const AODetail: React.FC = () => {
     return () => {
       isMounted = false;
     };
-  }, [id]);
+  }, [id, isValidId]);
 
   // 3. Fetch All-Time AO Summary
   const aoSummaryUrl = `${config.apiBaseUrl}/v2/reports/ao`;
@@ -156,12 +161,12 @@ export const AODetail: React.FC = () => {
     );
   }
 
-  if (error && !leaderboard && (!workouts || workouts.length === 0)) {
+  if (!isValidId || (error && !leaderboard && (!workouts || workouts.length === 0))) {
     return (
       <div className="bigdata-page-container">
         <BigDataPageHeader
           title="AO Not Found"
-          description={error || `Area of Operations #${id} could not be found.`}
+          description={!isValidId ? 'Invalid AO ID specified.' : (error || `Area of Operations #${id} could not be found.`)}
           category="AREAS OF OPERATION"
         />
         <div style={{ textAlign: 'center', padding: '3rem 1rem' }}>

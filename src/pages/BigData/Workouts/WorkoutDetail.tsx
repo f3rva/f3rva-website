@@ -13,7 +13,8 @@ export const WorkoutDetail: React.FC = () => {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
 
-  const apiUrl = id ? `${config.apiBaseUrl}/v2/workouts/${id}` : null;
+  const isValidId = Boolean(id && /^\d+$/.test(id));
+  const apiUrl = isValidId ? `${config.apiBaseUrl}/v2/workouts/${id}` : null;
   const { data: workout, loading, error } = useFetch<WorkoutPost>(apiUrl);
 
   if (loading) {

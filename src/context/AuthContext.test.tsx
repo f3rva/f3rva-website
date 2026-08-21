@@ -140,4 +140,25 @@ describe('AuthContext & useAuth', () => {
     expect(() => render(<TestAuthConsumer />)).toThrow('useAuth must be used within an AuthProvider');
     consoleError.mockRestore();
   });
+
+  it('proactively logs out when token expires on visibility change', async () => {
+    localStorage.setItem('f3rva_admin_token', 'expired-token');
+    localStorage.setItem('f3rva_admin_expires_at', (Date.now() + 10000).toString());
+
+    render(
+      <AuthProvider>
+        <TestAuthConsumer />
+      </AuthProvider>
+    );
+
+    expect(screen.getByTestId('auth-status').textContent).toBe('authenticated');
+
+    // Simulate time passing past expiry and tab becoming visible
+    vi.spyOn(Date, 'now').mockReturnValue(Date.now() + 20000);
+    fireEvent(document, new Event('visibilitychange'));
+
+    await waitFor(() => {
+      expect(screen.getByTestId('auth-status').textContent).toBe('unauthenticated');
+    });
+  });
 });

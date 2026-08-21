@@ -156,4 +156,25 @@ describe('AODetail Component', () => {
     expect(screen.queryByText('Foundry Beatdown')).not.toBeInTheDocument();
     expect(screen.getAllByText('Foundry Sprints').length).toBeGreaterThan(0);
   });
+
+  it('handles invalid non-numeric AO ID safely without fetching AO-specific data', async () => {
+    const fetchSpy = vi.spyOn(globalThis, 'fetch').mockImplementation(() =>
+      Promise.resolve({
+        ok: true,
+        json: async () => [],
+      } as Response)
+    );
+
+    render(
+      <MemoryRouter initialEntries={['/bigdata/ao/not-a-number']}>
+        <Routes>
+          <Route path="/bigdata/ao/:id" element={<AODetail />} />
+        </Routes>
+      </MemoryRouter>
+    );
+
+    expect(screen.getByText(/AO Not Found/i)).toBeInTheDocument();
+    expect(fetchSpy).not.toHaveBeenCalledWith(expect.stringContaining('/v2/reports/ao/not-a-number/leaderboard'), expect.anything());
+    expect(fetchSpy).not.toHaveBeenCalledWith(expect.stringContaining('/v2/workouts/ao/not-a-number'), expect.anything());
+  });
 });
