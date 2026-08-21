@@ -1,10 +1,26 @@
 /* Shared modern design system styles for F3 RVA Big Data pages (Clean Light Theme) */
 
+:root {
+  --bd-primary: #2c3e50;
+  --bd-accent-gold: #d97706;
+  --bd-accent-gold-dark: #b45309;
+  --bd-success: #10b981;
+  --bd-success-dark: #059669;
+  --bd-danger: #ef4444;
+  --bd-danger-dark: #dc2626;
+  --bd-blue: #3b82f6;
+  --bd-blue-dark: #1d4ed8;
+  --bd-text-main: #1e293b;
+  --bd-text-muted: #64748b;
+  --bd-border: #e2e8f0;
+  --bd-bg-subtle: #f8fafc;
+}
+
 .bigdata-page-container {
   max-width: 1200px;
   margin: 0 auto;
   padding: 2rem 1rem 3.5rem;
-  color: #2c3e50;
+  color: var(--bd-primary);
   font-family: inherit;
 }
 
@@ -323,6 +339,91 @@
   background: #e2e8f0;
   color: #0f172a;
   text-decoration: none;
+}
+
+/* Timeframe Bar & Filter Pill Buttons (Shared across all Big Data views) */
+.ao-timeframe-bar {
+  display: flex;
+  gap: 0.5rem;
+  flex-wrap: wrap;
+  align-items: center;
+}
+
+.pax-year-btn,
+.bigdata-filter-btn {
+  background: #ffffff;
+  border: 1px solid #cbd5e1;
+  color: #475569;
+  padding: 0.35rem 0.85rem;
+  border-radius: 20px;
+  font-size: 0.85rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.pax-year-btn:hover,
+.bigdata-filter-btn:hover {
+  background: #f1f5f9;
+  color: #1e293b;
+}
+
+.pax-year-btn.active,
+.bigdata-filter-btn.active {
+  background: #b45309;
+  color: #ffffff;
+  border-color: #b45309;
+}
+
+/* Tab Navigation for History Tables & Metric Selectors */
+.pax-tabs-container,
+.bigdata-tabs-container {
+  display: flex;
+  gap: 0.5rem;
+  border-bottom: 2px solid #e2e8f0;
+  margin-bottom: 1.5rem;
+}
+
+.pax-tab-btn,
+.bigdata-tab-btn {
+  background: #ffffff;
+  border: 1px solid #cbd5e1;
+  color: #475569;
+  padding: 0.6rem 1.25rem;
+  border-radius: 8px;
+  font-size: 0.95rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.pax-tab-btn:hover,
+.bigdata-tab-btn:hover {
+  background: #f1f5f9;
+  color: #1e293b;
+}
+
+.pax-tab-btn.active,
+.bigdata-tab-btn.active {
+  background: #2c3e50;
+  color: #ffffff;
+  border-color: #2c3e50;
+  box-shadow: 0 2px 4px rgba(44, 62, 80, 0.2);
+}
+
+.pax-tab-badge {
+  background: #f1f5f9;
+  color: #475569;
+  font-size: 0.78rem;
+  padding: 0.15rem 0.5rem;
+  border-radius: 12px;
+  margin-left: 0.5rem;
+  font-weight: 700;
+}
+
+.pax-tab-btn.active .pax-tab-badge {
+  background: #3b82f6;
+  color: #ffffff;
 }
 
 /* Search Bar & Controls */

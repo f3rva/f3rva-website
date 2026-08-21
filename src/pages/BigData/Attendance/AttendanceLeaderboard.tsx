@@ -1,8 +1,22 @@
 import React, { useState, useMemo, useCallback } from 'react';
 import { Link } from 'react-router-dom';
 import { config } from '../../../config';
+import {
+  F3_INCEPTION_DATE,
+  ALL_PAX_MEMBER_ID,
+  ALL_PAX_NAME,
+  DEFAULT_PAGE_SIZE,
+  TimeframePreset,
+  SortMetric,
+} from '../../../config/constants';
 import { AttendanceLeaderboardItem } from '../../../types/bigdata';
 import { useFetch } from '../../../hooks/useFetch';
+import {
+  formatDateToISO,
+  getDateDaysAgo,
+  getDateMonthsAgo,
+  getStartOfYearDate,
+} from '../../../utils/dateUtils';
 import LoadingSpinner from '../../../components/LoadingSpinner/LoadingSpinner';
 import BigDataPageHeader from '../../../components/BigDataPageHeader';
 import Pagination from '../../../components/Pagination';
@@ -11,39 +25,33 @@ import '../BigData.css';
 import '../AO/AO.css';
 import './Attendance.css';
 
-type TimeframePreset = 'ytd' | '12m' | '30d' | 'all';
-type SortMetric = 'workout' | 'q' | 'ratio';
-
 export const AttendanceLeaderboard: React.FC = () => {
   const [timeframe, setTimeframe] = useState<TimeframePreset>('ytd');
   const [sortMetric, setSortMetric] = useState<SortMetric>('workout');
   const [minQsThreshold, setMinQsThreshold] = useState<number>(3);
   const [filterText, setFilterText] = useState<string>('');
   const [currentPage, setCurrentPage] = useState<number>(1);
-  const [resultsPerPage, setResultsPerPage] = useState<number>(20);
+  const [resultsPerPage, setResultsPerPage] = useState<number>(DEFAULT_PAGE_SIZE);
 
   // Compute startDate & endDate query parameters for the selected timeframe
   const queryParams = useMemo(() => {
     const today = new Date();
-    const formatDate = (d: Date) => d.toISOString().split('T')[0];
 
     if (timeframe === 'ytd') {
-      const startOfYear = new Date(today.getFullYear(), 0, 1);
-      return `?startDate=${formatDate(startOfYear)}&endDate=${formatDate(today)}`;
+      const startOfYear = getStartOfYearDate(today);
+      return `?startDate=${formatDateToISO(startOfYear)}&endDate=${formatDateToISO(today)}`;
     }
     if (timeframe === '12m') {
-      const start12m = new Date();
-      start12m.setFullYear(today.getFullYear() - 1);
-      return `?startDate=${formatDate(start12m)}&endDate=${formatDate(today)}`;
+      const start12m = getDateMonthsAgo(12, today);
+      return `?startDate=${formatDateToISO(start12m)}&endDate=${formatDateToISO(today)}`;
     }
     if (timeframe === '30d') {
-      const start30d = new Date();
-      start30d.setDate(today.getDate() - 30);
-      return `?startDate=${formatDate(start30d)}&endDate=${formatDate(today)}`;
+      const start30d = getDateDaysAgo(30, today);
+      return `?startDate=${formatDateToISO(start30d)}&endDate=${formatDateToISO(today)}`;
     }
 
-    // All-time: explicit from region inception (2014-01-01) to today
-    return `?startDate=2014-01-01&endDate=${formatDate(today)}`;
+    // All-time: explicit from region inception to today
+    return `?startDate=${F3_INCEPTION_DATE}&endDate=${formatDateToISO(today)}`;
   }, [timeframe]);
 
   const apiUrl = `${config.apiBaseUrl}/v2/reports/attendance${queryParams}`;
@@ -63,7 +71,7 @@ export const AttendanceLeaderboard: React.FC = () => {
     }
 
     const sanitized = rawLeaderboard.filter(
-      (m) => m.memberId !== 123 && m.f3Name.toLowerCase() !== 'all pax'
+      (m) => m.memberId !== ALL_PAX_MEMBER_ID && m.f3Name.toLowerCase() !== ALL_PAX_NAME.toLowerCase()
     );
 
     if (sanitized.length === 0) {
@@ -106,7 +114,7 @@ export const AttendanceLeaderboard: React.FC = () => {
     if (!rawLeaderboard) return [];
 
     const sanitized = rawLeaderboard.filter(
-      (m) => m.memberId !== 123 && m.f3Name.toLowerCase() !== 'all pax'
+      (m) => m.memberId !== ALL_PAX_MEMBER_ID && m.f3Name.toLowerCase() !== ALL_PAX_NAME.toLowerCase()
     );
 
     // Apply Q-ratio threshold qualification if in ratio mode
@@ -284,28 +292,25 @@ export const AttendanceLeaderboard: React.FC = () => {
 
         {/* Metric Selector Tabs */}
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '0.75rem', marginBottom: '1.25rem' }}>
-          <div style={{ display: 'flex', gap: '0.5rem', flexWrap: 'wrap' }}>
+          <div className="attendance-metric-tabs">
             <button
               type="button"
-              className={`pax-tab-btn ${sortMetric === 'workout' ? 'active' : ''}`}
+              className={`attendance-metric-tab ${sortMetric === 'workout' ? 'active' : ''}`}
               onClick={() => handleMetricChange('workout')}
-              style={{ borderRadius: '8px', padding: '0.6rem 1.25rem' }}
             >
               🏃 Most Workouts Attended
             </button>
             <button
               type="button"
-              className={`pax-tab-btn ${sortMetric === 'q' ? 'active' : ''}`}
+              className={`attendance-metric-tab ${sortMetric === 'q' ? 'active' : ''}`}
               onClick={() => handleMetricChange('q')}
-              style={{ borderRadius: '8px', padding: '0.6rem 1.25rem' }}
             >
               👑 Most Workouts Led (Qs)
             </button>
             <button
               type="button"
-              className={`pax-tab-btn ${sortMetric === 'ratio' ? 'active' : ''}`}
+              className={`attendance-metric-tab ${sortMetric === 'ratio' ? 'active' : ''}`}
               onClick={() => handleMetricChange('ratio')}
-              style={{ borderRadius: '8px', padding: '0.6rem 1.25rem' }}
             >
               ⚡ Highest Q Ratio
             </button>

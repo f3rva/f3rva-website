@@ -1,8 +1,10 @@
 import React, { useState, useMemo } from 'react';
 import { Link } from 'react-router-dom';
 import { config } from '../../../config';
+import { F3_INCEPTION_DATE } from '../../../config/constants';
 import { AOAttendanceSummary } from '../../../types/bigdata';
 import { useFetch } from '../../../hooks/useFetch';
+import { formatDateToISO, getDateDaysAgo, getDateMonthsAgo } from '../../../utils/dateUtils';
 import LoadingSpinner from '../../../components/LoadingSpinner/LoadingSpinner';
 import BigDataPageHeader from '../../../components/BigDataPageHeader';
 import SEO from '../../../components/SEO';
@@ -22,20 +24,17 @@ export const AOReport: React.FC = () => {
   // Compute startDate / endDate for API call
   const queryParams = useMemo(() => {
     const today = new Date();
-    const formatDate = (d: Date) => d.toISOString().split('T')[0];
 
     if (timeframe === '30d') {
-      const start = new Date();
-      start.setDate(today.getDate() - 30);
-      return `?startDate=${formatDate(start)}&endDate=${formatDate(today)}`;
+      const start = getDateDaysAgo(30, today);
+      return `?startDate=${formatDateToISO(start)}&endDate=${formatDateToISO(today)}`;
     }
     if (timeframe === '12m') {
-      const start = new Date();
-      start.setFullYear(today.getFullYear() - 1);
-      return `?startDate=${formatDate(start)}&endDate=${formatDate(today)}`;
+      const start = getDateMonthsAgo(12, today);
+      return `?startDate=${formatDateToISO(start)}&endDate=${formatDateToISO(today)}`;
     }
-    // All-time: explicit from region inception (2014-01-01) to today
-    return `?startDate=2014-01-01&endDate=${formatDate(today)}`;
+    // All-time: explicit from region inception to today
+    return `?startDate=${F3_INCEPTION_DATE}&endDate=${formatDateToISO(today)}`;
   }, [timeframe]);
 
   const apiUrl = `${config.apiBaseUrl}/v2/reports/ao${queryParams}`;

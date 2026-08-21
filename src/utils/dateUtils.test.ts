@@ -5,7 +5,11 @@ import {
   formatFullDisplayDate,
   formatDateForUrl,
   formatDateDisplay,
-  formatMonthName
+  formatMonthName,
+  formatDateToISO,
+  getDateDaysAgo,
+  getDateMonthsAgo,
+  getStartOfYearDate,
 } from './dateUtils';
 
 describe('dateUtils', () => {
@@ -99,6 +103,38 @@ describe('dateUtils', () => {
     it('should handle december', () => {
       const formatted = formatMonthName('2024', '12');
       expect(formatted).toBe('December 2024');
+    });
+  });
+
+  describe('formatDateToISO', () => {
+    it('should format date to local YYYY-MM-DD string', () => {
+      const d = new Date(2024, 0, 5); // Jan 5, 2024
+      expect(formatDateToISO(d)).toBe('2024-01-05');
+    });
+
+    it('should pad single-digit months and days', () => {
+      const d = new Date(2024, 8, 9); // Sep 9, 2024
+      expect(formatDateToISO(d)).toBe('2024-09-09');
+    });
+  });
+
+  describe('relative date helpers', () => {
+    it('should compute days ago correctly', () => {
+      const ref = new Date(2024, 5, 15); // June 15, 2024
+      const result = getDateDaysAgo(30, ref);
+      expect(formatDateToISO(result)).toBe('2024-05-16');
+    });
+
+    it('should compute months ago correctly', () => {
+      const ref = new Date(2024, 5, 15); // June 15, 2024
+      const result = getDateMonthsAgo(12, ref);
+      expect(formatDateToISO(result)).toBe('2023-06-15');
+    });
+
+    it('should get start of year correctly', () => {
+      const ref = new Date(2024, 5, 15);
+      const result = getStartOfYearDate(ref);
+      expect(formatDateToISO(result)).toBe('2024-01-01');
     });
   });
 });

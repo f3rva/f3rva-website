@@ -7,6 +7,7 @@ import { useFetch } from '../../../hooks/useFetch';
 import BigDataPageHeader from '../../../components/BigDataPageHeader';
 import PaxAutocomplete from '../SelfService/PaxAutocomplete';
 import Pagination from '../../../components/Pagination';
+import { DEFAULT_PAGE_SIZE } from '../../../config/constants';
 import LoadingSpinner from '../../../components/LoadingSpinner/LoadingSpinner';
 import SEO from '../../../components/SEO';
 import '../BigData.css';
@@ -26,7 +27,7 @@ export const AdminManagePax: React.FC = () => {
   // Directory Search & Pagination State
   const [directorySearch, setDirectorySearch] = useState<string>('');
   const [currentPage, setCurrentPage] = useState<number>(1);
-  const [resultsPerPage, setResultsPerPage] = useState<number>(20);
+  const [resultsPerPage, setResultsPerPage] = useState<number>(DEFAULT_PAGE_SIZE);
 
   // Fetch all members
   const [fetchKey, setFetchKey] = useState<number>(0);

@@ -2,6 +2,7 @@ import React, { useMemo } from 'react';
 import { config } from '../../config';
 import { AOAttendanceSummary, DayOfWeekAttendance } from '../../types/bigdata';
 import { useFetch } from '../../hooks/useFetch';
+import { formatDateToISO, getDateDaysAgo } from '../../utils/dateUtils';
 import BigDataPageHeader from '../../components/BigDataPageHeader';
 import BigDataSearch from '../../components/BigDataSearch';
 import BigDataWorkouts from './Workouts/BigDataWorkouts';
@@ -12,13 +13,11 @@ export const BigDataHub: React.FC = () => {
   // Compute date range for past 30 days
   const { startDate30, endDateToday } = useMemo(() => {
     const today = new Date();
-    const thirtyDaysAgo = new Date();
-    thirtyDaysAgo.setDate(today.getDate() - 30);
+    const thirtyDaysAgo = getDateDaysAgo(30, today);
 
-    const formatDate = (d: Date) => d.toISOString().split('T')[0];
     return {
-      startDate30: formatDate(thirtyDaysAgo),
-      endDateToday: formatDate(today),
+      startDate30: formatDateToISO(thirtyDaysAgo),
+      endDateToday: formatDateToISO(today),
     };
   }, []);
 
