@@ -4,6 +4,7 @@ import MainSiteLayout from './components/Layout';
 import GoogleAnalytics from './components/GoogleAnalytics';
 import CookieConsent from './components/CookieConsent';
 import LoadingSpinner from './components/LoadingSpinner/LoadingSpinner';
+import ErrorBoundary from './components/ErrorBoundary';
 import { AuthProvider } from './context/AuthContext';
 import AdminRoute from './components/AdminRoute';
 
@@ -60,76 +61,78 @@ const App: React.FC = () => {
           <GoogleAnalytics />
           <CookieConsent />
           <MainSiteLayout>
-            <Suspense
-              fallback={
-                <div style={{ minHeight: '60vh', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                  <LoadingSpinner message="Loading..." />
-                </div>
-              }
-            >
-              <Routes>
-              <Route path="/" element={<HomePage />} />
-              <Route path="/index.html" element={<Navigate to="/" replace />} />
-              <Route path="/about" element={<AboutPage />} />
-              <Route path="/schedule" element={<SchedulePage />} />
-              <Route path="/new-guy" element={<NewGuyPage />} />
-              <Route path="/archives" element={<Archives />} />
-              <Route path="/archives/ao/:ao" element={<AOArchives />} />
-
-              {/* Big Data Public Routes */}
-              <Route path="/bigdata" element={<BigDataHub />} />
-              <Route path="/bigdata/workouts" element={<Navigate to="/bigdata" replace />} />
-              <Route path="/bigdata/attendance" element={<AttendanceLeaderboard />} />
-              <Route path="/bigdata/day-of-week" element={<DayOfWeekReport />} />
-              <Route path="/bigdata/ao" element={<AOReport />} />
-              <Route path="/bigdata/ao/:id" element={<AODetail />} />
-              <Route path="/bigdata/pax/:id" element={<MemberDetail />} />
-              <Route path="/bigdata/workout/:id" element={<WorkoutDetail />} />
-              <Route path="/bigdata/claim-alias" element={<ClaimAlias />} />
-
-
-              {/* Shorthand / Direct Entity Links */}
-              <Route path="/pax/:id" element={<PaxRedirect />} />
-              <Route path="/member/:id" element={<PaxRedirect />} />
-              <Route path="/ao/:id" element={<AoRedirect />} />
-
-              {/* Big Data Admin Routes */}
-              <Route path="/bigdata/admin/login" element={<AdminLogin />} />
-              <Route
-                path="/bigdata/admin"
-                element={
-                  <AdminRoute>
-                    <AdminAliasRequests />
-                  </AdminRoute>
+            <ErrorBoundary>
+              <Suspense
+                fallback={
+                  <div style={{ minHeight: '60vh', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                    <LoadingSpinner message="Loading..." />
+                  </div>
                 }
-              />
-              <Route
-                path="/bigdata/admin/alias-requests"
-                element={
-                  <AdminRoute>
-                    <AdminAliasRequests />
-                  </AdminRoute>
-                }
-              />
-              <Route
-                path="/bigdata/admin/manage-pax"
-                element={
-                  <AdminRoute>
-                    <AdminManagePax />
-                  </AdminRoute>
-                }
-              />
+              >
+                <Routes>
+                <Route path="/" element={<HomePage />} />
+                <Route path="/index.html" element={<Navigate to="/" replace />} />
+                <Route path="/about" element={<AboutPage />} />
+                <Route path="/schedule" element={<SchedulePage />} />
+                <Route path="/new-guy" element={<NewGuyPage />} />
+                <Route path="/archives" element={<Archives />} />
+                <Route path="/archives/ao/:ao" element={<AOArchives />} />
 
-              {/* Archive Date Hierarchy */}
-              <Route path="/:year" element={<YearArchives />} />
-              <Route path="/:year/:month" element={<MonthArchives />} />
-              <Route path="/:year/:month/:day" element={<DayArchives />} />
-              <Route path="/:year/:month/:day/:slug" element={<ArchivePost />} />
+                {/* Big Data Public Routes */}
+                <Route path="/bigdata" element={<BigDataHub />} />
+                <Route path="/bigdata/workouts" element={<Navigate to="/bigdata" replace />} />
+                <Route path="/bigdata/attendance" element={<AttendanceLeaderboard />} />
+                <Route path="/bigdata/day-of-week" element={<DayOfWeekReport />} />
+                <Route path="/bigdata/ao" element={<AOReport />} />
+                <Route path="/bigdata/ao/:id" element={<AODetail />} />
+                <Route path="/bigdata/pax/:id" element={<MemberDetail />} />
+                <Route path="/bigdata/workout/:id" element={<WorkoutDetail />} />
+                <Route path="/bigdata/claim-alias" element={<ClaimAlias />} />
 
-              {/* Fallback 404 */}
-              <Route path="*" element={<NotFoundPage />} />
-            </Routes>
-            </Suspense>
+
+                {/* Shorthand / Direct Entity Links */}
+                <Route path="/pax/:id" element={<PaxRedirect />} />
+                <Route path="/member/:id" element={<PaxRedirect />} />
+                <Route path="/ao/:id" element={<AoRedirect />} />
+
+                {/* Big Data Admin Routes */}
+                <Route path="/bigdata/admin/login" element={<AdminLogin />} />
+                <Route
+                  path="/bigdata/admin"
+                  element={
+                    <AdminRoute>
+                      <AdminAliasRequests />
+                    </AdminRoute>
+                  }
+                />
+                <Route
+                  path="/bigdata/admin/alias-requests"
+                  element={
+                    <AdminRoute>
+                      <AdminAliasRequests />
+                    </AdminRoute>
+                  }
+                />
+                <Route
+                  path="/bigdata/admin/manage-pax"
+                  element={
+                    <AdminRoute>
+                      <AdminManagePax />
+                    </AdminRoute>
+                  }
+                />
+
+                {/* Archive Date Hierarchy */}
+                <Route path="/:year" element={<YearArchives />} />
+                <Route path="/:year/:month" element={<MonthArchives />} />
+                <Route path="/:year/:month/:day" element={<DayArchives />} />
+                <Route path="/:year/:month/:day/:slug" element={<ArchivePost />} />
+
+                {/* Fallback 404 */}
+                <Route path="*" element={<NotFoundPage />} />
+              </Routes>
+              </Suspense>
+            </ErrorBoundary>
           </MainSiteLayout>
         </Router>
       </AuthProvider>

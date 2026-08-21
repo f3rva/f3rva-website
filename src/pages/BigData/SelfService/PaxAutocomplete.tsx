@@ -165,6 +165,10 @@ export const PaxAutocomplete: React.FC<PaxAutocompleteProps> = ({
             autoComplete="off"
             aria-autocomplete="list"
             aria-expanded={isOpen}
+            aria-controls={`${id}-listbox`}
+            aria-activedescendant={
+              isOpen && highlightedIndex >= 0 ? `${id}-opt-${highlightedIndex}` : undefined
+            }
             role="combobox"
           />
           {loadingMembers && <span className="pax-input-spinner">...</span>}
@@ -172,7 +176,7 @@ export const PaxAutocomplete: React.FC<PaxAutocompleteProps> = ({
       )}
 
       {isOpen && !selectedMember && (
-        <div className="pax-autocomplete-dropdown" role="listbox">
+        <div id={`${id}-listbox`} className="pax-autocomplete-dropdown" role="listbox" aria-label={`${label} suggestions`}>
           {suggestions.length === 0 ? (
             <div className="pax-dropdown-message">
               No members found matching <strong>&quot;{query}&quot;</strong>
@@ -181,6 +185,7 @@ export const PaxAutocomplete: React.FC<PaxAutocompleteProps> = ({
             suggestions.map((member, idx) => (
               <button
                 key={`sugg-${member.memberId}`}
+                id={`${id}-opt-${idx}`}
                 type="button"
                 className={`pax-dropdown-item ${idx === highlightedIndex ? 'highlighted' : ''}`}
                 onClick={() => handleSelect(member)}
