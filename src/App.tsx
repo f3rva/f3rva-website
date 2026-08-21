@@ -1,8 +1,9 @@
-import React from 'react';
+import React, { lazy, Suspense } from 'react';
 import { BrowserRouter as Router, Routes, Route, Navigate, useParams } from 'react-router-dom';
 import MainSiteLayout from './components/Layout';
 import GoogleAnalytics from './components/GoogleAnalytics';
 import CookieConsent from './components/CookieConsent';
+import LoadingSpinner from './components/LoadingSpinner/LoadingSpinner';
 import { AuthProvider } from './context/AuthContext';
 import AdminRoute from './components/AdminRoute';
 
@@ -18,17 +19,18 @@ import ArchivePost from './pages/Archives/ArchivePost';
 import AOArchives from './pages/Archives/AOArchives';
 import NotFoundPage from './pages/NotFound/notFound';
 
-import BigDataHub from './pages/BigData/BigDataHub';
-import AttendanceLeaderboard from './pages/BigData/Attendance/AttendanceLeaderboard';
-import DayOfWeekReport from './pages/BigData/Reports/DayOfWeekReport';
-import AOReport from './pages/BigData/AO/AOReport';
-import AODetail from './pages/BigData/AO/AODetail';
-import MemberDetail from './pages/BigData/Pax/MemberDetail';
-import WorkoutDetail from './pages/BigData/Workouts/WorkoutDetail';
-import ClaimAlias from './pages/BigData/SelfService/ClaimAlias';
-import AdminLogin from './pages/BigData/Admin/AdminLogin';
-import AdminAliasRequests from './pages/BigData/Admin/AdminAliasRequests';
-import AdminManagePax from './pages/BigData/Admin/AdminManagePax';
+// Lazy-loaded Big Data & Admin Route Components
+const BigDataHub = lazy(() => import('./pages/BigData/BigDataHub'));
+const AttendanceLeaderboard = lazy(() => import('./pages/BigData/Attendance/AttendanceLeaderboard'));
+const DayOfWeekReport = lazy(() => import('./pages/BigData/Reports/DayOfWeekReport'));
+const AOReport = lazy(() => import('./pages/BigData/AO/AOReport'));
+const AODetail = lazy(() => import('./pages/BigData/AO/AODetail'));
+const MemberDetail = lazy(() => import('./pages/BigData/Pax/MemberDetail'));
+const WorkoutDetail = lazy(() => import('./pages/BigData/Workouts/WorkoutDetail'));
+const ClaimAlias = lazy(() => import('./pages/BigData/SelfService/ClaimAlias'));
+const AdminLogin = lazy(() => import('./pages/BigData/Admin/AdminLogin'));
+const AdminAliasRequests = lazy(() => import('./pages/BigData/Admin/AdminAliasRequests'));
+const AdminManagePax = lazy(() => import('./pages/BigData/Admin/AdminManagePax'));
 
 import './App.css';
 
@@ -58,7 +60,14 @@ const App: React.FC = () => {
           <GoogleAnalytics />
           <CookieConsent />
           <MainSiteLayout>
-            <Routes>
+            <Suspense
+              fallback={
+                <div style={{ minHeight: '60vh', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                  <LoadingSpinner message="Loading..." />
+                </div>
+              }
+            >
+              <Routes>
               <Route path="/" element={<HomePage />} />
               <Route path="/index.html" element={<Navigate to="/" replace />} />
               <Route path="/about" element={<AboutPage />} />
@@ -120,6 +129,7 @@ const App: React.FC = () => {
               {/* Fallback 404 */}
               <Route path="*" element={<NotFoundPage />} />
             </Routes>
+            </Suspense>
           </MainSiteLayout>
         </Router>
       </AuthProvider>
