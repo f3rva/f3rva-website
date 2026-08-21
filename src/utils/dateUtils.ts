@@ -30,6 +30,23 @@ export const formatDisplayDate = (dateString: string): string => {
 };
 
 /**
+ * Format date string in YYYY-MM-DD format to full date with weekday in parentheses
+ * @param dateString - Date string in YYYY-MM-DD format
+ * @returns Formatted date string (e.g., "October 17, 2015 (Saturday)")
+ */
+export const formatFullDisplayDate = (dateString: string | null | undefined): string => {
+  if (!dateString || !/^\d{4}-\d{2}-\d{2}$/.test(dateString)) return dateString || 'N/A';
+  const date = getDateFromString(dateString);
+  const monthDayYear = date.toLocaleDateString('en-US', {
+    month: 'long',
+    day: 'numeric',
+    year: 'numeric'
+  });
+  const weekday = date.toLocaleDateString('en-US', { weekday: 'long' });
+  return `${monthDayYear} (${weekday})`;
+};
+
+/**
  * Format date string for URL construction
  * @param dateString - Date string in YYYY-MM-DD format
  * @returns Object with year, month, day strings formatted for URLs
@@ -72,4 +89,50 @@ export const formatMonthName = (year: string, month: string): string => {
     year: 'numeric',
     month: 'long'
   });
+};
+
+/**
+ * Format Date object to local YYYY-MM-DD string without UTC timezone shift.
+ * Avoids off-by-one errors caused by toISOString() late in the evening.
+ * @param date - Date object to format
+ * @returns YYYY-MM-DD formatted string in local time
+ */
+export const formatDateToISO = (date: Date): string => {
+  const year = date.getFullYear();
+  const month = (date.getMonth() + 1).toString().padStart(2, '0');
+  const day = date.getDate().toString().padStart(2, '0');
+  return `${year}-${month}-${day}`;
+};
+
+/**
+ * Get Date object N days prior to a reference date.
+ * @param days - Number of days to subtract
+ * @param fromDate - Reference date (defaults to today)
+ * @returns Calculated Date object
+ */
+export const getDateDaysAgo = (days: number, fromDate: Date = new Date()): Date => {
+  const target = new Date(fromDate);
+  target.setDate(target.getDate() - days);
+  return target;
+};
+
+/**
+ * Get Date object N months prior to a reference date.
+ * @param months - Number of months to subtract
+ * @param fromDate - Reference date (defaults to today)
+ * @returns Calculated Date object
+ */
+export const getDateMonthsAgo = (months: number, fromDate: Date = new Date()): Date => {
+  const target = new Date(fromDate);
+  target.setMonth(target.getMonth() - months);
+  return target;
+};
+
+/**
+ * Get the start of the current year (January 1st).
+ * @param fromDate - Reference date (defaults to today)
+ * @returns Date representing January 1st of the reference year
+ */
+export const getStartOfYearDate = (fromDate: Date = new Date()): Date => {
+  return new Date(fromDate.getFullYear(), 0, 1);
 };

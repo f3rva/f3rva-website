@@ -1,0 +1,198 @@
+/* Member / PAX Profile styles for F3 RVA Big Data */
+
+/* Profile Header Badges */
+.pax-header-aliases {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  flex-wrap: wrap;
+  margin-top: 0.5rem;
+}
+
+.pax-alias-tag {
+  font-size: 0.82rem;
+  color: #64748b;
+  background: #f1f5f9;
+  border: 1px solid #cbd5e1;
+  padding: 0.2rem 0.6rem;
+  border-radius: 6px;
+  font-weight: 500;
+}
+
+/* Heatmap Component */
+.pax-heatmap-container {
+  width: 100%;
+  overflow-x: auto;
+  padding-bottom: 0.75rem;
+}
+
+.pax-heatmap-year-selector {
+  display: flex;
+  gap: 0.5rem;
+  margin-bottom: 1.25rem;
+  flex-wrap: wrap;
+}
+
+.pax-year-btn {
+  background: #ffffff;
+  border: 1px solid #cbd5e1;
+  color: #475569;
+  padding: 0.35rem 0.85rem;
+  border-radius: 20px;
+  font-size: 0.85rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.pax-year-btn:hover {
+  background: #f1f5f9;
+  color: #1e293b;
+}
+
+.pax-year-btn.active {
+  background: #b45309;
+  color: #ffffff;
+  border-color: #b45309;
+}
+
+.pax-heatmap-grid-wrapper {
+  min-width: 720px;
+}
+
+.pax-heatmap-months-row {
+  display: grid;
+  grid-template-columns: 28px repeat(52, 1fr);
+  gap: 3px;
+  font-size: 0.72rem;
+  font-weight: 600;
+  color: #64748b;
+  margin-bottom: 4px;
+}
+
+.pax-heatmap-grid {
+  display: grid;
+  grid-template-rows: repeat(7, 13px);
+  grid-auto-flow: column;
+  grid-auto-columns: 13px;
+  gap: 3px;
+}
+
+.pax-heatmap-cell {
+  width: 13px;
+  height: 13px;
+  border-radius: 2px;
+  background: #f1f5f9;
+  border: 1px solid #e2e8f0;
+  cursor: pointer;
+  position: relative;
+  transition: transform 0.1s ease;
+}
+
+.pax-heatmap-cell:hover {
+  transform: scale(1.35);
+  z-index: 10;
+  border-color: #94a3b8;
+}
+
+/* Activity Levels */
+.pax-heatmap-cell.level-0 {
+  background: #f1f5f9;
+}
+
+.pax-heatmap-cell.level-1 {
+  background: #86efac;
+  border-color: #4ade80;
+}
+
+.pax-heatmap-cell.level-2 {
+  background: #22c55e;
+  border-color: #16a34a;
+}
+
+.pax-heatmap-cell.level-3 {
+  background: #15803d;
+  border-color: #166534;
+}
+
+.pax-heatmap-cell.is-q {
+  background: #f59e0b;
+  border-color: #d97706;
+  box-shadow: 0 0 0 1px #b45309;
+}
+
+/* Heatmap Legend */
+.pax-heatmap-legend {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 0.8rem;
+  color: #64748b;
+  margin-top: 1rem;
+  justify-content: flex-end;
+}
+
+.pax-legend-box {
+  width: 12px;
+  height: 12px;
+  border-radius: 2px;
+}
+
+/* Profile Analytics Grid */
+.pax-charts-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1.5rem;
+  margin-bottom: 2rem;
+}
+
+@media (max-width: 960px) {
+  .pax-charts-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* Tabs Navigation for History Tables */
+.pax-tabs-container {
+  display: flex;
+  gap: 0.5rem;
+  border-bottom: 2px solid #e2e8f0;
+  margin-bottom: 1.5rem;
+}
+
+.pax-tab-btn {
+  background: transparent;
+  border: none;
+  border-bottom: 3px solid transparent;
+  padding: 0.65rem 1.25rem;
+  font-size: 1rem;
+  font-weight: 600;
+  color: #64748b;
+  cursor: pointer;
+  margin-bottom: -2px;
+  transition: all 0.2s ease;
+}
+
+.pax-tab-btn:hover {
+  color: #1e293b;
+}
+
+.pax-tab-btn.active {
+  color: #b45309;
+  border-bottom-color: #b45309;
+}
+
+.pax-tab-badge {
+  background: #f1f5f9;
+  color: #475569;
+  font-size: 0.78rem;
+  padding: 0.15rem 0.5rem;
+  border-radius: 12px;
+  margin-left: 0.5rem;
+  font-weight: 700;
+}
+
+.pax-tab-btn.active .pax-tab-badge {
+  background: #fef3c7;
+  color: #92400e;
+}

@@ -4,6 +4,8 @@
   color: white;
   padding: 1rem 0;
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  position: relative;
+  z-index: 100;
 }
 
 .header-content-container {
@@ -85,7 +87,7 @@
 
 /* Navigation menu styles */
 .primary-navigation {
-  margin-top: 1rem;
+  margin-top: 0;
 }
 
 .navigation-menu-list {
@@ -93,20 +95,30 @@
   margin: 0;
   padding: 0;
   display: flex;
-  gap: 2rem;
+  align-items: center;
+  gap: 1.5rem;
 }
 
 .navigation-menu-item {
   margin: 0;
+  position: relative;
 }
 
 .navigation-link {
   color: #cccccc;
   text-decoration: none;
   font-weight: 500;
-  transition: color 0.3s ease;
-  padding: 0.5rem 1rem;
-  border-radius: 4px;
+  transition: color 0.2s ease, background-color 0.2s ease;
+  padding: 0.5rem 0.85rem;
+  border-radius: 6px;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  border: none;
+  background: transparent;
+  font-family: inherit;
+  font-size: 1rem;
+  cursor: pointer;
 }
 
 .navigation-link:hover,
@@ -114,6 +126,137 @@
   color: white;
   background-color: rgba(255, 255, 255, 0.1);
   text-decoration: none;
+}
+
+/* Dropdown Container */
+.dropdown-item-container {
+  position: relative;
+}
+
+.dropdown-trigger {
+  cursor: pointer;
+}
+
+.dropdown-arrow {
+  font-size: 0.8rem;
+  transition: transform 0.2s ease;
+}
+
+.dropdown-arrow.arrow-up {
+  transform: rotate(180deg);
+}
+
+/* Dropdown Menu styling (Desktop) */
+.nav-dropdown-menu {
+  position: absolute;
+  top: calc(100% + 4px);
+  right: 0;
+  width: 280px;
+  background: #242424;
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  border-radius: 10px;
+  padding: 0.5rem;
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.5);
+  display: none;
+  flex-direction: column;
+  gap: 0.25rem;
+  z-index: 200;
+}
+
+/* Invisible bridge so cursor never leaves the hover target when moving from button to menu */
+.nav-dropdown-menu::before {
+  content: '';
+  position: absolute;
+  top: -12px;
+  left: 0;
+  right: 0;
+  height: 12px;
+  background: transparent;
+}
+
+.nav-dropdown-menu.menu-visible {
+  display: flex;
+}
+
+
+
+.dropdown-link {
+  display: flex;
+  align-items: center;
+  padding: 0.6rem 0.75rem;
+  color: #e0e0e0;
+  text-decoration: none;
+  border-radius: 6px;
+  transition: background-color 0.2s ease, color 0.2s ease;
+}
+
+.dropdown-link:hover,
+.dropdown-link:focus {
+  background-color: rgba(255, 255, 255, 0.08);
+  color: #ffffff;
+  text-decoration: none;
+}
+
+.dropdown-link-content {
+  display: flex;
+  flex-direction: column;
+  text-align: left;
+}
+
+.dropdown-link-title {
+  font-size: 0.95rem;
+  font-weight: 600;
+  color: #ffffff;
+}
+
+.dropdown-link-desc {
+  font-size: 0.78rem;
+  color: #9e9e9e;
+  margin-top: 2px;
+}
+
+.dropdown-link:hover .dropdown-link-desc {
+  color: #c4c4c4;
+}
+
+.dropdown-divider {
+  height: 1px;
+  background: rgba(255, 255, 255, 0.1);
+  margin: 0.35rem 0;
+}
+
+.dropdown-admin-section {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+}
+
+.dropdown-link.admin-link {
+  border-left: 3px solid #f1b51c;
+  background: rgba(241, 181, 28, 0.08);
+}
+
+.dropdown-link.admin-link:hover {
+  background: rgba(241, 181, 28, 0.16);
+}
+
+.dropdown-logout-btn {
+  background: transparent;
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  color: #e0e0e0;
+  padding: 0.4rem 0.75rem;
+  border-radius: 6px;
+  font-size: 0.85rem;
+  cursor: pointer;
+  text-align: center;
+  transition: background-color 0.2s ease, color 0.2s ease;
+  margin-top: 0.25rem;
+}
+
+.dropdown-logout-btn:hover {
+  background: rgba(239, 68, 68, 0.15);
+  border-color: rgba(239, 68, 68, 0.4);
+  color: #f87171;
 }
 
 /* Responsive design for smaller screens */
@@ -151,6 +294,8 @@
     padding: 1rem;
     margin-top: 0;
     z-index: 9;
+    max-height: 80vh;
+    overflow-y: auto;
   }
   
   /* Show navigation when menu is open */
@@ -160,17 +305,39 @@
   
   .navigation-menu-list {
     flex-direction: column;
+    align-items: stretch;
     gap: 0.5rem;
   }
   
   .navigation-link {
-    display: block;
-    text-align: center;
-    padding: 1rem;
+    display: flex;
+    justify-content: center;
+    padding: 0.85rem;
     border-bottom: 1px solid #333;
+    width: 100%;
+  }
+
+  .nav-dropdown-menu {
+    position: static;
+    width: 100%;
+    box-shadow: none;
+    border: none;
+    background: #141414;
+    border-radius: 8px;
+    padding: 0.5rem;
+    margin-top: 0.25rem;
+  }
+
+  .dropdown-link {
+    padding: 0.75rem;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+  }
+
+  .dropdown-link:last-child {
+    border-bottom: none;
   }
   
-  .navigation-link:last-child {
+  .navigation-menu-item:last-child > .navigation-link {
     border-bottom: none;
   }
 }

@@ -1,5 +1,12 @@
 import { describe, it, expect } from 'vitest';
-import { isValidYear, isValidMonth, isValidDay, isValidSlug } from './validation';
+import {
+  isValidYear,
+  isValidMonth,
+  isValidDay,
+  isValidSlug,
+  isValidNumericId,
+  sanitizeRedirectPath,
+} from './validation';
 
 describe('Validation Utilities', () => {
   describe('isValidYear', () => {
@@ -60,6 +67,41 @@ describe('Validation Utilities', () => {
       expect(isValidSlug('slug?param=val')).toBe(false);
       expect(isValidSlug('<script>')).toBe(false);
       expect(isValidSlug('slug/path')).toBe(false);
+    });
+  });
+
+  describe('isValidNumericId', () => {
+    it('should validate positive integer strings', () => {
+      expect(isValidNumericId('1')).toBe(true);
+      expect(isValidNumericId('123')).toBe(true);
+      expect(isValidNumericId('99999')).toBe(true);
+    });
+
+    it('should reject non-numeric or negative values', () => {
+      expect(isValidNumericId('-1')).toBe(false);
+      expect(isValidNumericId('abc')).toBe(false);
+      expect(isValidNumericId('12.3')).toBe(false);
+      expect(isValidNumericId('123; DROP TABLE')).toBe(false);
+      expect(isValidNumericId('')).toBe(false);
+      expect(isValidNumericId(null)).toBe(false);
+      expect(isValidNumericId(undefined)).toBe(false);
+    });
+  });
+
+  describe('sanitizeRedirectPath', () => {
+    it('should accept valid relative paths', () => {
+      expect(sanitizeRedirectPath('/bigdata/admin/alias-requests')).toBe('/bigdata/admin/alias-requests');
+      expect(sanitizeRedirectPath('/bigdata/pax/77')).toBe('/bigdata/pax/77');
+    });
+
+    it('should reject open redirects and external schemes', () => {
+      expect(sanitizeRedirectPath('https://evil.com')).toBe('/bigdata/admin/alias-requests');
+      expect(sanitizeRedirectPath('http://evil.com')).toBe('/bigdata/admin/alias-requests');
+      expect(sanitizeRedirectPath('//evil.com')).toBe('/bigdata/admin/alias-requests');
+      expect(sanitizeRedirectPath('/\\evil.com')).toBe('/bigdata/admin/alias-requests');
+      expect(sanitizeRedirectPath('javascript:alert(1)')).toBe('/bigdata/admin/alias-requests');
+      expect(sanitizeRedirectPath(null)).toBe('/bigdata/admin/alias-requests');
+      expect(sanitizeRedirectPath(123)).toBe('/bigdata/admin/alias-requests');
     });
   });
 });

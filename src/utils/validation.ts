@@ -38,3 +38,29 @@ export const isValidDay = (day: string): boolean => {
 export const isValidSlug = (slug: string): boolean => {
   return /^[a-zA-Z0-9-_]+$/.test(slug);
 };
+
+/**
+ * Validates if a string is a valid positive numeric ID.
+ * @param id - The ID string to validate
+ * @returns true if positive integer, false otherwise
+ */
+export const isValidNumericId = (id: string | null | undefined): boolean => {
+  return Boolean(id && /^\d+$/.test(id));
+};
+
+/**
+ * Safely validates redirect target to prevent open redirect vulnerabilities.
+ * Ensures the destination is a relative internal path starting with a single '/'
+ * and does not contain protocol schemes (e.g. javascript:, http:) or double slashes (//).
+ * @param path - Target redirect path to sanitize
+ * @param fallback - Safe default fallback path
+ * @returns Sanitized relative path or fallback
+ */
+export const sanitizeRedirectPath = (path: unknown, fallback = '/bigdata/admin/alias-requests'): string => {
+  if (typeof path !== 'string') return fallback;
+  const trimmed = path.trim();
+  if (trimmed.startsWith('/') && !trimmed.startsWith('//') && !trimmed.includes('\\')) {
+    return trimmed;
+  }
+  return fallback;
+};
