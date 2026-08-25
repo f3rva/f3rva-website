@@ -22,14 +22,6 @@ const Footer: React.FC = () => {
           <h4 className="footer-section-title">Related Links</h4>
           <div className="external-links">
             <a 
-              href="https://bigdata.brianbischoff.com" 
-              target="_blank" 
-              rel="noopener noreferrer"
-              className="external-link"
-            >
-              Big Data
-            </a>
-            <a 
               href="https://backblasts.f3rva.org" 
               target="_blank" 
               rel="noopener noreferrer"
