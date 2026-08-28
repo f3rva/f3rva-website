@@ -33,29 +33,6 @@
   flex-wrap: wrap;
 }
 
-.pax-year-btn {
-  background: #ffffff;
-  border: 1px solid #cbd5e1;
-  color: #475569;
-  padding: 0.35rem 0.85rem;
-  border-radius: 20px;
-  font-size: 0.85rem;
-  font-weight: 600;
-  cursor: pointer;
-  transition: all 0.15s ease;
-}
-
-.pax-year-btn:hover {
-  background: #f1f5f9;
-  color: #1e293b;
-}
-
-.pax-year-btn.active {
-  background: #b45309;
-  color: #ffffff;
-  border-color: #b45309;
-}
-
 .pax-heatmap-grid-wrapper {
   min-width: 720px;
 }
@@ -150,49 +127,4 @@
   .pax-charts-grid {
     grid-template-columns: 1fr;
   }
-}
-
-/* Tabs Navigation for History Tables */
-.pax-tabs-container {
-  display: flex;
-  gap: 0.5rem;
-  border-bottom: 2px solid #e2e8f0;
-  margin-bottom: 1.5rem;
-}
-
-.pax-tab-btn {
-  background: transparent;
-  border: none;
-  border-bottom: 3px solid transparent;
-  padding: 0.65rem 1.25rem;
-  font-size: 1rem;
-  font-weight: 600;
-  color: #64748b;
-  cursor: pointer;
-  margin-bottom: -2px;
-  transition: all 0.2s ease;
-}
-
-.pax-tab-btn:hover {
-  color: #1e293b;
-}
-
-.pax-tab-btn.active {
-  color: #b45309;
-  border-bottom-color: #b45309;
-}
-
-.pax-tab-badge {
-  background: #f1f5f9;
-  color: #475569;
-  font-size: 0.78rem;
-  padding: 0.15rem 0.5rem;
-  border-radius: 12px;
-  margin-left: 0.5rem;
-  font-weight: 700;
-}
-
-.pax-tab-btn.active .pax-tab-badge {
-  background: #fef3c7;
-  color: #92400e;
 }
