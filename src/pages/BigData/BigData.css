@@ -421,8 +421,10 @@
   font-weight: 700;
 }
 
-.pax-tab-btn.active .pax-tab-badge {
-  background: #3b82f6;
+.pax-tab-btn.active .pax-tab-badge,
+.bigdata-tab-btn.active .pax-tab-badge,
+.bigdata-tab-btn.active .bigdata-tab-badge {
+  background: rgba(255, 255, 255, 0.25);
   color: #ffffff;
 }
 
