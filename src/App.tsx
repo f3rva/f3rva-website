@@ -1,5 +1,5 @@
 import React, { lazy, Suspense } from 'react';
-import { BrowserRouter as Router, Routes, Route, Navigate, useParams } from 'react-router-dom';
+import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
 import MainSiteLayout from './components/Layout';
 import GoogleAnalytics from './components/GoogleAnalytics';
 import CookieConsent from './components/CookieConsent';
@@ -33,20 +33,16 @@ const AdminLogin = lazy(() => import('./pages/BigData/Admin/AdminLogin'));
 const AdminAliasRequests = lazy(() => import('./pages/BigData/Admin/AdminAliasRequests'));
 const AdminManagePax = lazy(() => import('./pages/BigData/Admin/AdminManagePax'));
 
+import {
+  PaxParamRedirect,
+  AoParamRedirect,
+  WorkoutParamRedirect,
+  LegacyMemberQueryRedirect,
+  LegacyAoQueryRedirect,
+  LegacyWorkoutQueryRedirect,
+} from './components/LegacyRedirects';
+
 import './App.css';
-
-/**
- * Route parameter redirect helper for legacy / shorthand URLs
- */
-const PaxRedirect: React.FC = () => {
-  const { id } = useParams<{ id: string }>();
-  return <Navigate to={`/bigdata/pax/${id}`} replace />;
-};
-
-const AoRedirect: React.FC = () => {
-  const { id } = useParams<{ id: string }>();
-  return <Navigate to={`/bigdata/ao/${id}`} replace />;
-};
 
 /**
  * Main application component for F3 RVA website
@@ -90,10 +86,79 @@ const App: React.FC = () => {
                 <Route path="/bigdata/claim-alias" element={<ClaimAlias />} />
 
 
-                {/* Shorthand / Direct Entity Links */}
-                <Route path="/pax/:id" element={<PaxRedirect />} />
-                <Route path="/member/:id" element={<PaxRedirect />} />
-                <Route path="/ao/:id" element={<AoRedirect />} />
+                {/* Shorthand / Direct Entity Parameter Links */}
+                <Route path="/pax/:id" element={<PaxParamRedirect />} />
+                <Route path="/member/:id" element={<PaxParamRedirect />} />
+                <Route path="/ao/:id" element={<AoParamRedirect />} />
+                <Route path="/workout/:id" element={<WorkoutParamRedirect />} />
+
+                {/* Legacy PHP Query-Param Redirects (?id=123) */}
+                <Route path="/member/detail.php" element={<LegacyMemberQueryRedirect />} />
+                <Route path="/member/detail" element={<LegacyMemberQueryRedirect />} />
+                <Route path="/bigdata/member/detail.php" element={<LegacyMemberQueryRedirect />} />
+                <Route path="/bigdata/member/detail" element={<LegacyMemberQueryRedirect />} />
+
+                <Route path="/ao/detail.php" element={<LegacyAoQueryRedirect />} />
+                <Route path="/ao/detail" element={<LegacyAoQueryRedirect />} />
+                <Route path="/bigdata/ao/detail.php" element={<LegacyAoQueryRedirect />} />
+                <Route path="/bigdata/ao/detail" element={<LegacyAoQueryRedirect />} />
+
+                <Route path="/workout/detail.php" element={<LegacyWorkoutQueryRedirect />} />
+                <Route path="/workout/detail" element={<LegacyWorkoutQueryRedirect />} />
+                <Route path="/bigdata/workout/detail.php" element={<LegacyWorkoutQueryRedirect />} />
+                <Route path="/bigdata/workout/detail" element={<LegacyWorkoutQueryRedirect />} />
+
+                {/* Legacy Report & Self-Service Page Redirects */}
+                <Route path="/report/attendance.php" element={<Navigate to="/bigdata/attendance" replace />} />
+                <Route path="/report/attendance" element={<Navigate to="/bigdata/attendance" replace />} />
+                <Route path="/bigdata/report/attendance.php" element={<Navigate to="/bigdata/attendance" replace />} />
+                <Route path="/bigdata/report/attendance" element={<Navigate to="/bigdata/attendance" replace />} />
+
+                <Route path="/report/ao.php" element={<Navigate to="/bigdata/ao" replace />} />
+                <Route path="/report/ao" element={<Navigate to="/bigdata/ao" replace />} />
+                <Route path="/bigdata/report/ao.php" element={<Navigate to="/bigdata/ao" replace />} />
+                <Route path="/bigdata/report/ao" element={<Navigate to="/bigdata/ao" replace />} />
+
+                <Route path="/report/dayOfWeek.php" element={<Navigate to="/bigdata/day-of-week" replace />} />
+                <Route path="/report/dayofweek.php" element={<Navigate to="/bigdata/day-of-week" replace />} />
+                <Route path="/report/dayOfWeek" element={<Navigate to="/bigdata/day-of-week" replace />} />
+                <Route path="/report/dayofweek" element={<Navigate to="/bigdata/day-of-week" replace />} />
+                <Route path="/bigdata/report/dayOfWeek.php" element={<Navigate to="/bigdata/day-of-week" replace />} />
+                <Route path="/bigdata/report/dayofweek.php" element={<Navigate to="/bigdata/day-of-week" replace />} />
+                <Route path="/bigdata/report/dayOfWeek" element={<Navigate to="/bigdata/day-of-week" replace />} />
+                <Route path="/bigdata/report/dayofweek" element={<Navigate to="/bigdata/day-of-week" replace />} />
+
+                <Route path="/self-service/alias.php" element={<Navigate to="/bigdata/claim-alias" replace />} />
+                <Route path="/self-service/alias" element={<Navigate to="/bigdata/claim-alias" replace />} />
+                <Route path="/self-service" element={<Navigate to="/bigdata/claim-alias" replace />} />
+                <Route path="/bigdata/self-service/alias.php" element={<Navigate to="/bigdata/claim-alias" replace />} />
+                <Route path="/bigdata/self-service/alias" element={<Navigate to="/bigdata/claim-alias" replace />} />
+                <Route path="/bigdata/self-service" element={<Navigate to="/bigdata/claim-alias" replace />} />
+                <Route path="/bigdata/alias" element={<Navigate to="/bigdata/claim-alias" replace />} />
+                <Route path="/claim-alias" element={<Navigate to="/bigdata/claim-alias" replace />} />
+
+                {/* Legacy Admin & Auth Redirects */}
+                <Route path="/admin/aliasRequests.php" element={<Navigate to="/bigdata/admin/alias-requests" replace />} />
+                <Route path="/admin/aliasRequests" element={<Navigate to="/bigdata/admin/alias-requests" replace />} />
+                <Route path="/admin/aliasrequests.php" element={<Navigate to="/bigdata/admin/alias-requests" replace />} />
+                <Route path="/admin/aliasrequests" element={<Navigate to="/bigdata/admin/alias-requests" replace />} />
+                <Route path="/admin/alias-requests" element={<Navigate to="/bigdata/admin/alias-requests" replace />} />
+                <Route path="/bigdata/admin/aliasRequests.php" element={<Navigate to="/bigdata/admin/alias-requests" replace />} />
+                <Route path="/bigdata/admin/aliasRequests" element={<Navigate to="/bigdata/admin/alias-requests" replace />} />
+
+                <Route path="/admin/managePax.php" element={<Navigate to="/bigdata/admin/manage-pax" replace />} />
+                <Route path="/admin/managePax" element={<Navigate to="/bigdata/admin/manage-pax" replace />} />
+                <Route path="/admin/managepax.php" element={<Navigate to="/bigdata/admin/manage-pax" replace />} />
+                <Route path="/admin/managepax" element={<Navigate to="/bigdata/admin/manage-pax" replace />} />
+                <Route path="/admin/manage-pax" element={<Navigate to="/bigdata/admin/manage-pax" replace />} />
+                <Route path="/bigdata/admin/managePax.php" element={<Navigate to="/bigdata/admin/manage-pax" replace />} />
+                <Route path="/bigdata/admin/managePax" element={<Navigate to="/bigdata/admin/manage-pax" replace />} />
+
+                <Route path="/login.php" element={<Navigate to="/bigdata/admin/login" replace />} />
+                <Route path="/login" element={<Navigate to="/bigdata/admin/login" replace />} />
+                <Route path="/admin/login.php" element={<Navigate to="/bigdata/admin/login" replace />} />
+                <Route path="/logout.php" element={<Navigate to="/bigdata/admin/login" replace />} />
+                <Route path="/logout" element={<Navigate to="/bigdata/admin/login" replace />} />
 
                 {/* Big Data Admin Routes */}
                 <Route path="/bigdata/admin/login" element={<AdminLogin />} />
