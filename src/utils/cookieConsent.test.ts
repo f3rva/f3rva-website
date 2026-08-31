@@ -147,7 +147,8 @@ describe('cookieConsent utility', () => {
       expect(stored).toBeTruthy();
       expect(JSON.parse(stored as string).accepted).toBe(false);
 
-      expect(dispatchEventSpy).not.toHaveBeenCalled();
+      expect(dispatchEventSpy).toHaveBeenCalledWith(expect.any(Event));
+      expect(dispatchEventSpy.mock.calls[0][0].type).toBe('cookieConsentDeclined');
     });
   });
 

@@ -7,6 +7,7 @@ import LoadingSpinner from '../../../components/LoadingSpinner/LoadingSpinner';
 import BigDataPageHeader from '../../../components/BigDataPageHeader';
 import SEO from '../../../components/SEO';
 import PaxAutocomplete from './PaxAutocomplete';
+import { trackClaimAliasSubmit } from '../../../utils/analytics';
 import '../BigData.css';
 import './ClaimAlias.css';
 
@@ -84,6 +85,13 @@ export const ClaimAlias: React.FC = () => {
         });
 
         if (response.ok) {
+          trackClaimAliasSubmit({
+            primaryMemberId: primaryMember.memberId,
+            primaryMemberName: primaryMember.f3Name,
+            aliasMemberId: aliasMember.memberId,
+            aliasMemberName: aliasMember.f3Name,
+          });
+
           setAlert({
             type: 'success',
             message: `Alias claim request for "${aliasMember.f3Name}" into "${primaryMember.f3Name}" submitted successfully! An administrator will review and merge the records.`,

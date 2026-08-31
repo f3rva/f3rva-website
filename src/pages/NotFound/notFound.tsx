@@ -1,6 +1,7 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { MdHome, MdSearch, MdArrowBack } from 'react-icons/md';
+import { trackPageNotFound } from '../../utils/analytics';
 import './notFound.css';
 
 /**
@@ -9,6 +10,13 @@ import './notFound.css';
  * Provides helpful navigation options to get back on track
  */
 const NotFoundPage: React.FC = () => {
+  useEffect(() => {
+    trackPageNotFound({
+      brokenPath: window.location.pathname + window.location.search,
+      referrer: document.referrer || 'direct',
+    });
+  }, []);
+
   return (
     <div className="not-found-page-container">
       <title>Page Not Found | F3RVA</title>

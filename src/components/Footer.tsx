@@ -1,5 +1,6 @@
 import React from 'react';
 import { FaFacebook, FaInstagram, FaSlack, FaXTwitter } from 'react-icons/fa6';
+import { trackCommunityOutboundClick } from '../utils/analytics';
 import './Footer.css';
 
 /**
@@ -26,6 +27,12 @@ const Footer: React.FC = () => {
               target="_blank" 
               rel="noopener noreferrer"
               className="external-link"
+              onClick={() =>
+                trackCommunityOutboundClick({
+                  platform: 'backblasts',
+                  destinationUrl: 'https://backblasts.f3rva.org',
+                })
+              }
             >
               Backblasts
             </a>
@@ -34,6 +41,12 @@ const Footer: React.FC = () => {
               target="_blank" 
               rel="noopener noreferrer"
               className="external-link"
+              onClick={() =>
+                trackCommunityOutboundClick({
+                  platform: 'f3nation',
+                  destinationUrl: 'https://f3nation.com',
+                })
+              }
             >
               F3Nation
             </a>
@@ -51,6 +64,12 @@ const Footer: React.FC = () => {
               rel="noopener noreferrer"
               className="social-link"
               aria-label="Engage with F3RVA on Slack"
+              onClick={() =>
+                trackCommunityOutboundClick({
+                  platform: 'slack',
+                  destinationUrl: 'https://f3-rva-workspace.slack.com',
+                })
+              }
             >
               <FaSlack size={24} />
             </a>
@@ -60,6 +79,12 @@ const Footer: React.FC = () => {
               rel="noopener noreferrer"
               className="social-link"
               aria-label="Follow F3RVA on Instagram"
+              onClick={() =>
+                trackCommunityOutboundClick({
+                  platform: 'instagram',
+                  destinationUrl: 'https://instagram.com/F3Richmond',
+                })
+              }
             >
               <FaInstagram size={24} />
             </a>
@@ -69,6 +94,12 @@ const Footer: React.FC = () => {
               rel="noopener noreferrer"
               className="social-link"
               aria-label="Follow F3RVA on Facebook"
+              onClick={() =>
+                trackCommunityOutboundClick({
+                  platform: 'facebook',
+                  destinationUrl: 'https://facebook.com/F3Richmond',
+                })
+              }
             >
               <FaFacebook size={24} />
             </a>
@@ -78,6 +109,12 @@ const Footer: React.FC = () => {
               rel="noopener noreferrer"
               className="social-link"
               aria-label="Follow F3RVA on Twitter"
+              onClick={() =>
+                trackCommunityOutboundClick({
+                  platform: 'x',
+                  destinationUrl: 'https://x.com/F3Richmond',
+                })
+              }
             >
               <FaXTwitter size={24} />
             </a>

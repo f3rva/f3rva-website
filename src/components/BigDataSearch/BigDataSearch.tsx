@@ -2,6 +2,7 @@ import React, { useState, useEffect, useRef, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { config } from '../../config';
 import { MemberSummary, AOAttendanceSummary } from '../../types/bigdata';
+import { trackBigDataSearch, trackBigDataSearchSelect } from '../../utils/analytics';
 import './BigDataSearch.css';
 
 interface BigDataSearchProps {
@@ -60,13 +61,14 @@ export const BigDataSearch: React.FC<BigDataSearchProps> = ({
       setAos(matchingAos);
 
       // Fetch matching members from API
+      let fetchedMembers: MemberSummary[] = [];
       try {
         const memberRes = await fetch(
           `${config.apiBaseUrl}/v2/members/lookup?name=${encodeURIComponent(trimmed)}`
         );
         if (memberRes.ok) {
-          const memberData: MemberSummary[] = await memberRes.json();
-          setMembers(memberData.slice(0, 8));
+          fetchedMembers = await memberRes.json();
+          setMembers(fetchedMembers.slice(0, 8));
         } else {
           setMembers([]);
         }
@@ -75,6 +77,11 @@ export const BigDataSearch: React.FC<BigDataSearchProps> = ({
       } finally {
         setLoading(false);
         setIsOpen(true);
+        trackBigDataSearch({
+          searchTerm: trimmed,
+          paxCount: fetchedMembers.length,
+          aoCount: matchingAos.length,
+        });
       }
     }, 250);
 
@@ -104,21 +111,33 @@ export const BigDataSearch: React.FC<BigDataSearchProps> = ({
   }, []);
 
   const handleSelectPax = useCallback(
-    (memberId: number) => {
+    (member: MemberSummary) => {
+      trackBigDataSearchSelect({
+        searchTerm: query,
+        selectedType: 'pax',
+        selectedId: member.memberId,
+        selectedName: member.f3Name,
+      });
       setIsOpen(false);
       setQuery('');
-      navigate(`/bigdata/pax/${memberId}`);
+      navigate(`/bigdata/pax/${member.memberId}`);
     },
-    [navigate]
+    [navigate, query]
   );
 
   const handleSelectAo = useCallback(
-    (aoId: number) => {
+    (ao: AOAttendanceSummary) => {
+      trackBigDataSearchSelect({
+        searchTerm: query,
+        selectedType: 'ao',
+        selectedId: ao.aoId,
+        selectedName: ao.description,
+      });
       setIsOpen(false);
       setQuery('');
-      navigate(`/bigdata/ao/${aoId}`);
+      navigate(`/bigdata/ao/${ao.aoId}`);
     },
-    [navigate]
+    [navigate, query]
   );
 
   const hasResults = members.length > 0 || aos.length > 0;
@@ -178,7 +197,7 @@ export const BigDataSearch: React.FC<BigDataSearchProps> = ({
                       key={`ao-${ao.aoId}`}
                       type="button"
                       className="bigdata-search-item"
-                      onClick={() => handleSelectAo(ao.aoId)}
+                      onClick={() => handleSelectAo(ao)}
                     >
                       <div className="bigdata-search-item-primary">{ao.description}</div>
                       <div className="bigdata-search-item-badge ao-badge">
@@ -197,7 +216,7 @@ export const BigDataSearch: React.FC<BigDataSearchProps> = ({
                       key={`member-${member.memberId}`}
                       type="button"
                       className="bigdata-search-item"
-                      onClick={() => handleSelectPax(member.memberId)}
+                      onClick={() => handleSelectPax(member)}
                     >
                       <div className="bigdata-search-item-primary">{member.f3Name}</div>
                       <div className="bigdata-search-item-badge pax-badge">ID #{member.memberId}</div>

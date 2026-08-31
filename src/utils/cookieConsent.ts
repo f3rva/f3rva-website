@@ -100,6 +100,8 @@ export const setConsentData = (accepted: boolean): ConsentData => {
 
   if (accepted) {
     window.dispatchEvent(new Event('cookieConsentAccepted'));
+  } else {
+    window.dispatchEvent(new Event('cookieConsentDeclined'));
   }
 
   return consentData;

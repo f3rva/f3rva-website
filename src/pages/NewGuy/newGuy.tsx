@@ -1,7 +1,8 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import SEO from '../../components/SEO';
 import { generateBreadcrumbSchema } from '../../utils/structuredData';
+import { trackFngVideoPlay, trackFngPodcastClick, trackFngFindWorkoutClick } from '../../utils/analytics';
 import './newGuy.css';
 
 /**
@@ -28,6 +29,27 @@ const NewGuyPage: React.FC = () => {
   };
 
   const breadcrumbSchema = generateBreadcrumbSchema(breadcrumbData);
+
+  // Listen for Vimeo play messages from embedded player iframe
+  useEffect(() => {
+    let hasTrackedPlay = false;
+    const handleMessage = (event: MessageEvent) => {
+      if (typeof event.origin === 'string' && event.origin.includes('vimeo.com')) {
+        try {
+          const data = typeof event.data === 'string' ? JSON.parse(event.data) : event.data;
+          if (data && (data.event === 'play' || data === 'play') && !hasTrackedPlay) {
+            hasTrackedPlay = true;
+            trackFngVideoPlay({ videoTitle: 'What is F3?', provider: 'vimeo' });
+          }
+        } catch {
+          // Ignore non-JSON postMessage payloads
+        }
+      }
+    };
+
+    window.addEventListener('message', handleMessage);
+    return () => window.removeEventListener('message', handleMessage);
+  }, []);
 
   return (
     <div className="fng-page-container">
@@ -112,6 +134,13 @@ const NewGuyPage: React.FC = () => {
               target="_blank" 
               rel="noopener noreferrer"
               className="podcast-link"
+              onClick={() =>
+                trackFngPodcastClick({
+                  podcastUrl:
+                    'https://www.artofmanliness.com/people/relationships/podcast-1068-building-tribe-how-to-create-and-sustain-communities-of-men/',
+                  title: 'Building Tribe - How to Create and Sustain Communities of Men',
+                })
+              }
             >
               Listen to "Building Tribe - How to Create and Sustain Communities of Men"
             </a>
@@ -129,8 +158,15 @@ const NewGuyPage: React.FC = () => {
           </p>
           <div className="call-to-action-section">
             <p className="call-to-action-text">
-              <strong>Just show up!</strong> Find a <Link to="/schedule" className="content-link">workout location</Link> and time that
-              works for you, and take the first step toward becoming part of the F3 RVA community.
+              <strong>Just show up!</strong> Find a{' '}
+              <Link
+                to="/schedule"
+                className="content-link"
+                onClick={() => trackFngFindWorkoutClick()}
+              >
+                workout location
+              </Link>{' '}
+              and time that works for you, and take the first step toward becoming part of the F3 RVA community.
             </p>
           </div>
         </div>

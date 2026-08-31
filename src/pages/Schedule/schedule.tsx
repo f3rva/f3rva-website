@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import SEO from '../../components/SEO';
 import { generateBreadcrumbSchema } from '../../utils/structuredData';
 import { useWorkoutSchedule } from '../../hooks/useWorkoutSchedule';
+import { trackWorkoutDirectionsClick, trackWorkoutTagClick } from '../../utils/analytics';
 import './schedule.css';
 
 // Custom hook to detect mobile breakpoint (e.g., < 768px)
@@ -131,8 +132,39 @@ const WorkoutScheduleTable: React.FC = () => {
                 <tbody>
                   {workouts.map((workout, index) => (
                     <tr key={index}>
-                      <td><a href={workout.locationURL} target="_blank" rel="noopener noreferrer" className="content-link">{workout.location}</a></td>
-                      <td><a href={workout.tagURL} className="content-link">{workout.name}</a></td>
+                      <td>
+                        <a
+                          href={workout.locationURL}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="content-link"
+                          onClick={() =>
+                            trackWorkoutDirectionsClick({
+                              aoName: workout.name,
+                              dayOfWeek: workout.dayOfWeek,
+                              startTime: workout.startTime,
+                              workoutStyle: workout.workoutStyle,
+                              locationUrl: workout.locationURL,
+                            })
+                          }
+                        >
+                          {workout.location}
+                        </a>
+                      </td>
+                      <td>
+                        <a
+                          href={workout.tagURL}
+                          className="content-link"
+                          onClick={() =>
+                            trackWorkoutTagClick({
+                              aoName: workout.name,
+                              tagUrl: workout.tagURL,
+                            })
+                          }
+                        >
+                          {workout.name}
+                        </a>
+                      </td>
                       <td>{workout.dayOfWeek}</td>
                       <td>{workout.startTime}</td>
                       <td>{workout.endTime}</td>
