@@ -38,4 +38,22 @@ describe('App Routing & Legacy Redirects', () => {
     render(<App />);
     expect(screen.queryByText(/Page Not Found/i)).not.toBeInTheDocument();
   });
+
+  it('redirects /index.php and /bigdata/index.php to /bigdata', async () => {
+    window.history.pushState({}, 'Test', '/index.php');
+    render(<App />);
+    expect(screen.queryByText(/Page Not Found/i)).not.toBeInTheDocument();
+  });
+
+  it('redirects /bigdata/member/85 to /bigdata/pax/85', async () => {
+    window.history.pushState({}, 'Test', '/bigdata/member/85');
+    render(<App />);
+    expect(screen.queryByText(/Page Not Found/i)).not.toBeInTheDocument();
+  });
+
+  it('redirects /bigdata/login.php to /bigdata/admin/login', async () => {
+    window.history.pushState({}, 'Test', '/bigdata/login.php');
+    render(<App />);
+    expect(screen.queryByText(/Page Not Found/i)).not.toBeInTheDocument();
+  });
 });

@@ -82,13 +82,26 @@ const App: React.FC = () => {
                 <Route path="/bigdata/ao" element={<AOReport />} />
                 <Route path="/bigdata/ao/:id" element={<AODetail />} />
                 <Route path="/bigdata/pax/:id" element={<MemberDetail />} />
+                <Route path="/bigdata/pax" element={<Navigate to="/bigdata" replace />} />
+                <Route path="/bigdata/member/:id" element={<PaxParamRedirect />} />
+                <Route path="/bigdata/member" element={<Navigate to="/bigdata" replace />} />
                 <Route path="/bigdata/workout/:id" element={<WorkoutDetail />} />
                 <Route path="/bigdata/claim-alias" element={<ClaimAlias />} />
 
+                {/* Legacy Index & Root Page Redirects */}
+                <Route path="/index.php" element={<Navigate to="/bigdata" replace />} />
+                <Route path="/bigdata/index.php" element={<Navigate to="/bigdata" replace />} />
+                <Route path="/bigdata/index.html" element={<Navigate to="/bigdata" replace />} />
+                <Route path="/404.php" element={<Navigate to="/bigdata" replace />} />
+                <Route path="/bigdata/404.php" element={<Navigate to="/bigdata" replace />} />
+                <Route path="/info.php" element={<Navigate to="/bigdata" replace />} />
+                <Route path="/bigdata/info.php" element={<Navigate to="/bigdata" replace />} />
 
                 {/* Shorthand / Direct Entity Parameter Links */}
                 <Route path="/pax/:id" element={<PaxParamRedirect />} />
+                <Route path="/pax" element={<Navigate to="/bigdata" replace />} />
                 <Route path="/member/:id" element={<PaxParamRedirect />} />
+                <Route path="/member" element={<Navigate to="/bigdata" replace />} />
                 <Route path="/ao/:id" element={<AoParamRedirect />} />
                 <Route path="/workout/:id" element={<WorkoutParamRedirect />} />
 
@@ -138,6 +151,8 @@ const App: React.FC = () => {
                 <Route path="/claim-alias" element={<Navigate to="/bigdata/claim-alias" replace />} />
 
                 {/* Legacy Admin & Auth Redirects */}
+                <Route path="/admin" element={<Navigate to="/bigdata/admin/login" replace />} />
+                <Route path="/admin/index.php" element={<Navigate to="/bigdata/admin/login" replace />} />
                 <Route path="/admin/aliasRequests.php" element={<Navigate to="/bigdata/admin/alias-requests" replace />} />
                 <Route path="/admin/aliasRequests" element={<Navigate to="/bigdata/admin/alias-requests" replace />} />
                 <Route path="/admin/aliasrequests.php" element={<Navigate to="/bigdata/admin/alias-requests" replace />} />
@@ -157,8 +172,13 @@ const App: React.FC = () => {
                 <Route path="/login.php" element={<Navigate to="/bigdata/admin/login" replace />} />
                 <Route path="/login" element={<Navigate to="/bigdata/admin/login" replace />} />
                 <Route path="/admin/login.php" element={<Navigate to="/bigdata/admin/login" replace />} />
+                <Route path="/bigdata/login.php" element={<Navigate to="/bigdata/admin/login" replace />} />
+                <Route path="/bigdata/login" element={<Navigate to="/bigdata/admin/login" replace />} />
+                <Route path="/bigdata/admin/login.php" element={<Navigate to="/bigdata/admin/login" replace />} />
                 <Route path="/logout.php" element={<Navigate to="/bigdata/admin/login" replace />} />
                 <Route path="/logout" element={<Navigate to="/bigdata/admin/login" replace />} />
+                <Route path="/bigdata/logout.php" element={<Navigate to="/bigdata/admin/login" replace />} />
+                <Route path="/bigdata/logout" element={<Navigate to="/bigdata/admin/login" replace />} />
 
                 {/* Big Data Admin Routes */}
                 <Route path="/bigdata/admin/login" element={<AdminLogin />} />
