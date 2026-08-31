@@ -1,66 +1,51 @@
 # Agent Instructions for F3 RVA Website
 
-This file contains instructions for AI agents (and human developers) working on this repository.
+This file provides high-level development guidelines for AI agents and human developers working on the `f3rva-website` repository.
 
-## Project Overview
-This is a React 19 application built with TypeScript and Vite. It serves as the static website for F3 RVA (Fitness, Fellowship, Faith - Richmond, VA).
+> [!NOTE]
+> For the exhaustive architectural blueprint, OWASP client-side security standards, custom hooks patterns, directory tree, and CI/CD pipelines, see **[`GEMINI.md`](./GEMINI.md)**.
 
-## Tech Stack
-- **Framework:** React 19
-- **Language:** TypeScript
-- **Build Tool:** Vite
-- **Testing:** Vitest, React Testing Library
-- **Routing:** React Router 7
-- **Styling:** CSS
-- **Linting:** ESLint
+---
 
-## Development Guidelines
+## 1. Project Summary
 
-### Code Style
-- **TypeScript:** Use strict typing. Avoid `any` whenever possible. Define interfaces for props and state.
-- **Components:** Use functional components with Hooks.
-- **Naming:** Use descriptive, narrative variable and component names (e.g., `userAuthenticationStatus` instead of `auth`).
-- **Comments:** Comment on the *intent* of complex logic, not just what the code does.
+`f3rva-website` is the React 19+ Single Page Application (SPA) for F3 RVA (`f3rva.org`). It serves static brochureware, workout schedules, historical backblast archives, and the **Big Data Analytics Hub** interfacing with [`f3rva-api`](../f3rva-api) REST endpoints (`/v2/`).
 
-### Testing
-- **Framework:** Use `vitest` and `@testing-library/react`.
-- **Approach:** Follow Test-Driven Development (TDD) where possible.
-- **Running Tests:** `npm test` runs tests in watch mode.
-- **Test Location:** Co-located with components or in `__tests__` directories.
+## 2. Tech Stack
 
-### Directory Structure
-- `src/components`: Reusable UI components.
-- `src/pages`: Top-level page components.
-- `src/data`: Static data files.
-- `src/config`: Configuration files.
-- `src/types`: Shared TypeScript type definitions.
-- `src/utils`: Utility functions.
-- `public/`: Static assets and robots.txt templates.
-- `scripts/`: Build and utility scripts.
+- **Framework:** React 19.x (Functional components, React Hooks)
+- **Language:** TypeScript 5.9+ (Strict typing, no `any`)
+- **Build Tool:** Vite 7+
+- **Routing:** React Router 7.x (Code-split with `React.lazy` & `Suspense`)
+- **Data Visualization:** Recharts 3.x
+- **Sanitization:** DOMPurify 3.x
+- **Testing:** Vitest 3.x, `@vitest/coverage-v8`, React Testing Library 16+
+- **Code Quality:** ESLint 9+
 
-### Build & Deployment
-- **Dev Server:** `npm run dev` (automatically sets up development robots.txt).
-- **Build:** `npm run build` (runs TypeScript compiler then Vite build).
-- **Environment:**
-  - `dev`: Blocks search crawlers.
-  - `prod`: Allows search crawlers.
+## 3. Core Development Guardrails
 
-### Robots.txt Handling
-**IMPORTANT:** Do not edit `public/robots.txt` directly. It is auto-generated.
-- To modify development rules: Edit `public/robots-dev.txt`.
-- To modify production rules: Edit `public/robots-prod.txt`.
-- The build process and `scripts/setup-robots.js` handle the generation.
+1. **Client-Side Security:**
+   - Always sanitize raw HTML using `sanitizeHtml()` from `src/utils/sanitizer.ts`. Never use unsanitized `dangerouslySetInnerHTML`.
+   - Ensure all external `target="_blank"` links include `rel="noopener noreferrer"`.
+   - Escape JSON-LD data with `sanitizeJSON()` in `src/utils/sanitizer.ts`.
+2. **Custom Hooks Pattern:**
+   - Keep UI components thin and presentation-focused.
+   - Encapsulate data fetching, timeouts, and `AbortController` cancellation in custom hooks (`useFetch`, `useAuth`, `useWorkoutSchedule`).
+3. **No Magic Literals:**
+   - Centralize domain constants, pagination defaults, and status enums in `src/config/constants.ts`.
+4. **Testing Standards:**
+   - Maintain **80%+ test coverage** (`npm run test:coverage`).
+   - Use RTL `screen` queries prioritized by accessibility (`getByRole`, `getByText`). Mock network requests in `global.fetch`.
+5. **Robots.txt Policy:**
+   - **NEVER** edit `public/robots.txt` directly. Edit `public/robots-dev.txt` for dev or `public/robots-prod.txt` for production.
 
-## Common Tasks
+## 4. Key Commands
 
-### Adding a New Page
-1. Create the component in `src/pages`.
-2. Add the route in `src/App.tsx`.
-3. Add a test file for the new page.
+- `npm run dev`: Start development server (Node 24).
+- `npm test`: Run Vitest test suite.
+- `npm run test:watch`: Run tests in watch mode.
+- `npm run test:coverage`: Run tests with v8 code coverage.
+- `npm run build:dev`: Build development bundle with dev robots.txt.
+- `npm run build:prod`: Build production bundle with prod robots.txt.
+- `npm run lint`: Lint TypeScript and JSX.
 
-### Modifying Global Styles
-- Check `src/index.css` or `src/App.css` for global styles.
-- Use component-specific CSS or CSS modules for scoped styling if available.
-
-## Legacy Notes
-- Ignore instructions in `CLAUDE.md` regarding AWS boto3 or Jupyter notebooks; these are not present in this repository.
