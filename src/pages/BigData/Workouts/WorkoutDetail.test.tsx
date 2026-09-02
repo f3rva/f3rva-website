@@ -3,6 +3,7 @@ import { render, screen, waitFor } from '@testing-library/react';
 import { MemoryRouter, Routes, Route } from 'react-router-dom';
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import WorkoutDetail from './WorkoutDetail';
+import { AuthProvider } from '../../../context/AuthContext';
 
 const mockWorkoutDetail = {
   workoutId: 42,
@@ -28,11 +29,13 @@ describe('WorkoutDetail Component', () => {
     vi.spyOn(globalThis, 'fetch').mockImplementation(() => new Promise(() => {}));
 
     render(
-      <MemoryRouter initialEntries={['/bigdata/workout/42']}>
-        <Routes>
-          <Route path="/bigdata/workout/:id" element={<WorkoutDetail />} />
-        </Routes>
-      </MemoryRouter>
+      <AuthProvider>
+        <MemoryRouter initialEntries={['/bigdata/workout/42']}>
+          <Routes>
+            <Route path="/bigdata/workout/:id" element={<WorkoutDetail />} />
+          </Routes>
+        </MemoryRouter>
+      </AuthProvider>
     );
 
     expect(screen.getByText(/Loading workout details/i)).toBeInTheDocument();
@@ -45,11 +48,13 @@ describe('WorkoutDetail Component', () => {
     } as Response);
 
     render(
-      <MemoryRouter initialEntries={['/bigdata/workout/42']}>
-        <Routes>
-          <Route path="/bigdata/workout/:id" element={<WorkoutDetail />} />
-        </Routes>
-      </MemoryRouter>
+      <AuthProvider>
+        <MemoryRouter initialEntries={['/bigdata/workout/42']}>
+          <Routes>
+            <Route path="/bigdata/workout/:id" element={<WorkoutDetail />} />
+          </Routes>
+        </MemoryRouter>
+      </AuthProvider>
     );
 
     await waitFor(() => {
@@ -71,11 +76,13 @@ describe('WorkoutDetail Component', () => {
     } as Response);
 
     render(
-      <MemoryRouter initialEntries={['/bigdata/workout/999']}>
-        <Routes>
-          <Route path="/bigdata/workout/:id" element={<WorkoutDetail />} />
-        </Routes>
-      </MemoryRouter>
+      <AuthProvider>
+        <MemoryRouter initialEntries={['/bigdata/workout/999']}>
+          <Routes>
+            <Route path="/bigdata/workout/:id" element={<WorkoutDetail />} />
+          </Routes>
+        </MemoryRouter>
+      </AuthProvider>
     );
 
     await waitFor(() => {
@@ -88,11 +95,13 @@ describe('WorkoutDetail Component', () => {
     const fetchSpy = vi.spyOn(globalThis, 'fetch');
 
     render(
-      <MemoryRouter initialEntries={['/bigdata/workout/not-a-number']}>
-        <Routes>
-          <Route path="/bigdata/workout/:id" element={<WorkoutDetail />} />
-        </Routes>
-      </MemoryRouter>
+      <AuthProvider>
+        <MemoryRouter initialEntries={['/bigdata/workout/not-a-number']}>
+          <Routes>
+            <Route path="/bigdata/workout/:id" element={<WorkoutDetail />} />
+          </Routes>
+        </MemoryRouter>
+      </AuthProvider>
     );
 
     expect(screen.getByText(/Workout Not Found/i)).toBeInTheDocument();

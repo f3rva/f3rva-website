@@ -158,3 +158,88 @@ export interface ApiErrorResponse {
   errorCode: number;
   errorMessage: string;
 }
+
+/**
+ * Authenticated user profile (Member or Admin).
+ */
+export interface AuthUserProfile {
+  slackUserId?: string;
+  memberId?: number;
+  f3Name: string;
+  role: 'member' | 'admin';
+  realName?: string;
+  email?: string;
+}
+
+/**
+ * Slack OAuth authentication response.
+ */
+export interface SlackAuthResponse {
+  isLinked: boolean;
+  accessToken?: string | null;
+  tokenType?: string;
+  expiresIn?: number;
+  user?: AuthUserProfile | null;
+  suggestedMember?: MemberSummary | null;
+  tempToken?: string | null;
+}
+
+/**
+ * Structured AO input for workout creation / update.
+ */
+export interface AOInput {
+  name: string;
+  slug?: string | null;
+}
+
+/**
+ * Payload to create a new workout.
+ */
+export interface AddWorkoutPayload {
+  title: string;
+  workoutDate: string;
+  qic: string[] | string;
+  pax: string[] | string;
+  aos: (AOInput | string)[];
+  body?: string | null;
+  url?: string | null;
+  author?: string | null;
+  slug?: string | null;
+}
+
+/**
+ * Payload to update an existing workout.
+ */
+export interface UpdateWorkoutPayload {
+  title: string;
+  workoutDate: string;
+  qic: string[] | string;
+  pax: string[] | string;
+  aos: (AOInput | string)[];
+  body?: string | null;
+  url?: string | null;
+  author?: string | null;
+  slug?: string | null;
+}
+
+/**
+ * Response when a workout is created.
+ */
+export interface WorkoutCreatedResponse {
+  id: number;
+  title: string;
+  workoutDate: string;
+  url?: string | null;
+  slug?: string | null;
+}
+
+/**
+ * Response when a workout is updated.
+ */
+export interface WorkoutUpdatedResponse {
+  id: number;
+  title: string;
+  workoutDate: string;
+  url?: string | null;
+  slug?: string | null;
+}

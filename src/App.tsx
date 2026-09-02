@@ -32,6 +32,8 @@ const ClaimAlias = lazy(() => import('./pages/BigData/SelfService/ClaimAlias'));
 const AdminLogin = lazy(() => import('./pages/BigData/Admin/AdminLogin'));
 const AdminAliasRequests = lazy(() => import('./pages/BigData/Admin/AdminAliasRequests'));
 const AdminManagePax = lazy(() => import('./pages/BigData/Admin/AdminManagePax'));
+const BackblastForm = lazy(() => import('./pages/Backblast/BackblastForm'));
+const SlackCallback = lazy(() => import('./pages/Auth/SlackCallback'));
 
 import {
   PaxParamRedirect,
@@ -73,6 +75,13 @@ const App: React.FC = () => {
                 <Route path="/new-guy" element={<NewGuyPage />} />
                 <Route path="/archives" element={<Archives />} />
                 <Route path="/archives/ao/:ao" element={<AOArchives />} />
+
+                {/* Backblast Publishing & Editing */}
+                <Route path="/backblast/new" element={<BackblastForm />} />
+                <Route path="/backblast/edit/:id" element={<BackblastForm />} />
+
+                {/* Slack OAuth Callback */}
+                <Route path="/auth/slack/callback" element={<SlackCallback />} />
 
                 {/* Big Data Public Routes */}
                 <Route path="/bigdata" element={<BigDataHub />} />

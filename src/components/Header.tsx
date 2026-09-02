@@ -103,6 +103,11 @@ const MainNavigationHeader: React.FC = () => {
             <li className="navigation-menu-item">
               <Link to="/archives" className="navigation-link" onClick={closeMenu}>Archives</Link>
             </li>
+            <li className="navigation-menu-item">
+              <Link to="/backblast/new" className="navigation-link post-backblast-btn" onClick={closeMenu}>
+                Post Backblast
+              </Link>
+            </li>
 
             {/* Big Data Dropdown */}
             <li 
@@ -158,6 +163,9 @@ const MainNavigationHeader: React.FC = () => {
 
                 {isAuthenticated ? (
                   <div className="dropdown-admin-section">
+                    <div className="dropdown-user-greeting">
+                      <span>Logged in as <strong>{adminUsername || 'Member'}</strong></span>
+                    </div>
                     <Link to="/bigdata/admin" className="dropdown-link admin-link" role="menuitem" onClick={closeMenu}>
                       <div className="dropdown-link-content">
                         <span className="dropdown-link-title">Admin Portal ({adminUsername || 'Admin'})</span>

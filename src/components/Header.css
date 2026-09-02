@@ -259,7 +259,32 @@
   color: #f87171;
 }
 
-/* Responsive design for smaller screens */
+.dropdown-user-greeting {
+  padding: 0.6rem 1rem;
+  font-size: 0.85rem;
+  color: #94a3b8;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+  margin-bottom: 0.25rem;
+}
+
+.dropdown-user-greeting strong {
+  color: #ffffff;
+}
+
+.post-backblast-btn {
+  background-color: var(--primary-color, #a81c1c);
+  color: #ffffff !important;
+  border-radius: 4px;
+  padding: 0.4rem 0.85rem !important;
+  font-weight: 600;
+  transition: background-color 0.15s ease;
+}
+
+.post-backblast-btn:hover {
+  background-color: #8b1616;
+}
+
+/* Responsive styles */
 @media (max-width: 768px) {
   .header-content-container {
     flex-direction: row;

@@ -3,6 +3,7 @@ import { useParams, Link, useNavigate } from 'react-router-dom';
 import { config } from '../../../config';
 import { WorkoutPost } from '../../../types/WorkoutPost';
 import { useFetch } from '../../../hooks/useFetch';
+import { useAuth } from '../../../hooks/useAuth';
 import LoadingSpinner from '../../../components/LoadingSpinner/LoadingSpinner';
 import BigDataPageHeader from '../../../components/BigDataPageHeader';
 import SEO from '../../../components/SEO';
@@ -12,6 +13,7 @@ import '../BigData.css';
 export const WorkoutDetail: React.FC = () => {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
+  const { isAuthenticated, user, isAdmin } = useAuth();
 
   const isValidId = Boolean(id && /^\d+$/.test(id));
   const apiUrl = isValidId ? `${config.apiBaseUrl}/v2/workouts/${id}` : null;
@@ -61,7 +63,16 @@ export const WorkoutDetail: React.FC = () => {
           title={workout.title}
           category="WORKOUTS"
           actions={
-            <div style={{ display: 'flex', gap: '0.75rem', flexWrap: 'wrap' }}>
+            <div style={{ display: 'flex', gap: '0.75rem', flexWrap: 'wrap', alignItems: 'center' }}>
+              {isAuthenticated && (isAdmin || user?.f3Name === workout.author || workout.q.some(q => q.f3Name === user?.f3Name)) && (
+                <Link
+                  to={`/backblast/edit/${workout.workoutId}`}
+                  className="bigdata-pill action-pill"
+                  style={{ padding: '0.45rem 0.9rem', fontSize: '0.9rem', backgroundColor: '#a81c1c', color: '#ffffff' }}
+                >
+                  Edit Workout ✎
+                </Link>
+              )}
               {workout.backblastUrl && (
                 <a
                   href={workout.backblastUrl}

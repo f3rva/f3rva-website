@@ -8,10 +8,13 @@ import AdminRoute from './AdminRoute';
 const mockAuthContext = (overrides: Partial<AuthContextType> = {}): AuthContextType => ({
   token: null,
   isAuthenticated: false,
+  isAdmin: false,
+  user: null,
   adminUsername: null,
   loading: false,
   error: null,
   login: vi.fn(),
+  loginWithToken: vi.fn(),
   logout: vi.fn(),
   getAuthHeaders: vi.fn().mockReturnValue({}),
   ...overrides,
