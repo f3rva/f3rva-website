@@ -260,7 +260,6 @@ const MainNavigationHeader: React.FC = () => {
                   role="menuitem"
                   onClick={closeMenu}
                 >
-                  <span className="dropdown-item-icon">✍️</span>
                   <div className="dropdown-link-content">
                     <span className="dropdown-link-title">Post Backblast</span>
                     <span className="dropdown-link-desc">Record beatdown & attendance</span>
@@ -275,7 +274,6 @@ const MainNavigationHeader: React.FC = () => {
                     role="menuitem"
                     onClick={closeMenu}
                   >
-                    <span className="dropdown-item-icon">📊</span>
                     <div className="dropdown-link-content">
                       <span className="dropdown-link-title">My Stats & Profile</span>
                       <span className="dropdown-link-desc">Personal attendance & streaks</span>
@@ -292,7 +290,6 @@ const MainNavigationHeader: React.FC = () => {
                       role="menuitem"
                       onClick={closeMenu}
                     >
-                      <span className="dropdown-item-icon">🛡️</span>
                       <div className="dropdown-link-content">
                         <span className="dropdown-link-title">Admin Portal</span>
                         <span className="dropdown-link-desc">Alias requests & moderation</span>
@@ -492,20 +489,20 @@ const MainNavigationHeader: React.FC = () => {
                 {isMobileUserOpen && (
                   <div className="mobile-accordion-content">
                     <Link to="/backblast/new" className="mobile-sublink" onClick={closeMenu}>
-                      ✍️ Post Backblast
+                      Post Backblast
                     </Link>
                     {!isAdmin && user?.memberId && (
                       <Link to={`/bigdata/pax/${user.memberId}`} className="mobile-sublink" onClick={closeMenu}>
-                        📊 My Stats & Profile
+                        My Stats & Profile
                       </Link>
                     )}
                     {isAdmin && (
                       <>
                         <Link to="/bigdata/admin" className="mobile-sublink" onClick={closeMenu}>
-                          🛡️ Admin Portal
+                          Admin Portal
                         </Link>
                         <Link to="/bigdata/admin/manage-pax" className="mobile-sublink" onClick={closeMenu}>
-                          👥 Manage PAX
+                          Manage PAX
                         </Link>
                       </>
                     )}
@@ -514,7 +511,7 @@ const MainNavigationHeader: React.FC = () => {
                       className="mobile-sublink mobile-btn-link text-danger"
                       onClick={handleLogout}
                     >
-                      🚪 Log Out
+                      Log Out
                     </button>
                   </div>
                 )}
