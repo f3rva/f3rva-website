@@ -12,7 +12,7 @@ const MainNavigationHeader: React.FC = () => {
   const [isMenuOpen, setIsMenuOpen] = useState<boolean>(false);
   const [isBigDataOpen, setIsBigDataOpen] = useState<boolean>(false);
   const dropdownRef = useRef<HTMLLIElement>(null);
-  const { isAuthenticated, adminUsername, logout } = useAuth();
+  const { isAuthenticated, isAdmin, user, adminUsername, logout } = useAuth();
   const navigate = useNavigate();
 
   const toggleMenu = (): void => {
@@ -164,14 +164,25 @@ const MainNavigationHeader: React.FC = () => {
                 {isAuthenticated ? (
                   <div className="dropdown-admin-section">
                     <div className="dropdown-user-greeting">
-                      <span>Logged in as <strong>{adminUsername || 'Member'}</strong></span>
+                      <span>
+                        {isAdmin ? '🛡️ Admin' : '👤 Signed in as'}: <strong>{isAdmin ? (adminUsername || 'Admin') : (user?.f3Name || 'Member')}</strong>
+                      </span>
                     </div>
-                    <Link to="/bigdata/admin" className="dropdown-link admin-link" role="menuitem" onClick={closeMenu}>
-                      <div className="dropdown-link-content">
-                        <span className="dropdown-link-title">Admin Portal ({adminUsername || 'Admin'})</span>
-                        <span className="dropdown-link-desc">Review alias claims & merge PAX</span>
-                      </div>
-                    </Link>
+                    {isAdmin ? (
+                      <Link to="/bigdata/admin" className="dropdown-link admin-link" role="menuitem" onClick={closeMenu}>
+                        <div className="dropdown-link-content">
+                          <span className="dropdown-link-title">Admin Portal ({adminUsername || 'Admin'})</span>
+                          <span className="dropdown-link-desc">Review alias claims & merge PAX</span>
+                        </div>
+                      </Link>
+                    ) : (
+                      <Link to="/bigdata/admin/login" className="dropdown-link admin-login-link" role="menuitem" onClick={closeMenu}>
+                        <div className="dropdown-link-content">
+                          <span className="dropdown-link-title">Admin Login</span>
+                          <span className="dropdown-link-desc">Sign in with admin credentials</span>
+                        </div>
+                      </Link>
+                    )}
                     <button type="button" className="dropdown-logout-btn" onClick={handleLogout}>
                       Log Out
                     </button>

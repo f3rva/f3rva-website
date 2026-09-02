@@ -47,7 +47,46 @@ describe('Admin Portal Components', () => {
       expect(screen.getByText(/Administrator Login/i)).toBeInTheDocument();
       expect(screen.getByPlaceholderText(/Enter admin username/i)).toBeInTheDocument();
       expect(screen.getByPlaceholderText(/••••••••••••/i)).toBeInTheDocument();
-      expect(screen.getByRole('button', { name: /Sign In/i })).toBeInTheDocument();
+      expect(screen.getByRole('button', { name: /Sign In as Admin/i })).toBeInTheDocument();
+    });
+
+    it('renders admin login form with elevation notice when logged in as regular member', () => {
+      localStorage.setItem('f3rva_auth_token', 'member-token');
+      localStorage.setItem('f3rva_auth_expires_at', (Date.now() + 3600000).toString());
+      localStorage.setItem('f3rva_auth_user', JSON.stringify({ memberId: 1, f3Name: 'Dingo', role: 'member' }));
+
+      render(
+        <MemoryRouter>
+          <AuthProvider>
+            <AdminLogin />
+          </AuthProvider>
+        </MemoryRouter>
+      );
+
+      expect(screen.getByText(/Currently signed in as/i)).toBeInTheDocument();
+      expect(screen.getByText('Dingo')).toBeInTheDocument();
+      expect(screen.getByPlaceholderText(/Enter admin username/i)).toBeInTheDocument();
+      expect(screen.getByRole('button', { name: /Sign In as Admin/i })).toBeInTheDocument();
+    });
+
+    it('renders already authenticated card when logged in as admin', () => {
+      localStorage.setItem('f3rva_auth_token', 'admin-token');
+      localStorage.setItem('f3rva_auth_expires_at', (Date.now() + 3600000).toString());
+      localStorage.setItem('f3rva_auth_user', JSON.stringify({ memberId: 0, f3Name: 'ChiefAdmin', role: 'admin' }));
+      localStorage.setItem('f3rva_admin_token', 'admin-token');
+      localStorage.setItem('f3rva_admin_username', 'ChiefAdmin');
+
+      render(
+        <MemoryRouter>
+          <AuthProvider>
+            <AdminLogin />
+          </AuthProvider>
+        </MemoryRouter>
+      );
+
+      expect(screen.getByText(/Already Authenticated/i)).toBeInTheDocument();
+      expect(screen.getByText(/ChiefAdmin/i)).toBeInTheDocument();
+      expect(screen.getByRole('link', { name: /Go to Admin Portal/i })).toBeInTheDocument();
     });
 
     it('handles successful login and token storage', async () => {
@@ -76,7 +115,7 @@ describe('Admin Portal Components', () => {
       });
 
       await act(async () => {
-        fireEvent.click(screen.getByRole('button', { name: /Sign In/i }));
+        fireEvent.click(screen.getByRole('button', { name: /Sign In as Admin/i }));
       });
 
       expect(fetchSpy).toHaveBeenCalledWith(
@@ -114,7 +153,7 @@ describe('Admin Portal Components', () => {
       });
 
       await act(async () => {
-        fireEvent.click(screen.getByRole('button', { name: /Sign In/i }));
+        fireEvent.click(screen.getByRole('button', { name: /Sign In as Admin/i }));
       });
 
       await waitFor(() => {

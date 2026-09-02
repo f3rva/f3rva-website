@@ -61,13 +61,14 @@ describe('MainNavigationHeader Component', () => {
     expect(screen.getByText('Admin Login')).toBeInTheDocument();
   });
 
-  it('displays Admin Portal and Log Out option when user is authenticated', () => {
+  it('displays Admin Portal and Log Out option when user is authenticated as admin', () => {
     const logoutMock = vi.fn();
 
     render(
       <AuthContext.Provider
         value={mockAuthContext({
           isAuthenticated: true,
+          isAdmin: true,
           adminUsername: 'ChiefAdmin',
           logout: logoutMock,
         })}
@@ -87,6 +88,30 @@ describe('MainNavigationHeader Component', () => {
 
     fireEvent.click(logoutBtn);
     expect(logoutMock).toHaveBeenCalled();
+  });
+
+  it('displays member greeting and Admin Login link when user is authenticated as regular member', () => {
+    render(
+      <AuthContext.Provider
+        value={mockAuthContext({
+          isAuthenticated: true,
+          isAdmin: false,
+          user: { memberId: 42, f3Name: 'Bleeder', role: 'member' },
+        })}
+      >
+        <MemoryRouter>
+          <MainNavigationHeader />
+        </MemoryRouter>
+      </AuthContext.Provider>
+    );
+
+    const bigDataButton = screen.getByRole('button', { name: /Big Data/i });
+    fireEvent.click(bigDataButton);
+
+    expect(screen.getByText(/Signed in as/i)).toBeInTheDocument();
+    expect(screen.getByText('Bleeder')).toBeInTheDocument();
+    expect(screen.getByText('Admin Login')).toBeInTheDocument();
+    expect(screen.queryByText(/Admin Portal/i)).not.toBeInTheDocument();
   });
 
   it('closes dropdown menu when a dropdown link is clicked', () => {
