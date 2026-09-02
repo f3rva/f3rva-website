@@ -41,13 +41,13 @@ describe('LinkProfileModal', () => {
     expect(container.firstChild).toBeNull();
   });
 
-  it('renders modal with suggestion when open', () => {
+  it('renders modal with suggestion and confirmation preview when open', async () => {
     render(
       <LinkProfileModal
         isOpen={true}
         tempToken="temp-token-123"
-        slackDisplayName="Dingo"
-        suggestedMember={{ memberId: 1, f3Name: 'Dingo' }}
+        slackDisplayName="Splinter"
+        suggestedMember={{ memberId: 1, f3Name: 'Splinter' }}
         onSuccess={mockOnSuccess}
         onCancel={mockOnCancel}
       />
@@ -55,8 +55,10 @@ describe('LinkProfileModal', () => {
 
     expect(screen.getByRole('heading', { name: /link your slack profile/i })).toBeInTheDocument();
     expect(screen.getByText(/Welcome,/i)).toBeInTheDocument();
-    expect(screen.getAllByText('Dingo', { selector: 'strong' }).length).toBeGreaterThan(0);
+    expect(screen.getAllByText('Splinter', { selector: 'strong' }).length).toBeGreaterThan(0);
     expect(screen.getByText('✓ Selected')).toBeInTheDocument();
+    expect(screen.getByText(/Confirming link:/i)).toBeInTheDocument();
+    expect(screen.getByText(/Big Data #1/i)).toBeInTheDocument();
   });
 
   it('submits confirmation and calls onSuccess with token', async () => {
@@ -96,6 +98,39 @@ describe('LinkProfileModal', () => {
     );
 
     fireEvent.click(screen.getByRole('button', { name: /cancel/i }));
+    expect(mockOnCancel).toHaveBeenCalled();
+  });
+
+  it('handles cancellation when Escape key is pressed', () => {
+    render(
+      <LinkProfileModal
+        isOpen={true}
+        tempToken="temp-token-123"
+        slackDisplayName="Dingo"
+        suggestedMember={null}
+        onSuccess={mockOnSuccess}
+        onCancel={mockOnCancel}
+      />
+    );
+
+    fireEvent.keyDown(document, { key: 'Escape' });
+    expect(mockOnCancel).toHaveBeenCalled();
+  });
+
+  it('handles cancellation when clicking the modal background overlay', () => {
+    render(
+      <LinkProfileModal
+        isOpen={true}
+        tempToken="temp-token-123"
+        slackDisplayName="Dingo"
+        suggestedMember={null}
+        onSuccess={mockOnSuccess}
+        onCancel={mockOnCancel}
+      />
+    );
+
+    const dialog = screen.getByRole('dialog');
+    fireEvent.click(dialog);
     expect(mockOnCancel).toHaveBeenCalled();
   });
 });

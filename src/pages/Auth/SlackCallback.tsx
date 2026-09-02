@@ -72,7 +72,9 @@ export const SlackCallback: React.FC = () => {
         } else if (!data.isLinked && data.tempToken) {
           // User is not yet linked; trigger confirmation modal
           setTempToken(data.tempToken);
-          setSlackDisplayName(data.user?.f3Name || 'Slack User');
+          setSlackDisplayName(
+            data.slackUser?.displayName || data.slackUser?.realName || data.user?.f3Name || 'Slack User'
+          );
           setSuggestedMember(data.suggestedMember || null);
           setShowLinkModal(true);
           setLoading(false);

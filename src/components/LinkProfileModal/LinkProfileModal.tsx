@@ -27,6 +27,56 @@ export const LinkProfileModal: React.FC<LinkProfileModalProps> = ({
   const [submitting, setSubmitting] = useState<boolean>(false);
   const [error, setError] = useState<string | null>(null);
 
+  const modalRef = React.useRef<HTMLDivElement>(null);
+  const closeBtnRef = React.useRef<HTMLButtonElement>(null);
+
+  // Focus management & Escape key trapping
+  React.useEffect(() => {
+    if (!isOpen) return;
+
+    // Lock body scroll
+    const originalOverflow = document.body.style.overflow;
+    document.body.style.overflow = 'hidden';
+
+    // Auto-focus close button or modal
+    const timer = setTimeout(() => {
+      closeBtnRef.current?.focus();
+    }, 50);
+
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === 'Escape' && !submitting) {
+        onCancel();
+        return;
+      }
+
+      // Tab focus trap
+      if (e.key === 'Tab' && modalRef.current) {
+        const focusables = modalRef.current.querySelectorAll<HTMLElement>(
+          'button:not([disabled]), [href], input:not([disabled]), select:not([disabled]), textarea:not([disabled]), [tabindex]:not([tabindex="-1"])'
+        );
+        if (focusables.length === 0) return;
+
+        const firstElement = focusables[0];
+        const lastElement = focusables[focusables.length - 1];
+
+        if (e.shiftKey && document.activeElement === firstElement) {
+          e.preventDefault();
+          lastElement.focus();
+        } else if (!e.shiftKey && document.activeElement === lastElement) {
+          e.preventDefault();
+          firstElement.focus();
+        }
+      }
+    };
+
+    document.addEventListener('keydown', handleKeyDown);
+    return () => {
+      document.body.style.overflow = originalOverflow;
+      clearTimeout(timer);
+      document.removeEventListener('keydown', handleKeyDown);
+    };
+  }, [isOpen, onCancel, submitting]);
+
   React.useEffect(() => {
     let isMounted = true;
     setLoadingMembers(true);
@@ -87,11 +137,23 @@ export const LinkProfileModal: React.FC<LinkProfileModalProps> = ({
   if (!isOpen) return null;
 
   return (
-    <div className="link-profile-modal-overlay" role="dialog" aria-modal="true" aria-labelledby="link-modal-title">
-      <div className="link-profile-modal-content">
+    <div
+      className="link-profile-modal-overlay"
+      role="dialog"
+      aria-modal="true"
+      aria-labelledby="link-modal-title"
+      aria-describedby="link-modal-desc"
+      onClick={(e) => {
+        if (e.target === e.currentTarget && !submitting) {
+          onCancel();
+        }
+      }}
+    >
+      <div className="link-profile-modal-content" ref={modalRef}>
         <div className="link-profile-modal-header">
           <h2 id="link-modal-title">Link Your Slack Profile</h2>
           <button
+            ref={closeBtnRef}
             type="button"
             className="link-profile-close-btn"
             onClick={onCancel}
@@ -103,7 +165,7 @@ export const LinkProfileModal: React.FC<LinkProfileModalProps> = ({
         </div>
 
         <div className="link-profile-modal-body">
-          <p className="link-profile-intro">
+          <p id="link-modal-desc" className="link-profile-intro">
             Welcome, <strong>{slackDisplayName}</strong>! To post and manage backblasts, please confirm your F3 RVA
             name.
           </p>
@@ -118,11 +180,20 @@ export const LinkProfileModal: React.FC<LinkProfileModalProps> = ({
             <div className="link-profile-suggestion-box">
               <span className="suggestion-label">Suggested Match:</span>
               <div className="suggestion-card">
-                <span className="suggestion-name">{suggestedMember.f3Name}</span>
+                <div className="suggestion-info">
+                  <span className="suggestion-icon">🎯</span>
+                  <div className="suggestion-details">
+                    <span className="suggestion-name">{suggestedMember.f3Name}</span>
+                    <span className="suggestion-id">ID #{suggestedMember.memberId}</span>
+                  </div>
+                </div>
                 <button
                   type="button"
                   className={`btn-select-suggestion ${selectedMember?.memberId === suggestedMember.memberId ? 'active' : ''}`}
-                  onClick={() => setSelectedMember(suggestedMember)}
+                  onClick={() => {
+                    setSelectedMember(suggestedMember);
+                    setError(null);
+                  }}
                   disabled={submitting}
                 >
                   {selectedMember?.memberId === suggestedMember.memberId ? '✓ Selected' : 'Select'}
@@ -149,8 +220,11 @@ export const LinkProfileModal: React.FC<LinkProfileModalProps> = ({
 
           {selectedMember && (
             <div className="link-profile-confirmation-preview">
-              Confirming link: <strong>{slackDisplayName}</strong> (Slack) ➔{' '}
-              <strong>{selectedMember.f3Name}</strong> (F3 Profile #{selectedMember.memberId})
+              <span className="preview-icon">🔗</span>
+              <span>
+                Confirming link: <strong>{slackDisplayName}</strong> (Slack) ➔{' '}
+                <strong>{selectedMember.f3Name}</strong> (Big Data #{selectedMember.memberId})
+              </span>
             </div>
           )}
         </div>

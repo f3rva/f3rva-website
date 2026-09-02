@@ -172,6 +172,17 @@ export interface AuthUserProfile {
 }
 
 /**
+ * Raw Slack user identity details returned by OAuth OIDC exchange.
+ */
+export interface SlackUserProfile {
+  slackUserId: string;
+  slackTeamId: string;
+  displayName: string;
+  realName: string;
+  email: string;
+}
+
+/**
  * Slack OAuth authentication response.
  */
 export interface SlackAuthResponse {
@@ -180,6 +191,7 @@ export interface SlackAuthResponse {
   tokenType?: string;
   expiresIn?: number;
   user?: AuthUserProfile | null;
+  slackUser?: SlackUserProfile | null;
   suggestedMember?: MemberSummary | null;
   tempToken?: string | null;
 }

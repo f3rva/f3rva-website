@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useRef, useCallback } from 'react';
 import { MemberSummary } from '../../../types/bigdata';
+import './PaxAutocomplete.css';
 
 interface PaxAutocompleteProps {
   id: string;
@@ -11,6 +12,21 @@ interface PaxAutocompleteProps {
   selectedMember: MemberSummary | null;
   onSelectMember: (member: MemberSummary | null) => void;
   disabled?: boolean;
+}
+
+function highlightMatch(text: string, query: string): React.ReactNode {
+  if (!query.trim()) return text;
+  const regex = new RegExp(`(${query.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')})`, 'gi');
+  const parts = text.split(regex);
+  return parts.map((part, i) =>
+    regex.test(part) ? (
+      <mark key={i} className="pax-match-highlight">
+        {part}
+      </mark>
+    ) : (
+      part
+    )
+  );
 }
 
 export const PaxAutocomplete: React.FC<PaxAutocompleteProps> = ({
@@ -31,30 +47,71 @@ export const PaxAutocomplete: React.FC<PaxAutocompleteProps> = ({
 
   const containerRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLInputElement>(null);
+  const dropdownRef = useRef<HTMLDivElement>(null);
 
-  // Instant in-memory client-side search across pre-fetched members
+  // Instant in-memory client-side search with relevance ranking (exact match > prefix > word boundary > substring)
   useEffect(() => {
     const trimmed = query.trim().toLowerCase();
     if (trimmed.length < 1 || selectedMember) {
       setSuggestions([]);
       setIsOpen(false);
+      setHighlightedIndex(-1);
       return;
     }
 
     const matches = members
       .filter((m) => m.f3Name.toLowerCase().includes(trimmed))
+      .sort((a, b) => {
+        const aName = a.f3Name.toLowerCase();
+        const bName = b.f3Name.toLowerCase();
+
+        // 1. Exact match first
+        const aExact = aName === trimmed;
+        const bExact = bName === trimmed;
+        if (aExact && !bExact) return -1;
+        if (!aExact && bExact) return 1;
+
+        // 2. Starts with query next
+        const aStarts = aName.startsWith(trimmed);
+        const bStarts = bName.startsWith(trimmed);
+        if (aStarts && !bStarts) return -1;
+        if (!aStarts && bStarts) return 1;
+
+        // 3. Word boundary starts with query next (e.g. " Splinter")
+        const aWord = aName.includes(' ' + trimmed);
+        const bWord = bName.includes(' ' + trimmed);
+        if (aWord && !bWord) return -1;
+        if (!aWord && bWord) return 1;
+
+        // 4. Shorter name preferred, then alphabetical
+        if (aName.length !== bName.length) {
+          return aName.length - bName.length;
+        }
+        return aName.localeCompare(bName);
+      })
       .slice(0, 10);
 
     setSuggestions(matches);
-    setIsOpen(true);
+    setIsOpen(matches.length > 0);
     setHighlightedIndex(-1);
   }, [query, selectedMember, members]);
+
+  // Scroll active item into view during arrow key navigation
+  useEffect(() => {
+    if (highlightedIndex >= 0 && dropdownRef.current) {
+      const activeEl = dropdownRef.current.querySelector(`#${id}-opt-${highlightedIndex}`) as HTMLElement;
+      if (activeEl && typeof activeEl.scrollIntoView === 'function') {
+        activeEl.scrollIntoView({ block: 'nearest' });
+      }
+    }
+  }, [highlightedIndex, id]);
 
   // Click outside to dismiss dropdown
   useEffect(() => {
     const handleClickOutside = (e: MouseEvent) => {
       if (containerRef.current && !containerRef.current.contains(e.target as Node)) {
         setIsOpen(false);
+        setHighlightedIndex(-1);
       }
     };
 
@@ -97,20 +154,22 @@ export const PaxAutocomplete: React.FC<PaxAutocompleteProps> = ({
     switch (e.key) {
       case 'ArrowDown':
         e.preventDefault();
-        setHighlightedIndex((prev) => (prev < suggestions.length - 1 ? prev + 1 : 0));
+        setHighlightedIndex((prev) => (prev < 0 ? 0 : prev < suggestions.length - 1 ? prev + 1 : 0));
         break;
       case 'ArrowUp':
         e.preventDefault();
-        setHighlightedIndex((prev) => (prev > 0 ? prev - 1 : suggestions.length - 1));
+        setHighlightedIndex((prev) => (prev <= 0 ? suggestions.length - 1 : prev - 1));
         break;
       case 'Enter':
         e.preventDefault();
         if (highlightedIndex >= 0 && highlightedIndex < suggestions.length) {
           handleSelect(suggestions[highlightedIndex]);
+        } else if (suggestions.length > 0) {
+          handleSelect(suggestions[0]);
         }
         break;
       case 'Escape':
-        e.preventDefault();
+      case 'Tab':
         setIsOpen(false);
         setHighlightedIndex(-1);
         break;
@@ -132,7 +191,7 @@ export const PaxAutocomplete: React.FC<PaxAutocompleteProps> = ({
           <div className="pax-selected-info">
             <span className="pax-selected-icon">👤</span>
             <span className="pax-selected-name">{selectedMember.f3Name}</span>
-            <span className="pax-selected-id">#{selectedMember.memberId}</span>
+            <span className="pax-selected-id">ID #{selectedMember.memberId}</span>
           </div>
           <button
             type="button"
@@ -176,7 +235,13 @@ export const PaxAutocomplete: React.FC<PaxAutocompleteProps> = ({
       )}
 
       {isOpen && !selectedMember && (
-        <div id={`${id}-listbox`} className="pax-autocomplete-dropdown" role="listbox" aria-label={`${label} suggestions`}>
+        <div
+          ref={dropdownRef}
+          id={`${id}-listbox`}
+          className="pax-autocomplete-dropdown"
+          role="listbox"
+          aria-label={`${label} suggestions`}
+        >
           {suggestions.length === 0 ? (
             <div className="pax-dropdown-message">
               No members found matching <strong>&quot;{query}&quot;</strong>
@@ -193,7 +258,7 @@ export const PaxAutocomplete: React.FC<PaxAutocompleteProps> = ({
                 role="option"
                 aria-selected={idx === highlightedIndex}
               >
-                <span className="pax-dropdown-name">{member.f3Name}</span>
+                <span className="pax-dropdown-name">{highlightMatch(member.f3Name, query)}</span>
                 <span className="pax-dropdown-id">ID #{member.memberId}</span>
               </button>
             ))

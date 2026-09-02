@@ -110,13 +110,13 @@ describe('ClaimAlias Component', () => {
     fireEvent.change(primaryInput, { target: { value: 'Bischoff' } });
 
     await waitFor(() => {
-      expect(screen.getByRole('option', { name: /Bischoff ID #101/i })).toBeInTheDocument();
+      expect(screen.getByRole('option', { name: /Bischoff.*ID #101/i })).toBeInTheDocument();
     });
 
-    fireEvent.click(screen.getByRole('option', { name: /Bischoff ID #101/i }));
+    fireEvent.click(screen.getByRole('option', { name: /Bischoff.*ID #101/i }));
 
     // Verify primary member chip is selected
-    expect(screen.getByText('#101')).toBeInTheDocument();
+    expect(screen.getByText(/ID #101/)).toBeInTheDocument();
 
     // 2. Search and select alias member
     await waitFor(() => {
@@ -126,13 +126,13 @@ describe('ClaimAlias Component', () => {
     fireEvent.change(aliasInput, { target: { value: 'Bischoff_Old' } });
 
     await waitFor(() => {
-      expect(screen.getByRole('option', { name: /Bischoff_Old ID #202/i })).toBeInTheDocument();
+      expect(screen.getByRole('option', { name: /Bischoff_Old.*ID #202/i })).toBeInTheDocument();
     });
 
-    fireEvent.click(screen.getByRole('option', { name: /Bischoff_Old ID #202/i }));
+    fireEvent.click(screen.getByRole('option', { name: /Bischoff_Old.*ID #202/i }));
 
     // Verify alias member chip is selected
-    expect(screen.getByText('#202')).toBeInTheDocument();
+    expect(screen.getByText(/ID #202/)).toBeInTheDocument();
 
     // 3. Submit form
     const submitBtn = screen.getByRole('button', { name: /Submit Alias Claim Request/i });
@@ -193,8 +193,8 @@ describe('ClaimAlias Component', () => {
       expect(screen.getByRole('option', { name: /All PAX ID #123/i })).toBeInTheDocument();
     });
 
-    fireEvent.click(screen.getByRole('option', { name: /All PAX ID #123/i }));
-    expect(screen.getByText('#123')).toBeInTheDocument();
+    fireEvent.click(screen.getByRole('option', { name: /All.*PAX.*ID #123/i }));
+    expect(screen.getByText(/ID #123/)).toBeInTheDocument();
   });
 
   it('handles duplicate conflict error (409) from API', async () => {

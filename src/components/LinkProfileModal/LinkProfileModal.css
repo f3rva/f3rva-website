@@ -19,7 +19,7 @@
   width: 100%;
   max-width: 520px;
   box-shadow: 0 10px 25px rgba(0, 0, 0, 0.3);
-  overflow: hidden;
+  overflow: visible;
   animation: modal-fade-in 0.2s ease-out;
 }
 
@@ -40,6 +40,8 @@
   align-items: center;
   padding: 1.25rem 1.5rem;
   border-bottom: 1px solid var(--border-color, #e0e0e0);
+  border-top-left-radius: 8px;
+  border-top-right-radius: 8px;
 }
 
 .link-profile-modal-header h2 {
@@ -65,6 +67,7 @@
 
 .link-profile-modal-body {
   padding: 1.5rem;
+  overflow: visible;
 }
 
 .link-profile-intro {
@@ -86,8 +89,8 @@
 .link-profile-suggestion-box {
   background-color: #f8fafc;
   border: 1px solid #e2e8f0;
-  border-radius: 6px;
-  padding: 1rem;
+  border-radius: 8px;
+  padding: 0.75rem 1rem;
   margin-bottom: 1.25rem;
 }
 
@@ -95,8 +98,9 @@
   display: block;
   font-size: 0.8rem;
   text-transform: uppercase;
-  font-weight: 600;
+  font-weight: 700;
   color: #64748b;
+  letter-spacing: 0.05em;
   margin-bottom: 0.5rem;
 }
 
@@ -104,23 +108,63 @@
   display: flex;
   justify-content: space-between;
   align-items: center;
+  gap: 0.75rem;
+  background-color: #ffffff;
+  border: 1px solid #cbd5e1;
+  border-radius: 8px;
+  padding: 0.6rem 0.85rem;
+}
+
+.suggestion-info {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  min-width: 0;
+}
+
+.suggestion-icon {
+  font-size: 1.2rem;
+  flex-shrink: 0;
+}
+
+.suggestion-details {
+  display: flex;
+  align-items: center;
+  gap: 0.45rem;
+  min-width: 0;
 }
 
 .suggestion-name {
   font-weight: 700;
   font-size: 1.1rem;
-  color: var(--text-main, #1e293b);
+  color: #1e293b;
+  white-space: nowrap;
+}
+
+.suggestion-id {
+  font-size: 0.75rem;
+  color: #64748b;
+  background-color: #f1f5f9;
+  padding: 0.15rem 0.45rem;
+  border-radius: 4px;
+  font-weight: 600;
+  white-space: nowrap;
+  flex-shrink: 0;
 }
 
 .btn-select-suggestion {
   background: #ffffff;
   border: 1px solid #cbd5e1;
-  padding: 0.4rem 0.85rem;
-  border-radius: 4px;
+  color: #334155;
+  padding: 0.35rem 0.85rem;
+  border-radius: 6px;
   font-size: 0.85rem;
   font-weight: 600;
   cursor: pointer;
-  transition: all 0.15s ease;
+  flex-shrink: 0;
+  white-space: nowrap;
+  margin-left: auto;
+  transition: all 0.15s ease-in-out;
 }
 
 .btn-select-suggestion:hover {
@@ -132,10 +176,13 @@
   background: #16a34a;
   color: #ffffff;
   border-color: #16a34a;
+  box-shadow: 0 1px 3px rgba(22, 163, 74, 0.3);
 }
 
 .link-profile-search-section {
   margin-bottom: 1.25rem;
+  position: relative;
+  z-index: 20;
 }
 
 .search-label {
@@ -146,13 +193,23 @@
 }
 
 .link-profile-confirmation-preview {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
   background-color: #f0fdf4;
   border: 1px solid #bbf7d0;
   color: #166534;
-  padding: 0.75rem;
-  border-radius: 6px;
-  font-size: 0.85rem;
+  padding: 0.85rem 1rem;
+  border-radius: 8px;
+  font-size: 0.9rem;
   line-height: 1.4;
+  position: relative;
+  z-index: 1;
+}
+
+.preview-icon {
+  font-size: 1.2rem;
+  flex-shrink: 0;
 }
 
 .link-profile-modal-footer {
@@ -162,6 +219,10 @@
   padding: 1rem 1.5rem;
   border-top: 1px solid var(--border-color, #e0e0e0);
   background-color: #fafafa;
+  border-bottom-left-radius: 8px;
+  border-bottom-right-radius: 8px;
+  position: relative;
+  z-index: 1;
 }
 
 .btn-cancel {
@@ -196,4 +257,62 @@
 .btn-confirm-link:disabled {
   opacity: 0.5;
   cursor: not-allowed;
+}
+
+/* Mobile Responsive Layout - Positioned right below the navigation header */
+@media (max-width: 600px) {
+  .link-profile-modal-overlay {
+    padding: 5.5rem 0.75rem 1.5rem;
+    align-items: flex-start;
+    overflow-y: auto;
+  }
+
+  .link-profile-modal-content {
+    max-width: 100%;
+    border-radius: 12px;
+    margin: 0 auto 1.5rem;
+    display: flex;
+    flex-direction: column;
+    overflow: visible;
+  }
+
+  .link-profile-modal-header {
+    padding: 1rem 1.25rem;
+    border-top-left-radius: 12px;
+    border-top-right-radius: 12px;
+  }
+
+  .link-profile-modal-body {
+    padding: 1rem 0.85rem;
+    overflow: visible;
+  }
+
+  .link-profile-suggestion-box {
+    padding: 0.75rem;
+  }
+
+  .suggestion-card {
+    padding: 0.55rem 0.65rem;
+    gap: 0.5rem;
+  }
+
+  .link-profile-modal-footer {
+    padding: 1rem 1.25rem;
+    flex-direction: column-reverse;
+    gap: 0.5rem;
+    border-bottom-left-radius: 12px;
+    border-bottom-right-radius: 12px;
+    position: relative;
+    z-index: 1;
+  }
+
+  .btn-confirm-link,
+  .btn-cancel {
+    width: 100%;
+    min-height: 44px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1rem;
+  }
 }
