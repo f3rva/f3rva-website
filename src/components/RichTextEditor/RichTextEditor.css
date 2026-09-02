@@ -109,6 +109,36 @@
   font-style: italic;
 }
 
+.rich-editor-content .ProseMirror code {
+  background-color: #f1f5f9;
+  color: #a81c1c;
+  padding: 0.15rem 0.35rem;
+  border-radius: 4px;
+  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+  font-size: 0.875em;
+}
+
+.rich-editor-content .ProseMirror pre {
+  background-color: #1e293b;
+  color: #f8fafc;
+  padding: 0.75rem 1rem;
+  border-radius: 6px;
+  overflow-x: auto;
+  margin-bottom: 0.75rem;
+}
+
+.rich-editor-content .ProseMirror pre code {
+  background: transparent;
+  color: inherit;
+  padding: 0;
+}
+
+.rich-editor-content .ProseMirror hr {
+  border: none;
+  border-top: 2px solid #e2e8f0;
+  margin: 1.25rem 0;
+}
+
 .rich-editor-loading {
   padding: 2rem;
   text-align: center;

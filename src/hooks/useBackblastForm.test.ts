@@ -12,6 +12,7 @@ vi.mock('react-router-dom', () => ({
 vi.mock('./useAuth', () => ({
   useAuth: () => ({
     user: { f3Name: 'Dingo', role: 'member' },
+    isAuthenticated: true,
     getAuthHeaders: mockGetAuthHeaders,
   }),
 }));
@@ -41,7 +42,8 @@ describe('useBackblastForm Hook', () => {
     });
 
     expect(result.current.isEditMode).toBe(false);
-    expect(result.current.formData.qic).toBe('Dingo');
+    expect(result.current.formData.qic).toEqual(['Dingo']);
+    expect(result.current.formData.pax).toEqual(['Dingo']);
 
     act(() => {
       result.current.updateField('title', 'Summer Ruck');
@@ -68,7 +70,7 @@ describe('useBackblastForm Hook', () => {
 
     expect(success).toBe(false);
     expect(result.current.validationErrors.title).toBe('Title is required.');
-    expect(result.current.validationErrors.aoName).toBe('Area of Operations (AO) is required.');
+    expect(result.current.validationErrors.aoNames).toBe('At least one Area of Operations (AO) is required.');
   });
 
   it('submits successfully in create mode and navigates to new workout', async () => {
@@ -79,9 +81,19 @@ describe('useBackblastForm Hook', () => {
           json: async () => [{ id: 1, description: 'First Watch', slug: 'first-watch' }],
         } as Response);
       }
+      if (url.includes('/v2/members')) {
+        return Promise.resolve({
+          ok: true,
+          json: async () => [{ memberId: 1, f3Name: 'Dingo' }, { memberId: 2, f3Name: 'Lab Rat' }],
+        } as Response);
+      }
       return Promise.resolve({
         ok: true,
-        json: async () => ({ id: 501, title: 'Epic Workout' }),
+        json: async () => ({
+          id: 501,
+          title: 'Epic Workout',
+          url: 'https://f3rva.org/2026/09/02/epic-workout',
+        }),
       } as Response);
     });
 
@@ -93,9 +105,9 @@ describe('useBackblastForm Hook', () => {
 
     act(() => {
       result.current.updateField('title', 'Epic Workout');
-      result.current.updateField('aoName', 'First Watch');
-      result.current.updateField('qic', 'Dingo');
-      result.current.updateField('pax', 'Dingo, Lab Rat');
+      result.current.updateField('aoNames', ['First Watch']);
+      result.current.updateField('qic', ['Dingo']);
+      result.current.updateField('pax', ['Dingo', 'Lab Rat']);
       result.current.updateField('body', '<p>100 Burpees</p>');
     });
 
@@ -105,7 +117,7 @@ describe('useBackblastForm Hook', () => {
     });
 
     expect(success).toBe(true);
-    expect(mockNavigate).toHaveBeenCalledWith('/bigdata/workouts/501', { replace: true });
+    expect(mockNavigate).toHaveBeenCalledWith('/2026/09/02/epic-workout', { replace: true });
     expect(localStorage.getItem('f3rva_backblast_draft')).toBeNull();
   });
 });

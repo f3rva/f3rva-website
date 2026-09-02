@@ -15,8 +15,12 @@ describe('RichTextEditor', () => {
     expect(screen.getByRole('toolbar')).toBeInTheDocument();
     expect(screen.getByRole('button', { name: /bold/i })).toBeInTheDocument();
     expect(screen.getByRole('button', { name: /italic/i })).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: /strikethrough/i })).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: /inline code/i })).toBeInTheDocument();
     expect(screen.getByRole('button', { name: /heading 2/i })).toBeInTheDocument();
     expect(screen.getByRole('button', { name: /bullet list/i })).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: /horizontal rule/i })).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: /clear formatting/i })).toBeInTheDocument();
   });
 
   it('disables toolbar buttons when disabled prop is true', () => {
@@ -31,5 +35,6 @@ describe('RichTextEditor', () => {
 
     expect(screen.getByRole('button', { name: /bold/i })).toBeDisabled();
     expect(screen.getByRole('button', { name: /italic/i })).toBeDisabled();
+    expect(screen.getByRole('button', { name: /strikethrough/i })).toBeDisabled();
   });
 });

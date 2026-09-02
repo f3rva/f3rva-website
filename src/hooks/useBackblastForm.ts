@@ -1,19 +1,26 @@
-import { useState, useEffect, useCallback, useMemo } from 'react';
+import { useState, useEffect, useCallback, useMemo, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from './useAuth';
 import { config } from '../config';
-import { AOSummary, AddWorkoutPayload, UpdateWorkoutPayload, WorkoutCreatedResponse } from '../types/bigdata';
+import {
+  AOSummary,
+  MemberSummary,
+  AddWorkoutPayload,
+  UpdateWorkoutPayload,
+  WorkoutCreatedResponse,
+  WorkoutUpdatedResponse,
+} from '../types/bigdata';
 import { WorkoutPost } from '../types/WorkoutPost';
 
 const DRAFT_STORAGE_KEY = 'f3rva_backblast_draft';
+const DRAFT_TIMESTAMP_KEY = 'f3rva_backblast_draft_time';
 
 export interface BackblastFormData {
   title: string;
   workoutDate: string;
-  aoName: string;
-  aoSlug: string;
-  qic: string;
-  pax: string;
+  aoNames: string[];
+  qic: string[];
+  pax: string[];
   body: string;
   slug: string;
 }
@@ -27,9 +34,22 @@ export function slugify(text: string): string {
     .replace(/^-+|-+$/g, '');
 }
 
+function parseNames(input: unknown): string[] {
+  if (Array.isArray(input)) {
+    return input.map((item) => String(item).trim()).filter(Boolean);
+  }
+  if (typeof input === 'string') {
+    return input
+      .split(',')
+      .map((s) => s.trim())
+      .filter(Boolean);
+  }
+  return [];
+}
+
 export function useBackblastForm(workoutId?: number) {
   const navigate = useNavigate();
-  const { user, getAuthHeaders } = useAuth();
+  const { user, isAuthenticated, getAuthHeaders } = useAuth();
 
   const isEditMode = Boolean(workoutId);
 
@@ -41,25 +61,32 @@ export function useBackblastForm(workoutId?: number) {
   const [formData, setFormData] = useState<BackblastFormData>({
     title: '',
     workoutDate: initialDate,
-    aoName: '',
-    aoSlug: '',
-    qic: '',
-    pax: '',
+    aoNames: [],
+    qic: [],
+    pax: [],
     body: '',
     slug: '',
   });
 
   const [aos, setAos] = useState<AOSummary[]>([]);
+  const [loadingAos, setLoadingAos] = useState<boolean>(true);
+  const [members, setMembers] = useState<MemberSummary[]>([]);
+  const [loadingMembers, setLoadingMembers] = useState<boolean>(true);
   const [loadingInitial, setLoadingInitial] = useState<boolean>(true);
   const [submitting, setSubmitting] = useState<boolean>(false);
   const [error, setError] = useState<string | null>(null);
   const [validationErrors, setValidationErrors] = useState<Record<string, string>>({});
   const [slugManuallyEdited, setSlugManuallyEdited] = useState<boolean>(false);
+  const [lastSaved, setLastSaved] = useState<Date | null>(null);
+  const [isDirty, setIsDirty] = useState<boolean>(false);
+
+  const isInitialMount = useRef<boolean>(true);
 
   // Fetch available AOs
   useEffect(() => {
     let isMounted = true;
     const fetchAOs = async () => {
+      setLoadingAos(true);
       try {
         const res = await fetch(`${config.apiBaseUrl}/v2/workouts/aos`);
         if (res.ok) {
@@ -68,9 +95,35 @@ export function useBackblastForm(workoutId?: number) {
         }
       } catch {
         // Silently fallback if AOs list endpoint fails
+      } finally {
+        if (isMounted) setLoadingAos(false);
       }
     };
     fetchAOs();
+    return () => {
+      isMounted = false;
+    };
+  }, []);
+
+  // Fetch F3 member roster for multi-select chips
+  useEffect(() => {
+    let isMounted = true;
+    const fetchMembers = async () => {
+      setLoadingMembers(true);
+      try {
+        const res = await fetch(`${config.apiBaseUrl}/v2/members?limit=1000`);
+        if (res.ok) {
+          const data = await res.json();
+          const memberList: MemberSummary[] = Array.isArray(data) ? data : data.members || [];
+          if (isMounted) setMembers(memberList);
+        }
+      } catch {
+        // Silently handle member roster fetch error
+      } finally {
+        if (isMounted) setLoadingMembers(false);
+      }
+    };
+    fetchMembers();
     return () => {
       isMounted = false;
     };
@@ -90,21 +143,23 @@ export function useBackblastForm(workoutId?: number) {
           const data: WorkoutPost = await res.json();
 
           if (isMounted) {
-            const firstAo = data.ao && data.ao.length > 0 ? data.ao[0] : null;
-            const qNames = data.q ? (Array.isArray(data.q) ? data.q.map(q => q.f3Name).join(', ') : '') : '';
-            const paxNames = data.pax ? (Array.isArray(data.pax) ? data.pax.map(p => p.f3Name).join(', ') : '') : '';
+            const aoList = Array.isArray(data.ao)
+              ? data.ao.map((a) => a.description || '').filter(Boolean)
+              : [];
+            const qNames = Array.isArray(data.q) ? data.q.map((q) => q.f3Name) : [];
+            const paxNames = Array.isArray(data.pax) ? data.pax.map((p) => p.f3Name) : [];
 
             setFormData({
               title: data.title || '',
               workoutDate: data.workoutDate || initialDate,
-              aoName: firstAo?.description || '',
-              aoSlug: firstAo?.slug || '',
+              aoNames: aoList,
               qic: qNames,
               pax: paxNames,
               body: data.content || '',
               slug: data.slug || '',
             });
             setSlugManuallyEdited(true);
+            setIsDirty(false);
           }
         } catch (err: unknown) {
           if (isMounted) {
@@ -117,21 +172,38 @@ export function useBackblastForm(workoutId?: number) {
         // Create mode: Check for saved draft
         try {
           const savedDraft = localStorage.getItem(DRAFT_STORAGE_KEY);
+          const savedTimestamp = localStorage.getItem(DRAFT_TIMESTAMP_KEY);
+
           if (savedDraft && isMounted) {
             const parsed = JSON.parse(savedDraft);
-            setFormData(prev => ({
-              ...prev,
-              ...parsed,
-              // If user is logged in and qic is empty, default qic/pax to their F3 name
-              qic: parsed.qic || (user?.f3Name ?? ''),
-              pax: parsed.pax || (user?.f3Name ?? ''),
-            }));
-          } else if (isMounted && user?.f3Name) {
-            setFormData(prev => ({
-              ...prev,
-              qic: user.f3Name,
-              pax: user.f3Name,
-            }));
+            const userQ = user?.f3Name ? [user.f3Name] : [];
+            const parsedAos = parseNames(parsed.aoNames || parsed.aoName);
+
+            setFormData({
+              title: parsed.title || '',
+              workoutDate: parsed.workoutDate || initialDate,
+              aoNames: parsedAos,
+              qic: parseNames(parsed.qic).length > 0 ? parseNames(parsed.qic) : userQ,
+              pax: parseNames(parsed.pax).length > 0 ? parseNames(parsed.pax) : userQ,
+              body: parsed.body || '',
+              slug: parsed.slug || '',
+            });
+
+            if (savedTimestamp) {
+              setLastSaved(new Date(savedTimestamp));
+            }
+          } else if (isMounted) {
+            setFormData({
+              title: '',
+              workoutDate: initialDate,
+              aoNames: [],
+              qic: user?.f3Name ? [user.f3Name] : [],
+              pax: user?.f3Name ? [user.f3Name] : [],
+              body: '',
+              slug: '',
+            });
+            setLastSaved(null);
+            setIsDirty(false);
           }
         } catch {
           // Ignore localStorage errors
@@ -147,52 +219,86 @@ export function useBackblastForm(workoutId?: number) {
     };
   }, [isEditMode, workoutId, initialDate, user?.f3Name]);
 
-  // Auto-save draft in create mode
+  // Auto-save draft in create mode (only when user has made dirty edits while authenticated)
   useEffect(() => {
-    if (!isEditMode && !loadingInitial) {
+    if (isInitialMount.current) {
+      isInitialMount.current = false;
+      return;
+    }
+
+    if (!isEditMode && !loadingInitial && isDirty && isAuthenticated) {
       try {
         localStorage.setItem(DRAFT_STORAGE_KEY, JSON.stringify(formData));
+        const now = new Date();
+        localStorage.setItem(DRAFT_TIMESTAMP_KEY, now.toISOString());
+        setLastSaved(now);
       } catch {
         // Ignore localStorage errors
       }
     }
-  }, [formData, isEditMode, loadingInitial]);
+  }, [formData, isEditMode, loadingInitial, isDirty, isAuthenticated]);
 
-  const updateField = useCallback((field: keyof BackblastFormData, value: string) => {
-    setFormData(prev => {
-      const updated = { ...prev, [field]: value };
+  // Prevent accidental navigation with unsaved modifications
+  useEffect(() => {
+    if (!isAuthenticated || !isDirty || submitting) {
+      return;
+    }
 
-      // Auto-update slug if title changed and slug wasn't manually edited
-      if (field === 'title' && !slugManuallyEdited) {
-        updated.slug = slugify(value);
-      }
+    const handleBeforeUnload = (e: BeforeUnloadEvent) => {
+      e.preventDefault();
+      e.returnValue = '';
+    };
 
-      // If AO name is selected from list, auto-fill slug
-      if (field === 'aoName') {
-        const matchedAo = aos.find(a => a.description.toLowerCase() === value.toLowerCase());
-        if (matchedAo?.slug) {
-          updated.aoSlug = matchedAo.slug;
-        } else {
-          updated.aoSlug = slugify(value);
+    window.addEventListener('beforeunload', handleBeforeUnload);
+    return () => {
+      window.removeEventListener('beforeunload', handleBeforeUnload);
+    };
+  }, [isAuthenticated, isDirty, submitting]);
+
+  const updateField = useCallback(
+    <K extends keyof BackblastFormData>(field: K, value: BackblastFormData[K]) => {
+      setFormData((prev) => {
+        const updated = { ...prev, [field]: value };
+
+        // Auto-update slug if title changed and slug wasn't manually edited
+        if (field === 'title' && !slugManuallyEdited && typeof value === 'string') {
+          updated.slug = slugify(value);
         }
-      }
 
-      return updated;
-    });
+        return updated;
+      });
 
-    setValidationErrors(prev => {
-      if (prev[field]) {
-        const next = { ...prev };
-        delete next[field];
-        return next;
-      }
-      return prev;
-    });
-  }, [slugManuallyEdited, aos]);
+      setIsDirty(true);
+
+      setValidationErrors((prev) => {
+        if (prev[field]) {
+          const next = { ...prev };
+          delete next[field];
+          return next;
+        }
+        return prev;
+      });
+    },
+    [slugManuallyEdited]
+  );
 
   const setManualSlug = useCallback((slugValue: string) => {
     setSlugManuallyEdited(true);
-    setFormData(prev => ({ ...prev, slug: slugify(slugValue) }));
+    setIsDirty(true);
+    setFormData((prev) => ({ ...prev, slug: slugify(slugValue) }));
+  }, []);
+
+  const addQToPax = useCallback(() => {
+    setFormData((prev) => {
+      const existingSet = new Set(prev.pax.map((p) => p.trim().toLowerCase()));
+      const missingQs = prev.qic.filter((q) => !existingSet.has(q.trim().toLowerCase()));
+      if (missingQs.length === 0) return prev;
+      return {
+        ...prev,
+        pax: [...prev.pax, ...missingQs],
+      };
+    });
+    setIsDirty(true);
   }, []);
 
   const validate = useCallback((): boolean => {
@@ -200,9 +306,9 @@ export function useBackblastForm(workoutId?: number) {
 
     if (!formData.title.trim()) errors.title = 'Title is required.';
     if (!formData.workoutDate) errors.workoutDate = 'Workout date is required.';
-    if (!formData.aoName.trim()) errors.aoName = 'Area of Operations (AO) is required.';
-    if (!formData.qic.trim()) errors.qic = 'At least one Q is required.';
-    if (!formData.pax.trim()) errors.pax = 'At least one PAX attendee is required.';
+    if (formData.aoNames.length === 0) errors.aoNames = 'At least one Area of Operations (AO) is required.';
+    if (formData.qic.length === 0) errors.qic = 'At least one Q is required.';
+    if (formData.pax.length === 0) errors.pax = 'At least one PAX attendee is required.';
     if (!formData.body.trim() || formData.body === '<p></p>') {
       errors.body = 'Backblast content cannot be empty.';
     }
@@ -217,10 +323,18 @@ export function useBackblastForm(workoutId?: number) {
     setSubmitting(true);
     setError(null);
 
-    const aoPayload = [{
-      name: formData.aoName.trim(),
-      slug: formData.aoSlug.trim() || slugify(formData.aoName),
-    }];
+    const finalSlug = formData.slug.trim() || slugify(formData.title);
+
+    const aoPayload = formData.aoNames.map((name) => {
+      const trimmed = name.trim();
+      const matchedAo = (aos || []).find(
+        (a) => a && typeof a.description === 'string' && a.description.toLowerCase() === trimmed.toLowerCase()
+      );
+      return {
+        name: trimmed,
+        slug: matchedAo?.slug || slugify(trimmed),
+      };
+    });
 
     const headers = {
       'Content-Type': 'application/json',
@@ -232,12 +346,12 @@ export function useBackblastForm(workoutId?: number) {
         const payload: UpdateWorkoutPayload = {
           title: formData.title.trim(),
           workoutDate: formData.workoutDate,
-          qic: formData.qic,
-          pax: formData.pax,
+          qic: formData.qic.join(', '),
+          pax: formData.pax.join(', '),
           aos: aoPayload,
           body: formData.body,
           author: user?.f3Name || 'Admin',
-          slug: formData.slug.trim() || slugify(formData.title),
+          slug: finalSlug,
         };
 
         const res = await fetch(`${config.apiBaseUrl}/v2/workouts/${workoutId}`, {
@@ -251,18 +365,38 @@ export function useBackblastForm(workoutId?: number) {
           throw new Error(errData.errorMessage || 'Failed to update workout.');
         }
 
-        navigate(`/bigdata/workouts/${workoutId}`, { replace: true });
+        const editData: WorkoutUpdatedResponse = await res.json().catch(() => ({ id: Number(workoutId) }));
+        setIsDirty(false);
+
+        const datePath = formData.workoutDate.replace(/-/g, '/');
+        const defaultBackblastPath = `/${datePath}/${finalSlug}`;
+        let targetPath = defaultBackblastPath;
+
+        if (editData?.url) {
+          try {
+            const parsed = new URL(editData.url, window.location.origin);
+            targetPath = (parsed.pathname + parsed.search).replace(/\/$/, '');
+          } catch {
+            targetPath = editData.url;
+          }
+        }
+
+        if (targetPath.startsWith('/')) {
+          navigate(targetPath, { replace: true });
+        } else {
+          window.location.href = targetPath;
+        }
         return true;
       } else {
         const payload: AddWorkoutPayload = {
           title: formData.title.trim(),
           workoutDate: formData.workoutDate,
-          qic: formData.qic,
-          pax: formData.pax,
+          qic: formData.qic.join(', '),
+          pax: formData.pax.join(', '),
           aos: aoPayload,
           body: formData.body,
           author: user?.f3Name || 'Member',
-          slug: formData.slug.trim() || slugify(formData.title),
+          slug: finalSlug,
         };
 
         const res = await fetch(`${config.apiBaseUrl}/v2/workouts`, {
@@ -280,11 +414,44 @@ export function useBackblastForm(workoutId?: number) {
         // Clear saved draft on successful creation
         try {
           localStorage.removeItem(DRAFT_STORAGE_KEY);
+          localStorage.removeItem(DRAFT_TIMESTAMP_KEY);
         } catch {
           // Ignore localStorage error
         }
 
-        navigate(`/bigdata/workouts/${data.id}`, { replace: true });
+        setIsDirty(false);
+        setFormData({
+          title: '',
+          workoutDate: initialDate,
+          aoNames: [],
+          qic: user?.f3Name ? [user.f3Name] : [],
+          pax: user?.f3Name ? [user.f3Name] : [],
+          body: '',
+          slug: '',
+        });
+        setLastSaved(null);
+        setSlugManuallyEdited(false);
+        setValidationErrors({});
+        setError(null);
+
+        const datePath = formData.workoutDate.replace(/-/g, '/');
+        const defaultBackblastPath = `/${datePath}/${finalSlug}`;
+        let targetPath = defaultBackblastPath;
+
+        if (data?.url) {
+          try {
+            const parsed = new URL(data.url, window.location.origin);
+            targetPath = (parsed.pathname + parsed.search).replace(/\/$/, '');
+          } catch {
+            targetPath = data.url;
+          }
+        }
+
+        if (targetPath.startsWith('/')) {
+          navigate(targetPath, { replace: true });
+        } else {
+          window.location.href = targetPath;
+        }
         return true;
       }
     } catch (err: unknown) {
@@ -293,39 +460,49 @@ export function useBackblastForm(workoutId?: number) {
     } finally {
       setSubmitting(false);
     }
-  }, [validate, formData, getAuthHeaders, isEditMode, workoutId, user, navigate]);
+  }, [validate, formData, aos, getAuthHeaders, isEditMode, workoutId, user, initialDate, navigate]);
 
   const clearDraft = useCallback(() => {
-    try {
-      localStorage.removeItem(DRAFT_STORAGE_KEY);
-    } catch {
-      // Ignore
+    if (window.confirm('Are you sure you want to clear your saved draft? All unsaved text will be lost.')) {
+      try {
+        localStorage.removeItem(DRAFT_STORAGE_KEY);
+        localStorage.removeItem(DRAFT_TIMESTAMP_KEY);
+      } catch {
+        // Ignore
+      }
+      setFormData({
+        title: '',
+        workoutDate: initialDate,
+        aoNames: [],
+        qic: user?.f3Name ? [user.f3Name] : [],
+        pax: user?.f3Name ? [user.f3Name] : [],
+        body: '',
+        slug: '',
+      });
+      setSlugManuallyEdited(false);
+      setValidationErrors({});
+      setError(null);
+      setLastSaved(null);
+      setIsDirty(false);
     }
-    setFormData({
-      title: '',
-      workoutDate: initialDate,
-      aoName: '',
-      aoSlug: '',
-      qic: user?.f3Name ?? '',
-      pax: user?.f3Name ?? '',
-      body: '',
-      slug: '',
-    });
-    setSlugManuallyEdited(false);
-    setValidationErrors({});
-    setError(null);
   }, [initialDate, user]);
 
   return {
     formData,
     aos,
+    loadingAos,
+    members,
+    loadingMembers,
     loadingInitial,
     submitting,
     error,
     validationErrors,
     isEditMode,
+    lastSaved,
+    isDirty,
     updateField,
     setManualSlug,
+    addQToPax,
     submit,
     clearDraft,
   };

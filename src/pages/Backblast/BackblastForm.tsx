@@ -5,8 +5,20 @@ import { useBackblastForm } from '../../hooks/useBackblastForm';
 import { config } from '../../config';
 import RichTextEditor from '../../components/RichTextEditor';
 import LoadingSpinner from '../../components/LoadingSpinner/LoadingSpinner';
+import PaxMultiSelect from '../../components/PaxMultiSelect';
+import AoMultiSelect from '../../components/AoMultiSelect';
 import SEO from '../../components/SEO';
-import { FaSlack, FaCalendarAlt, FaMapMarkerAlt, FaUsers, FaUserCheck, FaPen, FaTrashAlt } from 'react-icons/fa';
+import {
+  FaSlack,
+  FaCalendarAlt,
+  FaMapMarkerAlt,
+  FaUsers,
+  FaUserCheck,
+  FaPen,
+  FaTrashAlt,
+  FaSave,
+  FaUserPlus,
+} from 'react-icons/fa';
 import './BackblastForm.css';
 
 export const BackblastForm: React.FC = () => {
@@ -17,13 +29,18 @@ export const BackblastForm: React.FC = () => {
   const {
     formData,
     aos,
+    loadingAos,
+    members,
+    loadingMembers,
     loadingInitial,
     submitting,
     error,
     validationErrors,
     isEditMode,
+    lastSaved,
     updateField,
     setManualSlug,
+    addQToPax,
     submit,
     clearDraft,
   } = useBackblastForm(workoutId);
@@ -73,6 +90,10 @@ export const BackblastForm: React.FC = () => {
     );
   }
 
+  const missingQs = formData.qic.filter(
+    (q) => !formData.pax.some((p) => p.trim().toLowerCase() === q.trim().toLowerCase())
+  );
+
   return (
     <div className="backblast-form-container">
       <SEO
@@ -83,9 +104,16 @@ export const BackblastForm: React.FC = () => {
       <div className="backblast-form-header">
         <div className="header-titles">
           <h1>{isEditMode ? 'Edit Backblast' : 'Post a Backblast'}</h1>
-          <p className="header-author-badge">
-            Posting as: <strong>{user?.f3Name}</strong> {user?.role === 'admin' ? '(Admin)' : ''}
-          </p>
+          <div className="header-meta-row">
+            <p className="header-author-badge">
+              Posting as: <strong>{user?.f3Name}</strong> {user?.role === 'admin' ? '(Admin)' : ''}
+            </p>
+            {lastSaved && !isEditMode && (
+              <span className="draft-saved-indicator" title={lastSaved.toLocaleString()}>
+                <FaSave /> Auto-saved {lastSaved.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+              </span>
+            )}
+          </div>
         </div>
         {!isEditMode && (
           <button type="button" className="btn-clear-draft" onClick={clearDraft} title="Clear saved draft">
@@ -140,13 +168,16 @@ export const BackblastForm: React.FC = () => {
         {/* Date & AO Row */}
         <div className="form-row">
           <div className="form-group col-half">
-            <label htmlFor="bb-date">
-              <FaCalendarAlt className="field-icon" /> Workout Date <span className="required">*</span>
-            </label>
+            <div className="date-field-header">
+              <label htmlFor="bb-date" className="date-field-label">
+                <FaCalendarAlt className="field-icon" /> Workout Date <span className="required">*</span>
+              </label>
+            </div>
+            <div className="date-field-help">Date when the beatdown took place.</div>
             <input
               id="bb-date"
               type="date"
-              className={`form-input ${validationErrors.workoutDate ? 'has-error' : ''}`}
+              className={`form-input date-input ${validationErrors.workoutDate ? 'has-error' : ''}`}
               value={formData.workoutDate}
               onChange={(e) => updateField('workoutDate', e.target.value)}
               disabled={submitting}
@@ -155,62 +186,65 @@ export const BackblastForm: React.FC = () => {
           </div>
 
           <div className="form-group col-half">
-            <label htmlFor="bb-ao">
-              <FaMapMarkerAlt className="field-icon" /> Area of Operations (AO) <span className="required">*</span>
-            </label>
-            <input
+            <AoMultiSelect
               id="bb-ao"
-              type="text"
-              list="ao-options"
-              className={`form-input ${validationErrors.aoName ? 'has-error' : ''}`}
+              label="Area of Operations (AO)"
+              icon={<FaMapMarkerAlt />}
               placeholder="Select or type AO (e.g. First Watch, Dogpile)..."
-              value={formData.aoName}
-              onChange={(e) => updateField('aoName', e.target.value)}
+              helpText="Host AO location(s) for the workout."
+              aos={aos}
+              loadingAos={loadingAos}
+              selectedNames={formData.aoNames}
+              onChange={(names) => updateField('aoNames', names)}
               disabled={submitting}
             />
-            <datalist id="ao-options">
-              {aos.map((ao) => (
-                <option key={ao.id} value={ao.description} />
-              ))}
-            </datalist>
-            {validationErrors.aoName && <span className="field-error">{validationErrors.aoName}</span>}
+            {validationErrors.aoNames && <span className="field-error">{validationErrors.aoNames}</span>}
           </div>
         </div>
 
         {/* Qs and PAX Attendance Row */}
         <div className="form-row">
           <div className="form-group col-half">
-            <label htmlFor="bb-qic">
-              <FaUserCheck className="field-icon" /> Q / Co-Q(s) <span className="required">*</span>
-            </label>
-            <input
+            <PaxMultiSelect
               id="bb-qic"
-              type="text"
-              className={`form-input ${validationErrors.qic ? 'has-error' : ''}`}
-              placeholder="Comma-separated F3 names (e.g. Dingo, Lab Rat)"
-              value={formData.qic}
-              onChange={(e) => updateField('qic', e.target.value)}
+              label="Q / Co-Q(s)"
+              icon={<FaUserCheck />}
+              placeholder="Type to search Q roster..."
+              helpText="Leader(s) who designed and executed the workout."
+              members={members}
+              loadingMembers={loadingMembers}
+              selectedNames={formData.qic}
+              onChange={(names) => updateField('qic', names)}
               disabled={submitting}
             />
             {validationErrors.qic && <span className="field-error">{validationErrors.qic}</span>}
-            <span className="field-hint">Leader(s) who designed and executed the workout.</span>
           </div>
 
           <div className="form-group col-half">
-            <label htmlFor="bb-pax">
-              <FaUsers className="field-icon" /> PAX Attendees <span className="required">*</span>
-            </label>
-            <input
+            <PaxMultiSelect
               id="bb-pax"
-              type="text"
-              className={`form-input ${validationErrors.pax ? 'has-error' : ''}`}
-              placeholder="Comma-separated PAX names (e.g. Splinter, Swag, Bleeder)"
-              value={formData.pax}
-              onChange={(e) => updateField('pax', e.target.value)}
+              label="PAX Attendees"
+              icon={<FaUsers />}
+              placeholder="Type to search PAX or add visiting names..."
+              helpText="All men present, including Qs."
+              members={members}
+              loadingMembers={loadingMembers}
+              selectedNames={formData.pax}
+              onChange={(names) => updateField('pax', names)}
               disabled={submitting}
             />
             {validationErrors.pax && <span className="field-error">{validationErrors.pax}</span>}
-            <span className="field-hint">All men present, including Qs.</span>
+
+            {missingQs.length > 0 && (
+              <button
+                type="button"
+                className="btn-sync-q-to-pax"
+                onClick={addQToPax}
+                title="Add missing Q(s) to attendance list"
+              >
+                <FaUserPlus /> + Add Q(s) to PAX ({missingQs.join(', ')})
+              </button>
+            )}
           </div>
         </div>
 
@@ -229,12 +263,17 @@ export const BackblastForm: React.FC = () => {
 
         {/* Submission Actions */}
         <div className="form-actions">
-          <Link to="/" className="btn-secondary">
-            Cancel
-          </Link>
-          <button type="submit" className="btn-primary" disabled={submitting}>
-            {submitting ? 'Saving Backblast...' : isEditMode ? 'Update Backblast' : 'Publish Backblast'}
-          </button>
+          <div className="attendance-summary-badge">
+            <FaUsers /> {formData.pax.length} PAX ({formData.qic.length} Q{formData.qic.length === 1 ? '' : 's'})
+          </div>
+          <div className="action-buttons-group">
+            <Link to="/" className="btn-secondary">
+              Cancel
+            </Link>
+            <button type="submit" className="btn-primary" disabled={submitting}>
+              {submitting ? 'Saving Backblast...' : isEditMode ? 'Update Backblast' : 'Publish Backblast'}
+            </button>
+          </div>
         </div>
       </form>
     </div>

@@ -113,6 +113,7 @@ const App: React.FC = () => {
                 <Route path="/member" element={<Navigate to="/bigdata" replace />} />
                 <Route path="/ao/:id" element={<AoParamRedirect />} />
                 <Route path="/workout/:id" element={<WorkoutParamRedirect />} />
+                <Route path="/workouts" element={<Navigate to="/bigdata" replace />} />
 
                 {/* Legacy PHP Query-Param Redirects (?id=123) */}
                 <Route path="/member/detail.php" element={<LegacyMemberQueryRedirect />} />

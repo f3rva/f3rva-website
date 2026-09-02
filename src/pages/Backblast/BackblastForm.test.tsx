@@ -7,10 +7,24 @@ import { AuthContext } from '../../context/AuthContext';
 describe('BackblastForm', () => {
   beforeEach(() => {
     vi.clearAllMocks();
-    globalThis.fetch = vi.fn().mockResolvedValue({
-      ok: true,
-      json: async () => [{ id: 1, description: 'First Watch', slug: 'first-watch' }],
-    } as Response);
+    globalThis.fetch = vi.fn().mockImplementation((url: string) => {
+      if (url.includes('/v2/workouts/aos')) {
+        return Promise.resolve({
+          ok: true,
+          json: async () => [{ id: 1, description: 'First Watch', slug: 'first-watch' }],
+        } as Response);
+      }
+      if (url.includes('/v2/members')) {
+        return Promise.resolve({
+          ok: true,
+          json: async () => [{ memberId: 1, f3Name: 'Dingo' }],
+        } as Response);
+      }
+      return Promise.resolve({
+        ok: true,
+        json: async () => [],
+      } as Response);
+    });
   });
 
   it('renders Slack login prompt when unauthenticated', () => {
@@ -67,6 +81,8 @@ describe('BackblastForm', () => {
     expect(screen.getByLabelText(/workout title/i)).toBeInTheDocument();
     expect(screen.getByLabelText(/workout date/i)).toBeInTheDocument();
     expect(screen.getByLabelText(/area of operations/i)).toBeInTheDocument();
+    expect(screen.getByText(/q \/ co-q\(s\)/i)).toBeInTheDocument();
+    expect(screen.getByText(/pax attendees/i)).toBeInTheDocument();
   });
 
   it('shows validation errors when submitting empty form', async () => {

@@ -9,6 +9,17 @@ vi.mock('../../components/SEO', () => ({
   default: () => null,
 }));
 
+const mockUseAuth = vi.fn().mockReturnValue({
+  user: null,
+  isAuthenticated: false,
+  isAdmin: false,
+  getAuthHeaders: () => ({}),
+});
+
+vi.mock('../../hooks/useAuth', () => ({
+  useAuth: () => mockUseAuth(),
+}));
+
 // Mock post data
 const mockPost: WorkoutPost = {
   workoutId: 101,
@@ -32,6 +43,12 @@ describe('ArchivePost Page', () => {
   const mockFetch = vi.fn();
 
   beforeEach(() => {
+    mockUseAuth.mockReturnValue({
+      user: null,
+      isAuthenticated: false,
+      isAdmin: false,
+      getAuthHeaders: () => ({}),
+    });
     globalThis.fetch = mockFetch;
     mockFetch.mockReset();
     // Silence console.log during tests
@@ -110,6 +127,98 @@ describe('ArchivePost Page', () => {
 
     expect(screen.getByText(/Error loading post/i)).toBeInTheDocument();
     expect(screen.getByText('API Failure')).toBeInTheDocument();
+  });
+
+  it('does not render Edit Workout button when user is unauthenticated', async () => {
+    mockUseAuth.mockReturnValue({
+      user: null,
+      isAuthenticated: false,
+      isAdmin: false,
+      getAuthHeaders: () => ({}),
+    });
+
+    mockFetch.mockResolvedValue({
+      ok: true,
+      json: async () => mockPost,
+    });
+
+    renderComponent();
+
+    await waitFor(() => {
+      expect(screen.getByText('Morning Beatdown at the Zoo')).toBeInTheDocument();
+    });
+
+    expect(screen.queryByRole('link', { name: /Edit Workout/i })).not.toBeInTheDocument();
+  });
+
+  it('renders Edit Workout button when user is the author', async () => {
+    mockUseAuth.mockReturnValue({
+      user: { f3Name: 'Gomer Pyle', role: 'member' },
+      isAuthenticated: true,
+      isAdmin: false,
+      getAuthHeaders: () => ({ Authorization: 'Bearer token' }),
+    });
+
+    mockFetch.mockResolvedValue({
+      ok: true,
+      json: async () => mockPost,
+    });
+
+    renderComponent();
+
+    await waitFor(() => {
+      expect(screen.getByText('Morning Beatdown at the Zoo')).toBeInTheDocument();
+    });
+
+    const editBtn = screen.getByRole('link', { name: /Edit Workout/i });
+    expect(editBtn).toBeInTheDocument();
+    expect(editBtn).toHaveAttribute('href', '/backblast/edit/101');
+  });
+
+  it('renders Edit Workout button when user is an admin', async () => {
+    mockUseAuth.mockReturnValue({
+      user: { f3Name: 'Some Admin', role: 'admin' },
+      isAuthenticated: true,
+      isAdmin: true,
+      getAuthHeaders: () => ({ Authorization: 'Bearer token' }),
+    });
+
+    mockFetch.mockResolvedValue({
+      ok: true,
+      json: async () => mockPost,
+    });
+
+    renderComponent();
+
+    await waitFor(() => {
+      expect(screen.getByText('Morning Beatdown at the Zoo')).toBeInTheDocument();
+    });
+
+    const editBtn = screen.getByRole('link', { name: /Edit Workout/i });
+    expect(editBtn).toBeInTheDocument();
+    expect(editBtn).toHaveAttribute('href', '/backblast/edit/101');
+  });
+
+  it('does not render Edit Workout button when user is not author or Q or admin', async () => {
+    mockUseAuth.mockReturnValue({
+      user: { f3Name: 'Shocker', role: 'member' },
+      isAuthenticated: true,
+      isAdmin: false,
+      getAuthHeaders: () => ({ Authorization: 'Bearer token' }),
+    });
+
+    mockFetch.mockResolvedValue({
+      ok: true,
+      json: async () => mockPost,
+    });
+
+    renderComponent();
+
+    await waitFor(() => {
+      expect(screen.getByText('Morning Beatdown at the Zoo')).toBeInTheDocument();
+    });
+
+    expect(screen.queryByRole('link', { name: /Edit Workout/i })).not.toBeInTheDocument();
   });
 
   it('redirects to 404 if post is not found', async () => {
