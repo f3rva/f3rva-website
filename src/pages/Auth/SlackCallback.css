@@ -1,0 +1,54 @@
+.slack-callback-container {
+  min-height: 60vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 3rem 1rem;
+}
+
+.slack-callback-loading {
+  text-align: center;
+}
+
+.slack-callback-error-card {
+  background: var(--bg-card, #ffffff);
+  border: 1px solid #fee2e2;
+  border-radius: 8px;
+  padding: 2.5rem 2rem;
+  max-width: 480px;
+  width: 100%;
+  text-align: center;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+}
+
+.slack-callback-error-card h2 {
+  color: #b91c1c;
+  margin-top: 0;
+  margin-bottom: 1rem;
+}
+
+.slack-callback-error-card p {
+  color: var(--text-muted, #475569);
+  line-height: 1.5;
+  margin-bottom: 1.5rem;
+}
+
+.slack-callback-actions {
+  display: flex;
+  justify-content: center;
+}
+
+.btn-retry {
+  background: var(--primary-color, #a81c1c);
+  color: #ffffff;
+  border: none;
+  padding: 0.65rem 1.25rem;
+  border-radius: 4px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.15s ease;
+}
+
+.btn-retry:hover {
+  background: #8b1616;
+}

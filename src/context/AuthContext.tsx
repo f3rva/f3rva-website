@@ -1,25 +1,27 @@
 /* eslint-disable react-refresh/only-export-components */
 import React, { createContext, useState, useEffect, useCallback, useMemo } from 'react';
 import { config } from '../config';
-import { TokenResponse, ApiErrorResponse } from '../types/bigdata';
+import { TokenResponse, ApiErrorResponse, AuthUserProfile } from '../types/bigdata';
 
 export interface AuthContextType {
   token: string | null;
   isAuthenticated: boolean;
+  isAdmin: boolean;
+  user: AuthUserProfile | null;
   adminUsername: string | null;
   loading: boolean;
   error: string | null;
   login: (username: string, password: string) => Promise<boolean>;
+  loginWithToken: (token: string, expiresIn: number, user: AuthUserProfile) => void;
   logout: () => void;
   getAuthHeaders: () => Record<string, string>;
 }
 
 export const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
-
-const TOKEN_STORAGE_KEY = 'f3rva_admin_token';
-const EXPIRY_STORAGE_KEY = 'f3rva_admin_expires_at';
-const USER_STORAGE_KEY = 'f3rva_admin_username';
+const TOKEN_STORAGE_KEY = 'f3rva_auth_token';
+const EXPIRY_STORAGE_KEY = 'f3rva_auth_expires_at';
+const USER_STORAGE_KEY = 'f3rva_auth_user';
 
 interface AuthProviderProps {
   children: React.ReactNode;
@@ -27,14 +29,14 @@ interface AuthProviderProps {
 
 export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
   const [token, setToken] = useState<string | null>(null);
-  const [adminUsername, setAdminUsername] = useState<string | null>(null);
+  const [user, setUser] = useState<AuthUserProfile | null>(null);
   const [expiresAt, setExpiresAt] = useState<number | null>(null);
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
 
   const logout = useCallback(() => {
     setToken(null);
-    setAdminUsername(null);
+    setUser(null);
     setExpiresAt(null);
     setError(null);
     try {
@@ -46,19 +48,44 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     }
   }, []);
 
+  const loginWithToken = useCallback((newToken: string, expiresIn: number, newUser: AuthUserProfile) => {
+    const expiryTimestamp = Date.now() + expiresIn * 1000;
+    setToken(newToken);
+    setExpiresAt(expiryTimestamp);
+    setUser(newUser);
+    setError(null);
+
+    try {
+      localStorage.setItem(TOKEN_STORAGE_KEY, newToken);
+      localStorage.setItem(EXPIRY_STORAGE_KEY, expiryTimestamp.toString());
+      localStorage.setItem(USER_STORAGE_KEY, JSON.stringify(newUser));
+    } catch {
+      // Storage restricted
+    }
+  }, []);
+
   // Initialize and validate token from localStorage on mount
   useEffect(() => {
     try {
       const savedToken = localStorage.getItem(TOKEN_STORAGE_KEY);
       const savedExpiry = localStorage.getItem(EXPIRY_STORAGE_KEY);
-      const savedUser = localStorage.getItem(USER_STORAGE_KEY);
+      const savedUserStr = localStorage.getItem(USER_STORAGE_KEY);
 
       if (savedToken && savedExpiry) {
         const expiryTime = parseInt(savedExpiry, 10);
         if (Date.now() < expiryTime) {
           setToken(savedToken);
           setExpiresAt(expiryTime);
-          setAdminUsername(savedUser || 'admin');
+
+          if (savedUserStr) {
+            try {
+              setUser(JSON.parse(savedUserStr));
+            } catch {
+              setUser({ f3Name: 'admin', role: 'admin' });
+            }
+          } else {
+            setUser({ f3Name: 'admin', role: 'admin' });
+          }
         } else {
           // Token has expired
           logout();
@@ -125,20 +152,8 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
       }
 
       const tokenData: TokenResponse = await response.json();
-      const expiryTimestamp = Date.now() + tokenData.expiresIn * 1000;
-
-      setToken(tokenData.accessToken);
-      setExpiresAt(expiryTimestamp);
-      setAdminUsername(username);
-
-      try {
-        localStorage.setItem(TOKEN_STORAGE_KEY, tokenData.accessToken);
-        localStorage.setItem(EXPIRY_STORAGE_KEY, expiryTimestamp.toString());
-        localStorage.setItem(USER_STORAGE_KEY, username);
-      } catch {
-        // Storage restricted
-      }
-
+      const adminUser: AuthUserProfile = { f3Name: username, role: 'admin' };
+      loginWithToken(tokenData.accessToken, tokenData.expiresIn, adminUser);
       return true;
     } catch (err: unknown) {
       const message = err instanceof Error ? err.message : 'Network error during login';
@@ -147,7 +162,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     } finally {
       setLoading(false);
     }
-  }, []);
+  }, [loginWithToken]);
 
   const getAuthHeaders = useCallback((): Record<string, string> => {
     if (token && expiresAt && Date.now() < expiresAt) {
@@ -162,18 +177,29 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     return Boolean(token && expiresAt && Date.now() < expiresAt);
   }, [token, expiresAt]);
 
+  const isAdmin = useMemo(() => {
+    return Boolean(isAuthenticated && user?.role === 'admin');
+  }, [isAuthenticated, user]);
+
+  const adminUsername = useMemo(() => {
+    return user?.f3Name || null;
+  }, [user]);
+
   const value = useMemo(
     () => ({
       token,
       isAuthenticated,
+      isAdmin,
+      user,
       adminUsername,
       loading,
       error,
       login,
+      loginWithToken,
       logout,
       getAuthHeaders,
     }),
-    [token, isAuthenticated, adminUsername, loading, error, login, logout, getAuthHeaders]
+    [token, isAuthenticated, isAdmin, user, adminUsername, loading, error, login, loginWithToken, logout, getAuthHeaders]
   );
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;

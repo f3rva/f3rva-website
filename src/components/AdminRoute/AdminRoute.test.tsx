@@ -8,10 +8,13 @@ import AdminRoute from './AdminRoute';
 const mockAuthContext = (overrides: Partial<AuthContextType> = {}): AuthContextType => ({
   token: null,
   isAuthenticated: false,
+  isAdmin: false,
+  user: null,
   adminUsername: null,
   loading: false,
   error: null,
   login: vi.fn(),
+  loginWithToken: vi.fn(),
   logout: vi.fn(),
   getAuthHeaders: vi.fn().mockReturnValue({}),
   ...overrides,
@@ -56,9 +59,40 @@ describe('AdminRoute Component', () => {
     expect(screen.queryByText('Protected Admin Area')).not.toBeInTheDocument();
   });
 
-  it('renders protected children when authenticated', () => {
+  it('shows administrator access required when user is authenticated as member only', () => {
     render(
-      <AuthContext.Provider value={mockAuthContext({ isAuthenticated: true, token: 'valid-token' })}>
+      <AuthContext.Provider
+        value={mockAuthContext({
+          isAuthenticated: true,
+          isAdmin: false,
+          user: { memberId: 10, f3Name: 'Bleeder', role: 'member' },
+          token: 'member-jwt-token',
+        })}
+      >
+        <MemoryRouter initialEntries={['/bigdata/admin']}>
+          <AdminRoute>
+            <div>Protected Admin Area</div>
+          </AdminRoute>
+        </MemoryRouter>
+      </AuthContext.Provider>
+    );
+
+    expect(screen.getByText(/Administrator Access Required/i)).toBeInTheDocument();
+    expect(screen.getByText(/Bleeder/i)).toBeInTheDocument();
+    expect(screen.getByRole('link', { name: /Sign In as Admin/i })).toBeInTheDocument();
+    expect(screen.queryByText('Protected Admin Area')).not.toBeInTheDocument();
+  });
+
+  it('renders protected children when authenticated as admin', () => {
+    render(
+      <AuthContext.Provider
+        value={mockAuthContext({
+          isAuthenticated: true,
+          isAdmin: true,
+          adminUsername: 'ChiefAdmin',
+          token: 'admin-token',
+        })}
+      >
         <MemoryRouter initialEntries={['/bigdata/admin']}>
           <AdminRoute>
             <div>Protected Admin Area</div>

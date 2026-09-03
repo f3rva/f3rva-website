@@ -48,7 +48,7 @@ describe('PaxAutocomplete Component', () => {
     const listbox = screen.getByRole('listbox');
     expect(listbox).toBeInTheDocument();
 
-    const option = screen.getByRole('option', { name: /Bischoff/i });
+    const option = screen.getByRole('option', { name: /Bisc.*hoff/i });
     expect(option).toBeInTheDocument();
     expect(option).toHaveAttribute('id', 'test-pax-opt-0');
 
@@ -75,11 +75,30 @@ describe('PaxAutocomplete Component', () => {
     );
 
     expect(screen.getByText('Bischoff')).toBeInTheDocument();
-    expect(screen.getByText('#101')).toBeInTheDocument();
+    expect(screen.getByText(/ID #101/)).toBeInTheDocument();
 
     const clearBtn = screen.getByRole('button', { name: /Change Test Member/i });
     fireEvent.click(clearBtn);
 
     expect(onSelect).toHaveBeenCalledWith(null);
+  });
+
+  it('renders matching text with mark highlights in suggestions', () => {
+    render(
+      <PaxAutocomplete
+        id="test-pax"
+        label="Test Member"
+        members={mockMembers}
+        selectedMember={null}
+        onSelectMember={vi.fn()}
+      />
+    );
+
+    const input = screen.getByRole('combobox', { name: 'Test Member' });
+    fireEvent.change(input, { target: { value: 'Lock' } });
+
+    const mark = screen.getByText('Lock');
+    expect(mark.tagName.toLowerCase()).toBe('mark');
+    expect(mark).toHaveClass('pax-match-highlight');
   });
 });

@@ -2,6 +2,7 @@ import React from 'react';
 import { render, screen, fireEvent, waitFor, act } from '@testing-library/react';
 import { MemoryRouter } from 'react-router-dom';
 import { describe, it, expect, vi, beforeEach } from 'vitest';
+import { AuthContext, AuthContextType } from '../../../context/AuthContext';
 import ClaimAlias from './ClaimAlias';
 
 const mockPendingRequests = [
@@ -23,12 +24,27 @@ const mockMemberLookup = [
   { memberId: 123, f3Name: 'All PAX' },
 ];
 
+const mockAuthContext = (overrides: Partial<AuthContextType> = {}): AuthContextType => ({
+  token: null,
+  isAuthenticated: false,
+  isAdmin: false,
+  user: null,
+  adminUsername: null,
+  loading: false,
+  error: null,
+  login: vi.fn(),
+  loginWithToken: vi.fn(),
+  logout: vi.fn(),
+  getAuthHeaders: vi.fn().mockReturnValue({}),
+  ...overrides,
+});
+
 describe('ClaimAlias Component', () => {
   beforeEach(() => {
     vi.restoreAllMocks();
   });
 
-  it('renders claim alias form and pending requests queue', async () => {
+  it('renders sign-in prompt and pending requests queue when unauthenticated', async () => {
     vi.spyOn(globalThis, 'fetch').mockImplementation(async (url) => {
       const urlStr = url.toString();
       if (urlStr.includes('/v2/aliases/requests')) {
@@ -47,15 +63,16 @@ describe('ClaimAlias Component', () => {
     });
 
     render(
-      <MemoryRouter>
-        <ClaimAlias />
-      </MemoryRouter>
+      <AuthContext.Provider value={mockAuthContext({ isAuthenticated: false })}>
+        <MemoryRouter>
+          <ClaimAlias />
+        </MemoryRouter>
+      </AuthContext.Provider>
     );
 
     expect(screen.getByText(/Claim Alias/i)).toBeInTheDocument();
-    expect(screen.getByText('Submit an Alias Claim')).toBeInTheDocument();
-    expect(screen.getByText(/1\. Preferred Primary Profile/i)).toBeInTheDocument();
-    expect(screen.getByText(/2\. Alternate \/ Duplicate Name to Merge/i)).toBeInTheDocument();
+    expect(screen.getByText('Sign in to Claim an Alias')).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: /Sign in with Slack/i })).toBeInTheDocument();
 
     await waitFor(() => {
       expect(screen.getByText('Bischoff_Old')).toBeInTheDocument();
@@ -65,7 +82,7 @@ describe('ClaimAlias Component', () => {
     expect(screen.getByText('2 Pending')).toBeInTheDocument();
   });
 
-  it('searches and selects members via autocomplete and submits successfully', async () => {
+  it('renders locked primary profile card for authenticated member and submits alias request', async () => {
     const fetchSpy = vi.spyOn(globalThis, 'fetch').mockImplementation(async (url, init) => {
       const urlStr = url.toString();
       if (urlStr.includes('/v2/aliases/requests')) {
@@ -95,30 +112,29 @@ describe('ClaimAlias Component', () => {
     });
 
     render(
-      <MemoryRouter>
-        <ClaimAlias />
-      </MemoryRouter>
+      <AuthContext.Provider
+        value={mockAuthContext({
+          isAuthenticated: true,
+          isAdmin: false,
+          user: { memberId: 101, f3Name: 'Bischoff', role: 'member' },
+          getAuthHeaders: () => ({ Authorization: 'Bearer mock-jwt-token' }),
+        })}
+      >
+        <MemoryRouter>
+          <ClaimAlias />
+        </MemoryRouter>
+      </AuthContext.Provider>
     );
 
-    await waitFor(() => {
-      expect(screen.getByText('2 Pending')).toBeInTheDocument();
-      expect(screen.getByPlaceholderText('Search your primary F3 name...')).toBeInTheDocument();
-    });
+    // Primary profile card is displayed and locked
+    expect(screen.getByText(/1\. Primary Profile \(Your Account\)/i)).toBeInTheDocument();
+    expect(screen.getByText('🔒 Locked')).toBeInTheDocument();
+    expect(screen.getByText('Member ID #101')).toBeInTheDocument();
 
-    // 1. Search and select primary member
-    const primaryInput = screen.getByPlaceholderText('Search your primary F3 name...');
-    fireEvent.change(primaryInput, { target: { value: 'Bischoff' } });
+    // Primary search input is NOT shown for regular members
+    expect(screen.queryByPlaceholderText('Search your primary F3 name...')).not.toBeInTheDocument();
 
-    await waitFor(() => {
-      expect(screen.getByRole('option', { name: /Bischoff ID #101/i })).toBeInTheDocument();
-    });
-
-    fireEvent.click(screen.getByRole('option', { name: /Bischoff ID #101/i }));
-
-    // Verify primary member chip is selected
-    expect(screen.getByText('#101')).toBeInTheDocument();
-
-    // 2. Search and select alias member
+    // Search and select alias member
     await waitFor(() => {
       expect(screen.getByPlaceholderText('Search the alias or duplicate name...')).toBeInTheDocument();
     });
@@ -126,15 +142,13 @@ describe('ClaimAlias Component', () => {
     fireEvent.change(aliasInput, { target: { value: 'Bischoff_Old' } });
 
     await waitFor(() => {
-      expect(screen.getByRole('option', { name: /Bischoff_Old ID #202/i })).toBeInTheDocument();
+      expect(screen.getByRole('option', { name: /Bischoff_Old.*ID #202/i })).toBeInTheDocument();
     });
 
-    fireEvent.click(screen.getByRole('option', { name: /Bischoff_Old ID #202/i }));
+    fireEvent.click(screen.getByRole('option', { name: /Bischoff_Old.*ID #202/i }));
+    expect(screen.getByText(/ID #202/)).toBeInTheDocument();
 
-    // Verify alias member chip is selected
-    expect(screen.getByText('#202')).toBeInTheDocument();
-
-    // 3. Submit form
+    // Submit form
     const submitBtn = screen.getByRole('button', { name: /Submit Alias Claim Request/i });
     expect(submitBtn).not.toBeDisabled();
 
@@ -150,6 +164,9 @@ describe('ClaimAlias Component', () => {
       expect.stringContaining('/v2/aliases/request'),
       expect.objectContaining({
         method: 'POST',
+        headers: expect.objectContaining({
+          Authorization: 'Bearer mock-jwt-token',
+        }),
         body: JSON.stringify({
           primaryMemberId: 101,
           aliasMemberId: 202,
@@ -158,7 +175,7 @@ describe('ClaimAlias Component', () => {
     );
   });
 
-  it('allows selecting All PAX (ID 123) in autocomplete', async () => {
+  it('allows selecting both primary and alias in autocomplete when authenticated as admin', async () => {
     vi.spyOn(globalThis, 'fetch').mockImplementation(async (url) => {
       const urlStr = url.toString();
       if (urlStr.includes('/v2/aliases/requests')) {
@@ -177,9 +194,17 @@ describe('ClaimAlias Component', () => {
     });
 
     render(
-      <MemoryRouter>
-        <ClaimAlias />
-      </MemoryRouter>
+      <AuthContext.Provider
+        value={mockAuthContext({
+          isAuthenticated: true,
+          isAdmin: true,
+          adminUsername: 'ChiefAdmin',
+        })}
+      >
+        <MemoryRouter>
+          <ClaimAlias />
+        </MemoryRouter>
+      </AuthContext.Provider>
     );
 
     await waitFor(() => {
@@ -193,8 +218,8 @@ describe('ClaimAlias Component', () => {
       expect(screen.getByRole('option', { name: /All PAX ID #123/i })).toBeInTheDocument();
     });
 
-    fireEvent.click(screen.getByRole('option', { name: /All PAX ID #123/i }));
-    expect(screen.getByText('#123')).toBeInTheDocument();
+    fireEvent.click(screen.getByRole('option', { name: /All.*PAX.*ID #123/i }));
+    expect(screen.getByText(/ID #123/)).toBeInTheDocument();
   });
 
   it('handles duplicate conflict error (409) from API', async () => {
@@ -226,22 +251,18 @@ describe('ClaimAlias Component', () => {
     });
 
     render(
-      <MemoryRouter>
-        <ClaimAlias />
-      </MemoryRouter>
+      <AuthContext.Provider
+        value={mockAuthContext({
+          isAuthenticated: true,
+          isAdmin: false,
+          user: { memberId: 101, f3Name: 'Bischoff', role: 'member' },
+        })}
+      >
+        <MemoryRouter>
+          <ClaimAlias />
+        </MemoryRouter>
+      </AuthContext.Provider>
     );
-
-    await waitFor(() => {
-      expect(screen.getByPlaceholderText('Search your primary F3 name...')).toBeInTheDocument();
-    });
-
-    // Select primary
-    const primaryInput = screen.getByPlaceholderText('Search your primary F3 name...');
-    fireEvent.change(primaryInput, { target: { value: 'Bischoff' } });
-    await waitFor(() => {
-      expect(screen.getByRole('option', { name: /Bischoff ID #101/i })).toBeInTheDocument();
-    });
-    fireEvent.click(screen.getByRole('option', { name: /Bischoff ID #101/i }));
 
     // Select alias
     await waitFor(() => {
@@ -306,9 +327,11 @@ describe('ClaimAlias Component', () => {
     });
 
     render(
-      <MemoryRouter>
-        <ClaimAlias />
-      </MemoryRouter>
+      <AuthContext.Provider value={mockAuthContext()}>
+        <MemoryRouter>
+          <ClaimAlias />
+        </MemoryRouter>
+      </AuthContext.Provider>
     );
 
     await waitFor(() => {

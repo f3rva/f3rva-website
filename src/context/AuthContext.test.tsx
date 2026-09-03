@@ -64,7 +64,7 @@ describe('AuthContext & useAuth', () => {
     expect(screen.getByTestId('auth-user').textContent).toBe('admin');
     expect(screen.getByTestId('auth-token').textContent).toBe('mock-jwt-token-xyz');
     expect(screen.getByTestId('auth-header').textContent).toContain('mock-jwt-token-xyz');
-    expect(localStorage.getItem('f3rva_admin_token')).toBe('mock-jwt-token-xyz');
+    expect(localStorage.getItem('f3rva_auth_token')).toBe('mock-jwt-token-xyz');
   });
 
   it('handles login failure and exposes error message', async () => {
@@ -115,14 +115,14 @@ describe('AuthContext & useAuth', () => {
 
     fireEvent.click(screen.getByText('Logout'));
     expect(screen.getByTestId('auth-status').textContent).toBe('unauthenticated');
-    expect(localStorage.getItem('f3rva_admin_token')).toBeNull();
+    expect(localStorage.getItem('f3rva_auth_token')).toBeNull();
   });
 
   it('restores active token from localStorage on mount', () => {
     const futureExpiry = Date.now() + 3600 * 1000;
-    localStorage.setItem('f3rva_admin_token', 'stored-token-123');
-    localStorage.setItem('f3rva_admin_expires_at', futureExpiry.toString());
-    localStorage.setItem('f3rva_admin_username', 'superadmin');
+    localStorage.setItem('f3rva_auth_token', 'stored-token-123');
+    localStorage.setItem('f3rva_auth_expires_at', futureExpiry.toString());
+    localStorage.setItem('f3rva_auth_user', JSON.stringify({ f3Name: 'superadmin', role: 'admin' }));
 
     render(
       <AuthProvider>
@@ -142,8 +142,8 @@ describe('AuthContext & useAuth', () => {
   });
 
   it('proactively logs out when token expires on visibility change', async () => {
-    localStorage.setItem('f3rva_admin_token', 'expired-token');
-    localStorage.setItem('f3rva_admin_expires_at', (Date.now() + 10000).toString());
+    localStorage.setItem('f3rva_auth_token', 'expired-token');
+    localStorage.setItem('f3rva_auth_expires_at', (Date.now() + 10000).toString());
 
     render(
       <AuthProvider>

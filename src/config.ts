@@ -12,11 +12,19 @@ interface Config {
   apiBaseUrl: string;
   /** Timeout for external API requests in milliseconds */
   apiTimeoutMs: number;
+  /** Slack OAuth Client ID for Member Login */
+  slackClientId: string;
+  /** Slack OAuth Redirect URI */
+  slackRedirectUri: string;
 }
 
 export const config: Config = {
   apiBaseUrl: import.meta.env.VITE_API_BASE_URL || 'http://localhost:8000',
   apiTimeoutMs: 10000,
+  slackClientId: import.meta.env.VITE_SLACK_CLIENT_ID || '',
+  slackRedirectUri:
+    import.meta.env.VITE_SLACK_REDIRECT_URI ||
+    (typeof window !== 'undefined' ? `${window.location.origin}/auth/slack/callback` : '/auth/slack/callback'),
 };
 
 // Validate required environment variables in development

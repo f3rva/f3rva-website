@@ -10,6 +10,7 @@ import { isValidYear, isValidMonth, isValidDay, isValidSlug } from '../../utils/
 import SEO from '../../components/SEO';
 import LoadingSpinner from '../../components/LoadingSpinner/LoadingSpinner';
 import { useFetch } from '../../hooks/useFetch';
+import { useAuth } from '../../hooks/useAuth';
 import './ArchivePost.css';
 
 /**
@@ -24,6 +25,7 @@ const ArchivePost: React.FC = () => {
     day: string;
     slug: string;
   }>();
+  const { isAuthenticated, user, isAdmin } = useAuth();
 
   // Validate parameters and format
   const isValidParams = year && month && day && slug;
@@ -67,6 +69,11 @@ const ArchivePost: React.FC = () => {
     return <Navigate to="/404" replace />;
   }
 
+  const canEdit = Boolean(
+    isAuthenticated &&
+      (isAdmin || user?.f3Name === post.author || post.q?.some((q) => q.f3Name === user?.f3Name))
+  );
+
   return (
     <>
       <SEO
@@ -83,6 +90,18 @@ const ArchivePost: React.FC = () => {
       <article className="archive-post-container">
         {/* Post Header with Metadata */}
         <header className="post-header-section">
+          {canEdit && (
+            <div className="post-edit-bar">
+              <Link
+                to={`/backblast/edit/${post.workoutId}`}
+                className="archive-edit-workout-btn"
+                aria-label="Edit Workout"
+              >
+                Edit Workout ✎
+              </Link>
+            </div>
+          )}
+
           <h1 className="post-main-title">{post.title}</h1>
 
           <div className="post-metadata-grid">

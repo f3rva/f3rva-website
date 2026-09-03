@@ -284,3 +284,129 @@
     transform: translateY(0);
   }
 }
+
+/* Authenticated Primary Profile Card */
+.claim-alias-primary-card {
+  background: #f8fafc;
+  border: 1px solid #cbd5e1;
+  border-radius: 8px;
+  padding: 1rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.6rem;
+}
+
+.claim-alias-primary-card-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.claim-alias-step-label {
+  font-weight: 600;
+  font-size: 0.95rem;
+  color: #1e293b;
+}
+
+.claim-alias-locked-badge {
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: #64748b;
+  background: #e2e8f0;
+  padding: 0.15rem 0.5rem;
+  border-radius: 4px;
+}
+
+.claim-alias-primary-card-body {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.claim-alias-avatar {
+  width: 38px;
+  height: 38px;
+  border-radius: 50%;
+  background-color: #2563eb;
+  color: #ffffff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 700;
+  font-size: 1.05rem;
+  flex-shrink: 0;
+}
+
+.claim-alias-primary-info {
+  display: flex;
+  flex-direction: column;
+}
+
+.claim-alias-primary-name {
+  font-size: 1.05rem;
+  color: #0f172a;
+}
+
+.claim-alias-primary-id {
+  font-size: 0.8rem;
+  color: #64748b;
+}
+
+.claim-alias-primary-hint {
+  font-size: 0.82rem;
+  color: #64748b;
+  margin: 0;
+  line-height: 1.4;
+}
+
+/* Unauthenticated Auth Prompt */
+.claim-alias-auth-prompt {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  padding: 2.25rem 1.5rem;
+  gap: 0.75rem;
+}
+
+.auth-prompt-icon {
+  font-size: 2.5rem;
+  margin-bottom: 0.25rem;
+}
+
+.auth-prompt-title {
+  font-size: 1.25rem;
+  font-weight: 700;
+  color: #1e293b;
+  margin: 0;
+}
+
+.auth-prompt-desc {
+  font-size: 0.92rem;
+  color: #64748b;
+  margin: 0 0 0.75rem;
+  line-height: 1.5;
+  max-width: 380px;
+}
+
+.claim-alias-login-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  background-color: #4a154b;
+  color: #ffffff;
+  font-weight: 600;
+  font-size: 0.95rem;
+  padding: 0.75rem 1.5rem;
+  border-radius: 8px;
+  border: none;
+  cursor: pointer;
+  transition: background-color 0.15s ease, transform 0.1s ease;
+  min-height: 44px;
+}
+
+.claim-alias-login-btn:hover {
+  background-color: #3b113c;
+  transform: translateY(-1px);
+}

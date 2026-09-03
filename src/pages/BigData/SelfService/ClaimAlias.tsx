@@ -3,6 +3,7 @@ import { Link } from 'react-router-dom';
 import { config } from '../../../config';
 import { MemberSummary, AliasRequestResponse, ApiErrorResponse } from '../../../types/bigdata';
 import { useFetch } from '../../../hooks/useFetch';
+import { useAuth } from '../../../hooks/useAuth';
 import LoadingSpinner from '../../../components/LoadingSpinner/LoadingSpinner';
 import BigDataPageHeader from '../../../components/BigDataPageHeader';
 import SEO from '../../../components/SEO';
@@ -12,6 +13,8 @@ import '../BigData.css';
 import './ClaimAlias.css';
 
 export const ClaimAlias: React.FC = () => {
+  const { isAuthenticated, isAdmin, user, getAuthHeaders } = useAuth();
+
   // Form state
   const [primaryMember, setPrimaryMember] = useState<MemberSummary | null>(null);
   const [aliasMember, setAliasMember] = useState<MemberSummary | null>(null);
@@ -24,6 +27,22 @@ export const ClaimAlias: React.FC = () => {
   // Fetch all registered members for fast client-side autocomplete
   const membersUrl = `${config.apiBaseUrl}/v2/members`;
   const { data: allMembers, loading: loadingMembers } = useFetch<MemberSummary[]>(membersUrl);
+
+  // Determine effective primary member (auto-locked to authenticated member if regular user)
+  const effectivePrimaryMember = useMemo<MemberSummary | null>(() => {
+    if (!isAdmin && user?.memberId) {
+      return { memberId: user.memberId, f3Name: user.f3Name };
+    }
+    return primaryMember;
+  }, [isAdmin, user, primaryMember]);
+
+  // Exclude primary member from alias choices so a member cannot alias to themselves
+  const availableAliasMembers = useMemo(() => {
+    if (!allMembers) return [];
+    const primaryId = effectivePrimaryMember?.memberId;
+    if (!primaryId) return allMembers;
+    return allMembers.filter((m) => m.memberId !== primaryId);
+  }, [allMembers, effectivePrimaryMember]);
 
   // Fetch pending alias requests
   const [fetchKey, setFetchKey] = useState<number>(0);
@@ -48,13 +67,26 @@ export const ClaimAlias: React.FC = () => {
     );
   }, [pendingRequests, queueFilter]);
 
+  const handleSlackLogin = useCallback(() => {
+    sessionStorage.setItem('f3rva_auth_return_to', window.location.pathname);
+    if (config.slackClientId) {
+      window.location.href = `https://slack.com/openid/connect/authorize?response_type=code&scope=openid%20profile%20email&client_id=${encodeURIComponent(
+        config.slackClientId
+      )}&redirect_uri=${encodeURIComponent(config.slackRedirectUri)}&state=${encodeURIComponent(
+        window.location.pathname
+      )}`;
+    }
+  }, []);
+
   const handleSubmit = useCallback(
     async (e: React.FormEvent) => {
       e.preventDefault();
       setAlert(null);
 
+      const targetPrimary = effectivePrimaryMember;
+
       // Client-side validation
-      if (!primaryMember || !aliasMember) {
+      if (!targetPrimary || !aliasMember) {
         setAlert({
           type: 'error',
           message: 'Please select both your primary profile and the alias record to merge.',
@@ -62,7 +94,7 @@ export const ClaimAlias: React.FC = () => {
         return;
       }
 
-      if (primaryMember.memberId === aliasMember.memberId) {
+      if (targetPrimary.memberId === aliasMember.memberId) {
         setAlert({
           type: 'error',
           message: 'Primary member and alias member cannot be the same record.',
@@ -77,37 +109,40 @@ export const ClaimAlias: React.FC = () => {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',
+            ...getAuthHeaders(),
           },
           body: JSON.stringify({
-            primaryMemberId: primaryMember.memberId,
+            primaryMemberId: targetPrimary.memberId,
             aliasMemberId: aliasMember.memberId,
           }),
         });
 
         if (response.ok) {
           trackClaimAliasSubmit({
-            primaryMemberId: primaryMember.memberId,
-            primaryMemberName: primaryMember.f3Name,
+            primaryMemberId: targetPrimary.memberId,
+            primaryMemberName: targetPrimary.f3Name,
             aliasMemberId: aliasMember.memberId,
             aliasMemberName: aliasMember.f3Name,
           });
 
           setAlert({
             type: 'success',
-            message: `Alias claim request for "${aliasMember.f3Name}" into "${primaryMember.f3Name}" submitted successfully! An administrator will review and merge the records.`,
+            message: `Alias claim request for "${aliasMember.f3Name}" into "${targetPrimary.f3Name}" submitted successfully! An administrator will review and merge the records.`,
           });
           // Update pending queue
           setPendingRequests((prev) => [
             {
-              primaryMember: { memberId: primaryMember.memberId, f3Name: primaryMember.f3Name },
+              primaryMember: { memberId: targetPrimary.memberId, f3Name: targetPrimary.f3Name },
               aliasMember: { memberId: aliasMember.memberId, f3Name: aliasMember.f3Name },
               status: 'pending',
             },
             ...(prev || []),
           ]);
           setFetchKey((k) => k + 1);
-          // Clear form inputs
-          setPrimaryMember(null);
+          // Clear inputs
+          if (isAdmin) {
+            setPrimaryMember(null);
+          }
           setAliasMember(null);
         } else {
           const errData: ApiErrorResponse = await response.json().catch(() => ({
@@ -130,7 +165,7 @@ export const ClaimAlias: React.FC = () => {
         setSubmitting(false);
       }
     },
-    [primaryMember, aliasMember, setPendingRequests]
+    [effectivePrimaryMember, aliasMember, setPendingRequests, getAuthHeaders, isAdmin]
   );
 
   return (
@@ -168,7 +203,7 @@ export const ClaimAlias: React.FC = () => {
         />
 
         <div className="claim-alias-grid">
-          {/* Left Column: Submission Form */}
+          {/* Left Column: Submission Form or Sign-in Prompt */}
           <div className="bigdata-card">
             <div className="bigdata-card-header" style={{ marginBottom: '1.25rem' }}>
               <div>
@@ -190,41 +225,79 @@ export const ClaimAlias: React.FC = () => {
               </div>
             )}
 
-            <form onSubmit={handleSubmit} className="claim-alias-form">
-              <PaxAutocomplete
-                id="primary-member-select"
-                label="1. Preferred Primary Profile"
-                placeholder="Search your primary F3 name..."
-                helpText="The main profile that will retain your combined workout attendance and stats."
-                members={allMembers || []}
-                loadingMembers={loadingMembers}
-                selectedMember={primaryMember}
-                onSelectMember={setPrimaryMember}
-                disabled={submitting}
-              />
-
-              <PaxAutocomplete
-                id="alias-member-select"
-                label="2. Alternate / Duplicate Name to Merge"
-                placeholder="Search the alias or duplicate name..."
-                helpText="The secondary name or typo that should be linked and merged into your primary profile."
-                members={allMembers || []}
-                loadingMembers={loadingMembers}
-                selectedMember={aliasMember}
-                onSelectMember={setAliasMember}
-                disabled={submitting}
-              />
-
-              <div style={{ marginTop: '0.5rem' }}>
+            {!isAuthenticated ? (
+              <div className="claim-alias-auth-prompt">
+                <div className="auth-prompt-icon">🔐</div>
+                <h3 className="auth-prompt-title">Sign in to Claim an Alias</h3>
+                <p className="auth-prompt-desc">
+                  Please sign in with your Slack account to claim duplicate attendance records and link alternate F3 names to your profile.
+                </p>
                 <button
-                  type="submit"
-                  className="claim-alias-submit-btn"
-                  disabled={submitting || !primaryMember || !aliasMember}
+                  type="button"
+                  className="claim-alias-login-btn"
+                  onClick={handleSlackLogin}
                 >
-                  {submitting ? 'Submitting Request...' : 'Submit Alias Claim Request'}
+                  Sign in with Slack
                 </button>
               </div>
-            </form>
+            ) : (
+              <form onSubmit={handleSubmit} className="claim-alias-form">
+                {!isAdmin && user ? (
+                  <div className="claim-alias-primary-card">
+                    <div className="claim-alias-primary-card-header">
+                      <span className="claim-alias-step-label">1. Primary Profile (Your Account)</span>
+                      <span className="claim-alias-locked-badge">🔒 Locked</span>
+                    </div>
+                    <div className="claim-alias-primary-card-body">
+                      <div className="claim-alias-avatar">
+                        {user.f3Name ? user.f3Name.charAt(0).toUpperCase() : '👤'}
+                      </div>
+                      <div className="claim-alias-primary-info">
+                        <strong className="claim-alias-primary-name">{user.f3Name}</strong>
+                        <span className="claim-alias-primary-id">Member ID #{user.memberId}</span>
+                      </div>
+                    </div>
+                    <p className="claim-alias-primary-hint">
+                      All attendance and historical Qs from the claimed duplicate will be consolidated into your profile.
+                    </p>
+                  </div>
+                ) : (
+                  <PaxAutocomplete
+                    id="primary-member-select"
+                    label="1. Preferred Primary Profile (Admin Selection)"
+                    placeholder="Search your primary F3 name..."
+                    helpText="The main profile that will retain your combined workout attendance and stats."
+                    members={allMembers || []}
+                    loadingMembers={loadingMembers}
+                    selectedMember={primaryMember}
+                    onSelectMember={setPrimaryMember}
+                    disabled={submitting}
+                  />
+                )}
+
+                <PaxAutocomplete
+                  id="alias-member-select"
+                  label={isAdmin ? '2. Alternate / Duplicate Name to Merge' : '2. Select Duplicate Profile / Alias to Claim'}
+                  placeholder="Search the alias or duplicate name..."
+                  helpText="The secondary name or typo that should be linked and merged into your primary profile."
+                  members={availableAliasMembers}
+                  loadingMembers={loadingMembers}
+                  selectedMember={aliasMember}
+                  onSelectMember={setAliasMember}
+                  disabled={submitting}
+                />
+
+                <div style={{ marginTop: '0.5rem' }}>
+                  <button
+                    type="submit"
+                    className="claim-alias-submit-btn"
+                    disabled={submitting || !effectivePrimaryMember || !aliasMember}
+                  >
+                    {submitting ? 'Submitting Request...' : 'Submit Alias Claim Request'}
+                  </button>
+                </div>
+              </form>
+            )}
 
             <div style={{ marginTop: '1.5rem', padding: '1rem', background: '#f8fafc', borderRadius: '8px', border: '1px solid #e2e8f0', fontSize: '0.85rem', color: '#64748b' }}>
               <strong style={{ color: '#1e293b' }}>💡 How it works:</strong>

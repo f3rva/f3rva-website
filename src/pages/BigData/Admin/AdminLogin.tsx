@@ -8,7 +8,7 @@ import '../BigData.css';
 import './Admin.css';
 
 export const AdminLogin: React.FC = () => {
-  const { isAuthenticated, adminUsername, login, logout, error: authError } = useAuth();
+  const { isAdmin, user, adminUsername, login, logout, error: authError } = useAuth();
   const [username, setUsername] = useState<string>('');
   const [password, setPassword] = useState<string>('');
   const [loading, setLoading] = useState<boolean>(false);
@@ -34,7 +34,7 @@ export const AdminLogin: React.FC = () => {
     setLoading(false);
 
     if (success) {
-      navigate(from, { replace: true });
+      navigate(from || '/bigdata/admin/alias-requests', { replace: true });
     }
   };
 
@@ -65,12 +65,12 @@ export const AdminLogin: React.FC = () => {
         />
 
         <div className="admin-login-card">
-          {isAuthenticated ? (
+          {isAdmin ? (
             <div style={{ textAlign: 'center' }}>
-              <div style={{ fontSize: '2.5rem', marginBottom: '0.5rem' }}>🔒</div>
+              <div style={{ fontSize: '2.5rem', marginBottom: '0.5rem' }}>🛡️</div>
               <h2 className="admin-login-title">Already Authenticated</h2>
               <p className="admin-login-subtitle">
-                You are currently signed in as <strong>{adminUsername || 'admin'}</strong>.
+                You are currently signed in as Administrator <strong>{adminUsername || 'Admin'}</strong>.
               </p>
               <div style={{ display: 'flex', flexDirection: 'column', gap: '0.75rem', marginTop: '1.5rem' }}>
                 <Link
@@ -92,10 +92,27 @@ export const AdminLogin: React.FC = () => {
             </div>
           ) : (
             <form onSubmit={handleSubmit}>
-              <h2 className="admin-login-title">Sign In</h2>
+              <h2 className="admin-login-title">Sign In as Admin</h2>
               <p className="admin-login-subtitle">
-                Enter your credentials to manage F3 RVA Big Data.
+                Enter your administrator credentials to access management tools.
               </p>
+
+              {user && !isAdmin && (
+                <div
+                  style={{
+                    backgroundColor: '#eff6ff',
+                    border: '1px solid #bfdbfe',
+                    color: '#1e40af',
+                    padding: '0.75rem 1rem',
+                    borderRadius: '8px',
+                    fontSize: '0.9rem',
+                    marginBottom: '1.25rem',
+                    lineHeight: '1.4',
+                  }}
+                >
+                  ℹ️ Currently signed in as <strong>{user.f3Name}</strong>. Signing in here will switch your session to Administrator.
+                </div>
+              )}
 
               {(localError || authError) && (
                 <div
@@ -144,7 +161,7 @@ export const AdminLogin: React.FC = () => {
                 className="admin-form-submit"
                 disabled={loading}
               >
-                {loading ? 'Authenticating...' : 'Sign In'}
+                {loading ? 'Authenticating...' : 'Sign In as Admin'}
               </button>
             </form>
           )}
