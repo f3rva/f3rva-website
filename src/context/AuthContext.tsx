@@ -23,11 +23,6 @@ const TOKEN_STORAGE_KEY = 'f3rva_auth_token';
 const EXPIRY_STORAGE_KEY = 'f3rva_auth_expires_at';
 const USER_STORAGE_KEY = 'f3rva_auth_user';
 
-// Legacy keys for backwards compatibility
-const LEGACY_TOKEN_STORAGE_KEY = 'f3rva_admin_token';
-const LEGACY_EXPIRY_STORAGE_KEY = 'f3rva_admin_expires_at';
-const LEGACY_USER_STORAGE_KEY = 'f3rva_admin_username';
-
 interface AuthProviderProps {
   children: React.ReactNode;
 }
@@ -48,9 +43,6 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
       localStorage.removeItem(TOKEN_STORAGE_KEY);
       localStorage.removeItem(EXPIRY_STORAGE_KEY);
       localStorage.removeItem(USER_STORAGE_KEY);
-      localStorage.removeItem(LEGACY_TOKEN_STORAGE_KEY);
-      localStorage.removeItem(LEGACY_EXPIRY_STORAGE_KEY);
-      localStorage.removeItem(LEGACY_USER_STORAGE_KEY);
     } catch {
       // Ignore localStorage access failures in restricted environments
     }
@@ -67,9 +59,6 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
       localStorage.setItem(TOKEN_STORAGE_KEY, newToken);
       localStorage.setItem(EXPIRY_STORAGE_KEY, expiryTimestamp.toString());
       localStorage.setItem(USER_STORAGE_KEY, JSON.stringify(newUser));
-      localStorage.setItem(LEGACY_TOKEN_STORAGE_KEY, newToken);
-      localStorage.setItem(LEGACY_EXPIRY_STORAGE_KEY, expiryTimestamp.toString());
-      localStorage.setItem(LEGACY_USER_STORAGE_KEY, newUser.f3Name);
     } catch {
       // Storage restricted
     }
@@ -78,10 +67,9 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
   // Initialize and validate token from localStorage on mount
   useEffect(() => {
     try {
-      const savedToken = localStorage.getItem(TOKEN_STORAGE_KEY) || localStorage.getItem(LEGACY_TOKEN_STORAGE_KEY);
-      const savedExpiry = localStorage.getItem(EXPIRY_STORAGE_KEY) || localStorage.getItem(LEGACY_EXPIRY_STORAGE_KEY);
+      const savedToken = localStorage.getItem(TOKEN_STORAGE_KEY);
+      const savedExpiry = localStorage.getItem(EXPIRY_STORAGE_KEY);
       const savedUserStr = localStorage.getItem(USER_STORAGE_KEY);
-      const savedLegacyUser = localStorage.getItem(LEGACY_USER_STORAGE_KEY);
 
       if (savedToken && savedExpiry) {
         const expiryTime = parseInt(savedExpiry, 10);
@@ -93,10 +81,8 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
             try {
               setUser(JSON.parse(savedUserStr));
             } catch {
-              setUser({ f3Name: savedLegacyUser || 'admin', role: 'admin' });
+              setUser({ f3Name: 'admin', role: 'admin' });
             }
-          } else if (savedLegacyUser) {
-            setUser({ f3Name: savedLegacyUser, role: 'admin' });
           } else {
             setUser({ f3Name: 'admin', role: 'admin' });
           }

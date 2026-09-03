@@ -73,8 +73,6 @@ describe('Admin Portal Components', () => {
       localStorage.setItem('f3rva_auth_token', 'admin-token');
       localStorage.setItem('f3rva_auth_expires_at', (Date.now() + 3600000).toString());
       localStorage.setItem('f3rva_auth_user', JSON.stringify({ memberId: 0, f3Name: 'ChiefAdmin', role: 'admin' }));
-      localStorage.setItem('f3rva_admin_token', 'admin-token');
-      localStorage.setItem('f3rva_admin_username', 'ChiefAdmin');
 
       render(
         <MemoryRouter>
@@ -175,9 +173,9 @@ describe('Admin Portal Components', () => {
   describe('AdminAliasRequests Component', () => {
     beforeEach(() => {
       // Set authenticated admin token
-      localStorage.setItem('f3rva_admin_token', 'test_token');
-      localStorage.setItem('f3rva_admin_expires_at', (Date.now() + 3600000).toString());
-      localStorage.setItem('f3rva_admin_username', 'admin');
+      localStorage.setItem('f3rva_auth_token', 'test_token');
+      localStorage.setItem('f3rva_auth_expires_at', (Date.now() + 3600000).toString());
+      localStorage.setItem('f3rva_auth_user', JSON.stringify({ memberId: 0, f3Name: 'admin', role: 'admin' }));
     });
 
     it('renders pending requests and approves a request', async () => {
@@ -307,9 +305,9 @@ describe('Admin Portal Components', () => {
 
   describe('AdminManagePax Component', () => {
     beforeEach(() => {
-      localStorage.setItem('f3rva_admin_token', 'test_token');
-      localStorage.setItem('f3rva_admin_expires_at', (Date.now() + 3600000).toString());
-      localStorage.setItem('f3rva_admin_username', 'admin');
+      localStorage.setItem('f3rva_auth_token', 'test_token');
+      localStorage.setItem('f3rva_auth_expires_at', (Date.now() + 3600000).toString());
+      localStorage.setItem('f3rva_auth_user', JSON.stringify({ memberId: 0, f3Name: 'admin', role: 'admin' }));
     });
 
     it('renders direct merger tool and member directory browser', async () => {
