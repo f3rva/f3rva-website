@@ -57,7 +57,7 @@ describe('MainNavigationHeader Component', () => {
     expect(screen.getByText('Attendance Leaderboard')).toBeInTheDocument();
     expect(screen.getByText('AO Analytics')).toBeInTheDocument();
     expect(screen.getByText('Day of Week')).toBeInTheDocument();
-    expect(screen.getByText('Claim PAX Alias')).toBeInTheDocument();
+    expect(screen.queryByText('Member Tools')).not.toBeInTheDocument();
   });
 
   it('toggles Log In dropdown menu when clicked and displays Slack and Admin options', () => {
@@ -105,9 +105,10 @@ describe('MainNavigationHeader Component', () => {
     fireEvent.click(userBadge);
     expect(userBadge).toHaveAttribute('aria-expanded', 'true');
 
-    // Shows Post Backblast and personal stats link
+    // Shows Post Backblast, personal stats link, and Claim PAX Alias
     expect(screen.getAllByText('Post Backblast')[0]).toBeInTheDocument();
     expect(screen.getAllByText('My Stats & Profile')[0]).toBeInTheDocument();
+    expect(screen.getAllByText('Claim PAX Alias')[0]).toBeInTheDocument();
     expect(screen.queryByText(/Admin Portal/i)).not.toBeInTheDocument();
 
     const logoutBtns = screen.getAllByRole('button', { name: /Log Out/i });
@@ -253,6 +254,7 @@ describe('MainNavigationHeader Component', () => {
     // Reveals member options inside mobile drawer
     expect(screen.getAllByText('Post Backblast').length).toBeGreaterThan(0);
     expect(screen.getAllByText('My Stats & Profile').length).toBeGreaterThan(0);
+    expect(screen.getAllByText('Claim PAX Alias').length).toBeGreaterThan(0);
   });
 });
 

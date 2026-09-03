@@ -199,16 +199,6 @@ const MainNavigationHeader: React.FC = () => {
                     <span className="dropdown-link-desc">Attendance volume by weekday</span>
                   </div>
                 </Link>
-
-                <div className="dropdown-divider"></div>
-
-                <div className="dropdown-category-title">Member Tools</div>
-                <Link to="/bigdata/claim-alias" className="dropdown-link" role="menuitem" onClick={closeMenu}>
-                  <div className="dropdown-link-content">
-                    <span className="dropdown-link-title">Claim PAX Alias</span>
-                    <span className="dropdown-link-desc">Link duplicate PAX names</span>
-                  </div>
-                </Link>
               </div>
             </li>
           </ul>
@@ -268,17 +258,30 @@ const MainNavigationHeader: React.FC = () => {
 
                 {/* Member Profile Stats */}
                 {!isAdmin && user?.memberId && (
-                  <Link
-                    to={`/bigdata/pax/${user.memberId}`}
-                    className="user-dropdown-link"
-                    role="menuitem"
-                    onClick={closeMenu}
-                  >
-                    <div className="dropdown-link-content">
-                      <span className="dropdown-link-title">My Stats & Profile</span>
-                      <span className="dropdown-link-desc">Personal attendance & streaks</span>
-                    </div>
-                  </Link>
+                  <>
+                    <Link
+                      to={`/bigdata/pax/${user.memberId}`}
+                      className="user-dropdown-link"
+                      role="menuitem"
+                      onClick={closeMenu}
+                    >
+                      <div className="dropdown-link-content">
+                        <span className="dropdown-link-title">My Stats & Profile</span>
+                        <span className="dropdown-link-desc">Personal attendance & streaks</span>
+                      </div>
+                    </Link>
+                    <Link
+                      to="/bigdata/claim-alias"
+                      className="user-dropdown-link"
+                      role="menuitem"
+                      onClick={closeMenu}
+                    >
+                      <div className="dropdown-link-content">
+                        <span className="dropdown-link-title">Claim PAX Alias</span>
+                        <span className="dropdown-link-desc">Merge duplicate attendance records</span>
+                      </div>
+                    </Link>
+                  </>
                 )}
 
                 {/* Admin Portal & Tools */}
@@ -305,6 +308,17 @@ const MainNavigationHeader: React.FC = () => {
                       <div className="dropdown-link-content">
                         <span className="dropdown-link-title">Manage PAX</span>
                         <span className="dropdown-link-desc">Merge & organize member records</span>
+                      </div>
+                    </Link>
+                    <Link
+                      to="/bigdata/claim-alias"
+                      className="user-dropdown-link"
+                      role="menuitem"
+                      onClick={closeMenu}
+                    >
+                      <div className="dropdown-link-content">
+                        <span className="dropdown-link-title">Claim PAX Alias</span>
+                        <span className="dropdown-link-desc">Merge duplicate attendance records</span>
                       </div>
                     </Link>
                   </>
@@ -456,9 +470,6 @@ const MainNavigationHeader: React.FC = () => {
                 <Link to="/bigdata/day-of-week" className="mobile-sublink" onClick={closeMenu}>
                   Day of Week
                 </Link>
-                <Link to="/bigdata/claim-alias" className="mobile-sublink" onClick={closeMenu}>
-                  Claim PAX Alias
-                </Link>
               </div>
             )}
           </li>
@@ -506,6 +517,9 @@ const MainNavigationHeader: React.FC = () => {
                         </Link>
                       </>
                     )}
+                    <Link to="/bigdata/claim-alias" className="mobile-sublink" onClick={closeMenu}>
+                      Claim PAX Alias
+                    </Link>
                     <button
                       type="button"
                       className="mobile-sublink mobile-btn-link text-danger"
