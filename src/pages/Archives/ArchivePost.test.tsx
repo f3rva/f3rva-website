@@ -116,6 +116,49 @@ describe('ArchivePost Page', () => {
     expect(screen.getByText(/Posted by:/i)).toBeInTheDocument();
   });
 
+  it('renders rich text elements including headings, blockquotes, and lists', async () => {
+    const richPost: WorkoutPost = {
+      ...mockPost,
+      content: `
+        <h2>The Thang</h2>
+        <p>Warmup completed.</p>
+        <h3>COP</h3>
+        <ul>
+          <li>Burpees</li>
+          <li>Merkins</li>
+        </ul>
+        <blockquote><p>He who says things is often heard</p></blockquote>
+      `,
+    };
+
+    mockFetch.mockResolvedValue({
+      ok: true,
+      json: async () => richPost,
+    });
+
+    renderComponent();
+
+    await waitFor(() => {
+      expect(screen.queryByText('Loading post...')).not.toBeInTheDocument();
+    });
+
+    // Check headings
+    const h2 = screen.getByRole('heading', { level: 2, name: 'The Thang' });
+    expect(h2).toBeInTheDocument();
+
+    const h3 = screen.getByRole('heading', { level: 3, name: 'COP' });
+    expect(h3).toBeInTheDocument();
+
+    // Check list items
+    expect(screen.getByText('Burpees')).toBeInTheDocument();
+    expect(screen.getByText('Merkins')).toBeInTheDocument();
+
+    // Check blockquote
+    const quote = screen.getByText('He who says things is often heard');
+    expect(quote).toBeInTheDocument();
+    expect(quote.closest('blockquote')).not.toBeNull();
+  });
+
   it('handles API errors gracefully', async () => {
     mockFetch.mockRejectedValue(new Error('API Failure'));
 
