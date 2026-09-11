@@ -155,7 +155,7 @@ export const WorkoutDetail: React.FC = () => {
         {/* Full PAX Attendee Roster Card */}
         <div className="bigdata-card">
           <div className="bigdata-card-header">
-            <h2 className="bigdata-card-title">👥 PAX Attendee Roster ({workout.pax?.length || workout.paxCount || 0})</h2>
+            <h2 className="bigdata-card-title">PAX Attendee Roster ({workout.pax?.length || workout.paxCount || 0})</h2>
             <span style={{ fontSize: '0.85rem', color: '#64748b' }}>
               Click any member to view their individual profile, streak & posting history
             </span>
@@ -220,6 +220,128 @@ export const WorkoutDetail: React.FC = () => {
             </div>
           )}
         </div>
+
+        {/* FNGs Card if present */}
+        {workout.fngs && workout.fngs.length > 0 && (
+          <div className="bigdata-card" style={{ marginTop: '1.5rem' }}>
+            <div className="bigdata-card-header">
+              <h2 className="bigdata-card-title">Friendly New Guys (FNGs) ({workout.fngs.length})</h2>
+              <span style={{ fontSize: '0.85rem', color: '#64748b' }}>
+                First-time participants at this beatdown
+              </span>
+            </div>
+            <div
+              style={{
+                display: 'grid',
+                gridTemplateColumns: 'repeat(auto-fill, minmax(210px, 1fr))',
+                gap: '0.75rem',
+              }}
+            >
+              {workout.fngs.map((fng) => (
+                <Link
+                  key={`fng-${fng.memberId}`}
+                  to={`/bigdata/pax/${fng.memberId}`}
+                  style={{
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: '0.65rem',
+                    background: '#f0fdf4',
+                    border: '1px solid #bbf7d0',
+                    borderRadius: '8px',
+                    padding: '0.65rem 0.85rem',
+                    textDecoration: 'none',
+                    color: '#1e293b',
+                    boxShadow: '0 1px 3px rgba(0,0,0,0.05)',
+                    transition: 'all 0.15s ease',
+                  }}
+                >
+                  <div
+                    style={{
+                      width: '32px',
+                      height: '32px',
+                      borderRadius: '50%',
+                      background: '#22c55e',
+                      color: '#ffffff',
+                      fontWeight: 700,
+                      fontSize: '0.85rem',
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                      flexShrink: 0,
+                    }}
+                  >
+                    {fng.f3Name.charAt(0).toUpperCase()}
+                  </div>
+                  <div style={{ overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+                    <span style={{ fontWeight: 600, fontSize: '0.95rem', color: '#1e293b' }}>{fng.f3Name}</span>
+                    <span style={{ fontSize: '0.75rem', color: '#15803d', display: 'block', fontWeight: 600 }}>FNG</span>
+                  </div>
+                </Link>
+              ))}
+            </div>
+          </div>
+        )}
+
+        {/* Downrange PAX Card if present */}
+        {workout.drs && workout.drs.length > 0 && (
+          <div className="bigdata-card" style={{ marginTop: '1.5rem' }}>
+            <div className="bigdata-card-header">
+              <h2 className="bigdata-card-title">Downrange PAX ({workout.drs.length})</h2>
+              <span style={{ fontSize: '0.85rem', color: '#64748b' }}>
+                Visiting PAX from other regions
+              </span>
+            </div>
+            <div
+              style={{
+                display: 'grid',
+                gridTemplateColumns: 'repeat(auto-fill, minmax(210px, 1fr))',
+                gap: '0.75rem',
+              }}
+            >
+              {workout.drs.map((dr) => (
+                <Link
+                  key={`dr-${dr.memberId}`}
+                  to={`/bigdata/pax/${dr.memberId}`}
+                  style={{
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: '0.65rem',
+                    background: '#eff6ff',
+                    border: '1px solid #bfdbfe',
+                    borderRadius: '8px',
+                    padding: '0.65rem 0.85rem',
+                    textDecoration: 'none',
+                    color: '#1e293b',
+                    boxShadow: '0 1px 3px rgba(0,0,0,0.05)',
+                    transition: 'all 0.15s ease',
+                  }}
+                >
+                  <div
+                    style={{
+                      width: '32px',
+                      height: '32px',
+                      borderRadius: '50%',
+                      background: '#3b82f6',
+                      color: '#ffffff',
+                      fontWeight: 700,
+                      fontSize: '0.85rem',
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                      flexShrink: 0,
+                    }}
+                  >
+                    {dr.f3Name.charAt(0).toUpperCase()}
+                  </div>
+                  <div style={{ overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+                    <span style={{ fontWeight: 600, fontSize: '0.95rem', color: '#1e293b' }}>{dr.f3Name}</span>
+                    <span style={{ fontSize: '0.75rem', color: '#1d4ed8', display: 'block', fontWeight: 600 }}>Downrange</span>
+                  </div>
+                </Link>
+              ))}
+            </div>
+          </div>
+        )}
       </div>
     </>
   );

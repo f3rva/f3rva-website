@@ -277,4 +277,34 @@ describe('ArchivePost Page', () => {
       expect(screen.getByText('404 Not Found')).toBeInTheDocument();
     });
   });
+
+  it('renders FNGs and Downrange attendees separately from regular PAX when present', async () => {
+    const postWithFngsAndDrs: WorkoutPost = {
+      ...mockPost,
+      fngs: [{ memberId: 10, f3Name: 'Flipper', paxType: 'FNG' }],
+      drs: [{ memberId: 11, f3Name: 'Sparky', isDr: true, paxType: 'DR' }],
+    };
+
+    mockFetch.mockResolvedValue({
+      ok: true,
+      json: async () => postWithFngsAndDrs,
+    });
+
+    renderComponent();
+
+    await waitFor(() => {
+      expect(screen.getByText('Morning Beatdown at the Zoo')).toBeInTheDocument();
+    });
+
+    // Verify PAX label and members
+    expect(screen.getByText(/PAX \(3\)/)).toBeInTheDocument();
+
+    // Verify FNG section
+    expect(screen.getByText(/FNGs \(1\)/)).toBeInTheDocument();
+    expect(screen.getByText('Flipper')).toBeInTheDocument();
+
+    // Verify Downrange section
+    expect(screen.getByText(/Downrange \(1\)/)).toBeInTheDocument();
+    expect(screen.getByText('Sparky')).toBeInTheDocument();
+  });
 });

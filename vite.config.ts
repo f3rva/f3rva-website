@@ -15,6 +15,11 @@ export default defineConfig({
     globals: true,
     environment: 'jsdom',
     setupFiles: './src/setupTests.js',
+    poolOptions: {
+      threads: {
+        maxThreads: 4,
+      },
+    },
   },
   define: {
     global: 'globalThis',

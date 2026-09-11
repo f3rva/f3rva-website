@@ -20,6 +20,7 @@ export interface AOSummary {
 export interface MemberSummary {
   memberId: number;
   f3Name: string;
+  isDr?: boolean;
 }
 
 /**
@@ -212,6 +213,8 @@ export interface AddWorkoutPayload {
   workoutDate: string;
   qic: string[] | string;
   pax: string[] | string;
+  fngs?: string[] | string;
+  drs?: string[] | string;
   aos: (AOInput | string)[];
   body?: string | null;
   url?: string | null;
@@ -227,6 +230,8 @@ export interface UpdateWorkoutPayload {
   workoutDate: string;
   qic: string[] | string;
   pax: string[] | string;
+  fngs?: string[] | string;
+  drs?: string[] | string;
   aos: (AOInput | string)[];
   body?: string | null;
   url?: string | null;

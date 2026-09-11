@@ -22,6 +22,8 @@ export interface WorkoutAO {
 export interface WorkoutMember {
   memberId: number;
   f3Name: string;
+  isDr?: boolean;
+  paxType?: 'PAX' | 'FNG' | 'DR';
 }
 
 /**
@@ -50,10 +52,16 @@ export interface WorkoutPost {
   /** Array of QICs (Q In Charge - workout leaders) */
   q: WorkoutMember[];
 
-  /** Array of PAX (participants in the workout) - only available in detailed post views */
+  /** Array of regular PAX (participants in the workout) - only available in detailed post views */
   pax?: WorkoutMember[];
 
-  /** Count of PAX participants - available in listing views when pax array is not populated */
+  /** Array of FNGs (first-time attendees) - only available in detailed post views */
+  fngs?: WorkoutMember[];
+
+  /** Array of Downrange PAX (visiting attendees) - only available in detailed post views */
+  drs?: WorkoutMember[];
+
+  /** Count of total PAX participants - available in listing views when pax array is not populated */
   paxCount?: number;
 
   /** Date when the workout occurred (YYYY-MM-DD, date-only string) */
