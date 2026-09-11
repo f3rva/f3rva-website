@@ -14,6 +14,10 @@ interface PaxMultiSelectProps {
   disabled?: boolean;
   maxSelections?: number;
   icon?: React.ReactNode;
+  allowCustom?: boolean;
+  onlyCustom?: boolean;
+  onValidateAdd?: (name: string) => string | null;
+  customBadgeText?: string;
 }
 
 function highlightMatch(text: string, query: string): React.ReactNode {
@@ -31,18 +35,25 @@ function highlightMatch(text: string, query: string): React.ReactNode {
   );
 }
 
+const DEFAULT_MEMBERS: MemberSummary[] = [];
+const DEFAULT_SELECTED_NAMES: string[] = [];
+
 export const PaxMultiSelect: React.FC<PaxMultiSelectProps> = ({
   id,
   label,
   placeholder = 'Type to search or add name...',
   helpText,
-  members = [],
+  members = DEFAULT_MEMBERS,
   loadingMembers = false,
-  selectedNames = [],
+  selectedNames = DEFAULT_SELECTED_NAMES,
   onChange,
   disabled = false,
   maxSelections,
   icon,
+  allowCustom = true,
+  onlyCustom = false,
+  onValidateAdd,
+  customBadgeText,
 }) => {
   const [query, setQuery] = useState<string>('');
   const [suggestions, setSuggestions] = useState<MemberSummary[]>([]);
@@ -58,10 +69,10 @@ export const PaxMultiSelect: React.FC<PaxMultiSelectProps> = ({
   // Search & rank candidates excluding already selected names
   useEffect(() => {
     const trimmed = query.trim().toLowerCase();
-    if (trimmed.length < 1 || isAtMax) {
-      setSuggestions([]);
-      setIsOpen(false);
-      setHighlightedIndex(-1);
+    if (onlyCustom || trimmed.length < 1 || isAtMax) {
+      setSuggestions((prev) => (prev.length === 0 ? prev : []));
+      setIsOpen((prev) => (prev ? false : prev));
+      setHighlightedIndex((prev) => (prev === -1 ? prev : -1));
       return;
     }
 
@@ -104,7 +115,7 @@ export const PaxMultiSelect: React.FC<PaxMultiSelectProps> = ({
     setSuggestions(matches);
     setIsOpen(true);
     setHighlightedIndex(-1);
-  }, [query, selectedNames, members, isAtMax]);
+  }, [query, selectedNames, members, isAtMax, onlyCustom]);
 
   // Scroll active item into view during arrow key navigation
   useEffect(() => {
@@ -133,8 +144,26 @@ export const PaxMultiSelect: React.FC<PaxMultiSelectProps> = ({
 
   const addName = useCallback(
     (name: string) => {
-      const trimmed = name.trim();
+      let trimmed = name.trim();
       if (!trimmed) return;
+
+      if (onValidateAdd) {
+        const validated = onValidateAdd(trimmed);
+        if (!validated) return;
+        trimmed = validated;
+      }
+
+      if (!allowCustom) {
+        const matchesRoster = (members || []).some(
+          (m) =>
+            m &&
+            typeof m.f3Name === 'string' &&
+            m.f3Name.trim().toLowerCase() === trimmed.toLowerCase()
+        );
+        if (!matchesRoster) {
+          return;
+        }
+      }
 
       const exists = selectedNames.some((n) => n.trim().toLowerCase() === trimmed.toLowerCase());
       if (!exists && (!maxSelections || selectedNames.length < maxSelections)) {
@@ -146,7 +175,7 @@ export const PaxMultiSelect: React.FC<PaxMultiSelectProps> = ({
       setHighlightedIndex(-1);
       inputRef.current?.focus();
     },
-    [selectedNames, onChange, maxSelections]
+    [selectedNames, onChange, maxSelections, allowCustom, members, onValidateAdd]
   );
 
   const removeName = useCallback(
@@ -157,10 +186,28 @@ export const PaxMultiSelect: React.FC<PaxMultiSelectProps> = ({
     [selectedNames, onChange]
   );
 
+  const exactMatchExists = suggestions.some(
+    (s) => s.f3Name.trim().toLowerCase() === query.trim().toLowerCase()
+  );
+  const showCustomOption = allowCustom && !exactMatchExists && Boolean(query.trim());
+
   const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
+    if (onlyCustom) {
+      if (e.key === ',' || e.key === 'Enter') {
+        e.preventDefault();
+        if (query.trim()) {
+          addName(query);
+        }
+      } else if (e.key === 'Backspace' && !query && selectedNames.length > 0) {
+        e.preventDefault();
+        removeName(selectedNames.length - 1);
+      }
+      return;
+    }
+
     if (e.key === ',' || (e.key === 'Enter' && !isOpen)) {
       e.preventDefault();
-      if (query.trim()) {
+      if (allowCustom && query.trim()) {
         addName(query);
       }
       return;
@@ -172,16 +219,14 @@ export const PaxMultiSelect: React.FC<PaxMultiSelectProps> = ({
       return;
     }
 
-    if (!isOpen || suggestions.length === 0) {
+    if (!isOpen || (suggestions.length === 0 && !showCustomOption)) {
       if (e.key === 'ArrowDown' && query.trim()) {
         setIsOpen(true);
       }
       return;
     }
 
-    // Total dropdown options = suggestions + (custom add option if query doesn't exactly match top suggestion)
-    const exactMatch = suggestions.some((s) => s.f3Name.trim().toLowerCase() === query.trim().toLowerCase());
-    const totalOptions = exactMatch ? suggestions.length : suggestions.length + 1;
+    const totalOptions = suggestions.length + (showCustomOption ? 1 : 0);
 
     switch (e.key) {
       case 'ArrowDown':
@@ -196,11 +241,11 @@ export const PaxMultiSelect: React.FC<PaxMultiSelectProps> = ({
         e.preventDefault();
         if (highlightedIndex >= 0 && highlightedIndex < suggestions.length) {
           addName(suggestions[highlightedIndex].f3Name);
-        } else if (highlightedIndex === suggestions.length && !exactMatch) {
+        } else if (highlightedIndex === suggestions.length && showCustomOption) {
           addName(query);
         } else if (suggestions.length > 0) {
           addName(suggestions[0].f3Name);
-        } else if (query.trim()) {
+        } else if (allowCustom && query.trim()) {
           addName(query);
         }
         break;
@@ -213,10 +258,6 @@ export const PaxMultiSelect: React.FC<PaxMultiSelectProps> = ({
         break;
     }
   };
-
-  const exactMatchExists = suggestions.some(
-    (s) => s.f3Name.trim().toLowerCase() === query.trim().toLowerCase()
-  );
 
   return (
     <div className="pax-multiselect-container" ref={containerRef}>
@@ -250,7 +291,7 @@ export const PaxMultiSelect: React.FC<PaxMultiSelectProps> = ({
               <span
                 key={`chip-${name}-${index}`}
                 className={`pax-chip ${isRoster ? 'pax-chip-roster' : 'pax-chip-custom'}`}
-                title={isRoster ? `${name} (F3 RVA Roster)` : `${name} (New / Visiting PAX)`}
+                title={isRoster ? `${name} (F3 RVA Roster)` : `${name} (${customBadgeText || 'New / Visiting PAX'})`}
               >
                 <span className="pax-chip-avatar">{isRoster ? '👤' : '✨'}</span>
                 <span className="pax-chip-text">{name}</span>
@@ -280,7 +321,7 @@ export const PaxMultiSelect: React.FC<PaxMultiSelectProps> = ({
               onChange={(e) => setQuery(e.target.value)}
               onKeyDown={handleKeyDown}
               onFocus={() => {
-                if (query.trim()) setIsOpen(true);
+                if (query.trim() && !onlyCustom) setIsOpen(true);
               }}
               placeholder={
                 selectedNames.length === 0
@@ -303,7 +344,7 @@ export const PaxMultiSelect: React.FC<PaxMultiSelectProps> = ({
         </div>
       </div>
 
-      {isOpen && !isAtMax && (
+      {isOpen && !isAtMax && !onlyCustom && (
         <div
           ref={dropdownRef}
           id={`${id}-listbox`}
@@ -327,7 +368,7 @@ export const PaxMultiSelect: React.FC<PaxMultiSelectProps> = ({
             </button>
           ))}
 
-          {query.trim() && !exactMatchExists && (
+          {showCustomOption && (
             <button
               id={`${id}-opt-${suggestions.length}`}
               type="button"
@@ -340,10 +381,14 @@ export const PaxMultiSelect: React.FC<PaxMultiSelectProps> = ({
               aria-selected={highlightedIndex === suggestions.length}
             >
               <span className="pax-dropdown-name">
-                ✨ Add &quot;<strong>{query.trim()}</strong>&quot; as custom PAX
+                ✨ Add &quot;<strong>{query.trim()}</strong>&quot; as custom {customBadgeText || 'PAX'}
               </span>
-              <span className="pax-dropdown-custom-badge">New / Visiting</span>
+              <span className="pax-dropdown-custom-badge">{customBadgeText || 'New / Visiting'}</span>
             </button>
+          )}
+
+          {suggestions.length === 0 && query.trim() && !allowCustom && (
+            <div className="pax-dropdown-message">No matching PAX found in roster</div>
           )}
 
           {suggestions.length === 0 && !query.trim() && (

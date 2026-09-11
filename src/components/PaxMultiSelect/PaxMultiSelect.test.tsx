@@ -152,4 +152,80 @@ describe('PaxMultiSelect Component', () => {
     expect(customChip).toHaveAttribute('title', 'Visiting Guy (New / Visiting PAX)');
     expect(screen.getByText('✨')).toBeInTheDocument();
   });
+
+  it('rejects custom entry when allowCustom is false and name is not in roster', () => {
+    const handleChange = vi.fn();
+    render(
+      <PaxMultiSelect
+        id="test-pax"
+        label="PAX Attendees"
+        members={mockMembers}
+        selectedNames={[]}
+        onChange={handleChange}
+        allowCustom={false}
+      />
+    );
+
+    const input = screen.getByRole('combobox');
+    fireEvent.change(input, { target: { value: 'Nonexistent PAX' } });
+    fireEvent.keyDown(input, { key: 'Enter' });
+
+    expect(handleChange).not.toHaveBeenCalled();
+  });
+
+  it('adds custom names directly on Enter when onlyCustom is true', () => {
+    const handleChange = vi.fn();
+    render(
+      <PaxMultiSelect
+        id="test-fng"
+        label="FNGs"
+        selectedNames={[]}
+        onChange={handleChange}
+        onlyCustom={true}
+      />
+    );
+
+    const input = screen.getByPlaceholderText(/type to search/i);
+    fireEvent.change(input, { target: { value: 'Flipper' } });
+    fireEvent.keyDown(input, { key: 'Enter' });
+
+    expect(handleChange).toHaveBeenCalledWith(['Flipper']);
+  });
+
+  it('applies onValidateAdd callback to sanitize or clean entered names', () => {
+    const handleChange = vi.fn();
+    const sanitizeFng = (name: string) => name.replace(/\s*\(\s*fng\s*\)\s*$/i, '').trim();
+
+    render(
+      <PaxMultiSelect
+        id="test-fng"
+        label="FNGs"
+        selectedNames={[]}
+        onChange={handleChange}
+        onlyCustom={true}
+        onValidateAdd={sanitizeFng}
+      />
+    );
+
+    const input = screen.getByPlaceholderText(/type to search/i);
+    fireEvent.change(input, { target: { value: 'Sparky (FNG)' } });
+    fireEvent.keyDown(input, { key: 'Enter' });
+
+    expect(handleChange).toHaveBeenCalledWith(['Sparky']);
+  });
+
+  it('uses customBadgeText for custom chip titles when provided', () => {
+    render(
+      <PaxMultiSelect
+        id="test-dr"
+        label="Downrange PAX"
+        selectedNames={['Out-of-Towner']}
+        onChange={vi.fn()}
+        customBadgeText="Downrange"
+      />
+    );
+
+    const chip = screen.getByText('Out-of-Towner').closest('.pax-chip');
+    expect(chip).toHaveAttribute('title', 'Out-of-Towner (Downrange)');
+  });
 });

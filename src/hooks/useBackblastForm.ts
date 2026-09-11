@@ -21,6 +21,8 @@ export interface BackblastFormData {
   aoNames: string[];
   qic: string[];
   pax: string[];
+  fngs: string[];
+  drs: string[];
   body: string;
   slug: string;
 }
@@ -64,6 +66,8 @@ export function useBackblastForm(workoutId?: number) {
     aoNames: [],
     qic: [],
     pax: [],
+    fngs: [],
+    drs: [],
     body: '',
     slug: '',
   });
@@ -79,6 +83,7 @@ export function useBackblastForm(workoutId?: number) {
   const [slugManuallyEdited, setSlugManuallyEdited] = useState<boolean>(false);
   const [lastSaved, setLastSaved] = useState<Date | null>(null);
   const [isDirty, setIsDirty] = useState<boolean>(false);
+  const [originalFngs, setOriginalFngs] = useState<string[]>([]);
 
   const isInitialMount = useRef<boolean>(true);
 
@@ -148,6 +153,10 @@ export function useBackblastForm(workoutId?: number) {
               : [];
             const qNames = Array.isArray(data.q) ? data.q.map((q) => q.f3Name) : [];
             const paxNames = Array.isArray(data.pax) ? data.pax.map((p) => p.f3Name) : [];
+            const fngNames = Array.isArray(data.fngs) ? data.fngs.map((f) => f.f3Name) : [];
+            const drNames = Array.isArray(data.drs) ? data.drs.map((d) => d.f3Name) : [];
+
+            setOriginalFngs(fngNames);
 
             setFormData({
               title: data.title || '',
@@ -155,6 +164,8 @@ export function useBackblastForm(workoutId?: number) {
               aoNames: aoList,
               qic: qNames,
               pax: paxNames,
+              fngs: fngNames,
+              drs: drNames,
               body: data.content || '',
               slug: data.slug || '',
             });
@@ -179,12 +190,15 @@ export function useBackblastForm(workoutId?: number) {
             const userQ = user?.f3Name ? [user.f3Name] : [];
             const parsedAos = parseNames(parsed.aoNames || parsed.aoName);
 
+            setOriginalFngs([]);
             setFormData({
               title: parsed.title || '',
               workoutDate: parsed.workoutDate || initialDate,
               aoNames: parsedAos,
               qic: parseNames(parsed.qic).length > 0 ? parseNames(parsed.qic) : userQ,
               pax: parseNames(parsed.pax).length > 0 ? parseNames(parsed.pax) : userQ,
+              fngs: parseNames(parsed.fngs),
+              drs: parseNames(parsed.drs),
               body: parsed.body || '',
               slug: parsed.slug || '',
             });
@@ -193,12 +207,15 @@ export function useBackblastForm(workoutId?: number) {
               setLastSaved(new Date(savedTimestamp));
             }
           } else if (isMounted) {
+            setOriginalFngs([]);
             setFormData({
               title: '',
               workoutDate: initialDate,
               aoNames: [],
               qic: user?.f3Name ? [user.f3Name] : [],
               pax: user?.f3Name ? [user.f3Name] : [],
+              fngs: [],
+              drs: [],
               body: '',
               slug: '',
             });
@@ -308,7 +325,9 @@ export function useBackblastForm(workoutId?: number) {
     if (!formData.workoutDate) errors.workoutDate = 'Workout date is required.';
     if (formData.aoNames.length === 0) errors.aoNames = 'At least one Area of Operations (AO) is required.';
     if (formData.qic.length === 0) errors.qic = 'At least one Q is required.';
-    if (formData.pax.length === 0) errors.pax = 'At least one PAX attendee is required.';
+    if (formData.pax.length === 0 && formData.fngs.length === 0 && formData.drs.length === 0) {
+      errors.pax = 'At least one attendee (PAX, FNG, or Downrange) is required.';
+    }
     if (!formData.body.trim() || formData.body === '<p></p>') {
       errors.body = 'Backblast content cannot be empty.';
     }
@@ -348,6 +367,8 @@ export function useBackblastForm(workoutId?: number) {
           workoutDate: formData.workoutDate,
           qic: formData.qic.join(', '),
           pax: formData.pax.join(', '),
+          fngs: formData.fngs.join(', '),
+          drs: formData.drs.join(', '),
           aos: aoPayload,
           body: formData.body,
           author: user?.f3Name || 'Admin',
@@ -393,6 +414,8 @@ export function useBackblastForm(workoutId?: number) {
           workoutDate: formData.workoutDate,
           qic: formData.qic.join(', '),
           pax: formData.pax.join(', '),
+          fngs: formData.fngs.join(', '),
+          drs: formData.drs.join(', '),
           aos: aoPayload,
           body: formData.body,
           author: user?.f3Name || 'Member',
@@ -426,6 +449,8 @@ export function useBackblastForm(workoutId?: number) {
           aoNames: [],
           qic: user?.f3Name ? [user.f3Name] : [],
           pax: user?.f3Name ? [user.f3Name] : [],
+          fngs: [],
+          drs: [],
           body: '',
           slug: '',
         });
@@ -470,12 +495,15 @@ export function useBackblastForm(workoutId?: number) {
       } catch {
         // Ignore
       }
+      setOriginalFngs([]);
       setFormData({
         title: '',
         workoutDate: initialDate,
         aoNames: [],
         qic: user?.f3Name ? [user.f3Name] : [],
         pax: user?.f3Name ? [user.f3Name] : [],
+        fngs: [],
+        drs: [],
         body: '',
         slug: '',
       });
@@ -500,6 +528,7 @@ export function useBackblastForm(workoutId?: number) {
     isEditMode,
     lastSaved,
     isDirty,
+    originalFngs,
     updateField,
     setManualSlug,
     addQToPax,

@@ -65,8 +65,10 @@
   text-align: left;
 }
 
-.metadata-item.metadata-pax {
-  grid-column: 1 / -1; /* Full width for PAX list */
+.metadata-item.metadata-pax,
+.metadata-item.metadata-fngs,
+.metadata-item.metadata-drs {
+  grid-column: 1 / -1; /* Full width for PAX, FNG, and DR lists */
 }
 
 .metadata-icon {

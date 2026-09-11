@@ -107,4 +107,34 @@ describe('WorkoutDetail Component', () => {
     expect(screen.getByText(/Workout Not Found/i)).toBeInTheDocument();
     expect(fetchSpy).not.toHaveBeenCalled();
   });
+
+  it('renders FNG and Downrange attendee cards when present on workout', async () => {
+    const workoutWithFngAndDr = {
+      ...mockWorkoutDetail,
+      fngs: [{ memberId: 101, f3Name: 'Flipper', paxType: 'FNG' }],
+      drs: [{ memberId: 102, f3Name: 'Sparky', isDr: true, paxType: 'DR' }],
+    };
+
+    vi.spyOn(globalThis, 'fetch').mockResolvedValueOnce({
+      ok: true,
+      json: async () => workoutWithFngAndDr,
+    } as Response);
+
+    render(
+      <AuthProvider>
+        <MemoryRouter initialEntries={['/bigdata/workout/42']}>
+          <Routes>
+            <Route path="/bigdata/workout/:id" element={<WorkoutDetail />} />
+          </Routes>
+        </MemoryRouter>
+      </AuthProvider>
+    );
+
+    await waitFor(() => {
+      expect(screen.getByText(/Friendly New Guys \(FNGs\) \(1\)/i)).toBeInTheDocument();
+      expect(screen.getByText('Flipper')).toBeInTheDocument();
+      expect(screen.getByText(/Downrange PAX \(1\)/i)).toBeInTheDocument();
+      expect(screen.getByText('Sparky')).toBeInTheDocument();
+    });
+  });
 });

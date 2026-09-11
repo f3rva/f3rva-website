@@ -31,14 +31,17 @@ function highlightMatch(text: string, query: string): React.ReactNode {
   );
 }
 
+const DEFAULT_AOS: AOSummary[] = [];
+const DEFAULT_SELECTED_AO_NAMES: string[] = [];
+
 export const AoMultiSelect: React.FC<AoMultiSelectProps> = ({
   id,
   label,
   placeholder = 'Type to search or add AO...',
   helpText,
-  aos = [],
+  aos = DEFAULT_AOS,
   loadingAos = false,
-  selectedNames = [],
+  selectedNames = DEFAULT_SELECTED_AO_NAMES,
   onChange,
   disabled = false,
   maxSelections,
@@ -59,9 +62,9 @@ export const AoMultiSelect: React.FC<AoMultiSelectProps> = ({
   useEffect(() => {
     const trimmed = query.trim().toLowerCase();
     if (trimmed.length < 1 || isAtMax) {
-      setSuggestions([]);
-      setIsOpen(false);
-      setHighlightedIndex(-1);
+      setSuggestions((prev) => (prev.length === 0 ? prev : []));
+      setIsOpen((prev) => (prev ? false : prev));
+      setHighlightedIndex((prev) => (prev === -1 ? prev : -1));
       return;
     }
 

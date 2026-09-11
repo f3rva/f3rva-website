@@ -1,6 +1,6 @@
 import React from 'react';
 import { useParams, Navigate, Link } from 'react-router-dom';
-import { MdCalendarToday, MdPerson, MdGroup, MdLocationOn } from 'react-icons/md';
+import { MdCalendarToday, MdPerson, MdGroup, MdLocationOn, MdPersonAdd, MdPublic } from 'react-icons/md';
 import { config } from '../../config';
 import { WorkoutPost } from '../../types/WorkoutPost';
 import { formatDisplayDate } from '../../utils/dateUtils';
@@ -170,6 +170,44 @@ const ArchivePost: React.FC = () => {
                 </div>
               </div>
             </div>
+
+            {post.fngs && post.fngs.length > 0 && (
+              <div className="metadata-item metadata-fngs">
+                <div className="metadata-icon">
+                  <MdPersonAdd />
+                </div>
+                <div className="metadata-content">
+                  <span className="metadata-label">FNGs ({post.fngs.length})</span>
+                  <div className="pax-list">
+                    {post.fngs.map((fngMember, index) => (
+                      <span key={fngMember.memberId} className="pax-member">
+                        {fngMember.f3Name}
+                        {index < post.fngs!.length - 1 && ', '}
+                      </span>
+                    ))}
+                  </div>
+                </div>
+              </div>
+            )}
+
+            {post.drs && post.drs.length > 0 && (
+              <div className="metadata-item metadata-drs">
+                <div className="metadata-icon">
+                  <MdPublic />
+                </div>
+                <div className="metadata-content">
+                  <span className="metadata-label">Downrange ({post.drs.length})</span>
+                  <div className="pax-list">
+                    {post.drs.map((drMember, index) => (
+                      <span key={drMember.memberId} className="pax-member">
+                        {drMember.f3Name}
+                        {index < post.drs!.length - 1 && ', '}
+                      </span>
+                    ))}
+                  </div>
+                </div>
+              </div>
+            )}
           </div>
         </header>
 

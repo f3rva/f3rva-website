@@ -18,6 +18,7 @@ import {
   FaTrashAlt,
   FaSave,
   FaUserPlus,
+  FaGlobeAmericas,
 } from 'react-icons/fa';
 import './BackblastForm.css';
 
@@ -38,12 +39,35 @@ export const BackblastForm: React.FC = () => {
     validationErrors,
     isEditMode,
     lastSaved,
+    originalFngs,
     updateField,
     setManualSlug,
     addQToPax,
     submit,
     clearDraft,
   } = useBackblastForm(workoutId);
+
+  const regularPaxMembers = React.useMemo(
+    () => (members || []).filter((m) => !m.isDr),
+    [members]
+  );
+  const drMembers = React.useMemo(
+    () => (members || []).filter((m) => !!m.isDr),
+    [members]
+  );
+
+  const duplicateFngs = React.useMemo(() => {
+    const originalFngSet = new Set((originalFngs || []).map((f) => f.trim().toLowerCase()));
+    const memberNameSet = new Set((members || []).map((m) => m.f3Name.trim().toLowerCase()));
+    return formData.fngs.filter((fng) => {
+      const lower = fng.trim().toLowerCase();
+      // Allow FNGs that were already registered as FNGs on this specific workout
+      if (originalFngSet.has(lower)) {
+        return false;
+      }
+      return memberNameSet.has(lower);
+    });
+  }, [formData.fngs, members, originalFngs]);
 
   const slackAuthUrl = `${config.slackClientId ? `https://slack.com/openid/connect/authorize?response_type=code&scope=openid%20profile%20email&client_id=${encodeURIComponent(config.slackClientId)}&redirect_uri=${encodeURIComponent(config.slackRedirectUri)}&state=${encodeURIComponent(window.location.pathname)}` : '#'}`;
 
@@ -209,13 +233,14 @@ export const BackblastForm: React.FC = () => {
               id="bb-qic"
               label="Q / Co-Q(s)"
               icon={<FaUserCheck />}
-              placeholder="Type to search Q roster..."
+              placeholder="Select Q from roster..."
               helpText="Leader(s) who designed and executed the workout."
-              members={members}
+              members={regularPaxMembers}
               loadingMembers={loadingMembers}
               selectedNames={formData.qic}
               onChange={(names) => updateField('qic', names)}
               disabled={submitting}
+              allowCustom={false}
             />
             {validationErrors.qic && <span className="field-error">{validationErrors.qic}</span>}
           </div>
@@ -225,13 +250,14 @@ export const BackblastForm: React.FC = () => {
               id="bb-pax"
               label="PAX Attendees"
               icon={<FaUsers />}
-              placeholder="Type to search PAX or add visiting names..."
-              helpText="All men present, including Qs."
-              members={members}
+              placeholder="Select PAX from roster..."
+              helpText="Registered F3 RVA PAX present, including Qs."
+              members={regularPaxMembers}
               loadingMembers={loadingMembers}
               selectedNames={formData.pax}
               onChange={(names) => updateField('pax', names)}
               disabled={submitting}
+              allowCustom={false}
             />
             {validationErrors.pax && <span className="field-error">{validationErrors.pax}</span>}
 
@@ -245,6 +271,46 @@ export const BackblastForm: React.FC = () => {
                 <FaUserPlus /> + Add Q(s) to PAX ({missingQs.join(', ')})
               </button>
             )}
+          </div>
+        </div>
+
+        {/* FNGs and Downrange PAX Row */}
+        <div className="form-row">
+          <div className="form-group col-half">
+            <PaxMultiSelect
+              id="bb-fngs"
+              label="Friendly New Guys (FNGs)"
+              icon={<FaUserPlus />}
+              placeholder="Type FNG name (e.g. Hemorrhoid) and press Enter..."
+              helpText="First-time workout participants only. Do not add '(FNG)'."
+              selectedNames={formData.fngs}
+              onChange={(names) => updateField('fngs', names)}
+              disabled={submitting}
+              onlyCustom={true}
+              onValidateAdd={(name) => name.replace(/\s*\(\s*fng\s*\)\s*$/i, '').trim()}
+            />
+            {duplicateFngs.length > 0 && (
+              <div className="fng-duplicate-warning" role="alert">
+                <strong>Notice:</strong> &quot;{duplicateFngs.join(', ')}&quot; is already a registered member in the roster. FNGs should only be first-time participants. If this is a returning PAX, please add them under PAX Attendees instead.
+              </div>
+            )}
+          </div>
+
+          <div className="form-group col-half">
+            <PaxMultiSelect
+              id="bb-drs"
+              label="Downrange PAX (DR)"
+              icon={<FaGlobeAmericas />}
+              placeholder="e.g. Sparky (Carpex)"
+              helpText="Visiting PAX from other F3 regions."
+              members={drMembers}
+              loadingMembers={loadingMembers}
+              selectedNames={formData.drs}
+              onChange={(names) => updateField('drs', names)}
+              disabled={submitting}
+              allowCustom={true}
+              customBadgeText="Downrange"
+            />
           </div>
         </div>
 
@@ -264,7 +330,10 @@ export const BackblastForm: React.FC = () => {
         {/* Submission Actions */}
         <div className="form-actions">
           <div className="attendance-summary-badge">
-            <FaUsers /> {formData.pax.length} PAX ({formData.qic.length} Q{formData.qic.length === 1 ? '' : 's'})
+            <FaUsers /> {formData.pax.length + formData.fngs.length + formData.drs.length} Total Attendees ({formData.pax.length} PAX
+            {formData.fngs.length > 0 ? `, ${formData.fngs.length} FNG` : ''}
+            {formData.drs.length > 0 ? `, ${formData.drs.length} DR` : ''}) • {formData.qic.length} Q
+            {formData.qic.length === 1 ? '' : 's'}
           </div>
           <div className="action-buttons-group">
             <Link to="/" className="btn-secondary">
