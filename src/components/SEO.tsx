@@ -13,6 +13,7 @@ interface SEOProps {
   modifiedTime?: string;
   structuredData?: object;
   canonical?: string;
+  noindex?: boolean;
 }
 
 /**
@@ -31,7 +32,8 @@ const SEO: React.FC<SEOProps> = ({
   publishedTime,
   modifiedTime,
   structuredData,
-  canonical
+  canonical,
+  noindex = false,
 }) => {
   const fullTitle = title === 'F3RVA - Always 70 and Sunny' ? title : `${title} | F3RVA`;
   const fullImageUrl = image.startsWith('http') ? image : `${url}${image}`;
@@ -75,9 +77,19 @@ const SEO: React.FC<SEOProps> = ({
       <meta name="twitter:creator" content="@F3Richmond" />
 
       {/* Additional SEO Meta Tags */}
-      <meta name="robots" content="index, follow, max-snippet:-1, max-image-preview:large, max-video-preview:-1" />
-      <meta name="googlebot" content="index, follow" />
-      <meta name="bingbot" content="index, follow" />
+      {noindex ? (
+        <>
+          <meta name="robots" content="noindex, nofollow" />
+          <meta name="googlebot" content="noindex, nofollow" />
+          <meta name="bingbot" content="noindex, nofollow" />
+        </>
+      ) : (
+        <>
+          <meta name="robots" content="index, follow, max-snippet:-1, max-image-preview:large, max-video-preview:-1" />
+          <meta name="googlebot" content="index, follow" />
+          <meta name="bingbot" content="index, follow" />
+        </>
+      )}
       
       {/* Geographic Meta Tags */}
       <meta name="geo.region" content="US-VA" />

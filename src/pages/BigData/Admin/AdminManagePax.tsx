@@ -157,6 +157,7 @@ export const AdminManagePax: React.FC = () => {
         description="Directly merge duplicate member entities and browse member directory."
         url="https://f3rva.org/bigdata/admin/manage-pax"
         type="website"
+        noindex={true}
       />
       <div className="bigdata-page-container">
         <BigDataPageHeader

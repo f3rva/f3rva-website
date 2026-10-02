@@ -46,6 +46,13 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     } catch {
       // Ignore localStorage access failures in restricted environments
     }
+    try {
+      sessionStorage.removeItem(TOKEN_STORAGE_KEY);
+      sessionStorage.removeItem(EXPIRY_STORAGE_KEY);
+      sessionStorage.removeItem(USER_STORAGE_KEY);
+    } catch {
+      // Ignore sessionStorage access failures in restricted environments
+    }
   }, []);
 
   const loginWithToken = useCallback((newToken: string, expiresIn: number, newUser: AuthUserProfile) => {
@@ -55,36 +62,88 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     setUser(newUser);
     setError(null);
 
+    // Administrative tokens are stored in sessionStorage for defense-in-depth against shared devices.
+    // Regular member tokens remain in localStorage for a frictionless 60-day community experience.
+    const isUserAdmin = newUser.role === 'admin';
+    const targetStorage = isUserAdmin ? sessionStorage : localStorage;
+    const oppositeStorage = isUserAdmin ? localStorage : sessionStorage;
+
     try {
-      localStorage.setItem(TOKEN_STORAGE_KEY, newToken);
-      localStorage.setItem(EXPIRY_STORAGE_KEY, expiryTimestamp.toString());
-      localStorage.setItem(USER_STORAGE_KEY, JSON.stringify(newUser));
+      oppositeStorage.removeItem(TOKEN_STORAGE_KEY);
+      oppositeStorage.removeItem(EXPIRY_STORAGE_KEY);
+      oppositeStorage.removeItem(USER_STORAGE_KEY);
+    } catch {
+      // Ignore storage access failures
+    }
+
+    try {
+      targetStorage.setItem(TOKEN_STORAGE_KEY, newToken);
+      targetStorage.setItem(EXPIRY_STORAGE_KEY, expiryTimestamp.toString());
+      targetStorage.setItem(USER_STORAGE_KEY, JSON.stringify(newUser));
     } catch {
       // Storage restricted
     }
   }, []);
 
-  // Initialize and validate token from localStorage on mount
+  // Initialize and validate token on mount (checking sessionStorage first, then localStorage)
   useEffect(() => {
-    try {
-      const savedToken = localStorage.getItem(TOKEN_STORAGE_KEY);
-      const savedExpiry = localStorage.getItem(EXPIRY_STORAGE_KEY);
-      const savedUserStr = localStorage.getItem(USER_STORAGE_KEY);
+    let savedToken: string | null = null;
+    let savedExpiry: string | null = null;
+    let savedUserStr: string | null = null;
+    let fromLocalStorage = false;
 
+    // Check sessionStorage first (active admin session takes priority)
+    try {
+      savedToken = sessionStorage.getItem(TOKEN_STORAGE_KEY);
+      savedExpiry = sessionStorage.getItem(EXPIRY_STORAGE_KEY);
+      savedUserStr = sessionStorage.getItem(USER_STORAGE_KEY);
+    } catch {
+      // Session storage unavailable
+    }
+
+    // Fall back to localStorage for persistent member sessions
+    if (!savedToken) {
+      try {
+        savedToken = localStorage.getItem(TOKEN_STORAGE_KEY);
+        savedExpiry = localStorage.getItem(EXPIRY_STORAGE_KEY);
+        savedUserStr = localStorage.getItem(USER_STORAGE_KEY);
+        if (savedToken) {
+          fromLocalStorage = true;
+        }
+      } catch {
+        // Local storage unavailable
+      }
+    }
+
+    try {
       if (savedToken && savedExpiry) {
         const expiryTime = parseInt(savedExpiry, 10);
         if (Date.now() < expiryTime) {
           setToken(savedToken);
           setExpiresAt(expiryTime);
 
+          let parsedUser: AuthUserProfile = { f3Name: 'admin', role: 'admin' };
           if (savedUserStr) {
             try {
-              setUser(JSON.parse(savedUserStr));
+              parsedUser = JSON.parse(savedUserStr);
             } catch {
-              setUser({ f3Name: 'admin', role: 'admin' });
+              parsedUser = { f3Name: 'admin', role: 'admin' };
             }
-          } else {
-            setUser({ f3Name: 'admin', role: 'admin' });
+          }
+          setUser(parsedUser);
+
+          // If a legacy admin token was found in localStorage, migrate it to sessionStorage
+          if (fromLocalStorage && parsedUser.role === 'admin') {
+            try {
+              sessionStorage.setItem(TOKEN_STORAGE_KEY, savedToken);
+              sessionStorage.setItem(EXPIRY_STORAGE_KEY, savedExpiry);
+              sessionStorage.setItem(USER_STORAGE_KEY, savedUserStr || JSON.stringify(parsedUser));
+              localStorage.removeItem(TOKEN_STORAGE_KEY);
+              localStorage.removeItem(EXPIRY_STORAGE_KEY);
+              localStorage.removeItem(USER_STORAGE_KEY);
+            } catch {
+              // Ignore storage errors
+            }
           }
         } else {
           // Token has expired
@@ -92,7 +151,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
         }
       }
     } catch {
-      // Local storage unavailable
+      // Storage parsing failure
     } finally {
       setLoading(false);
     }
