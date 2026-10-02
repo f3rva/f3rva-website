@@ -4,58 +4,43 @@
 // learn more: https://github.com/testing-library/jest-dom
 import '@testing-library/jest-dom';
 
-// Mock localStorage if it doesn't exist (or is partial) in the jsdom environment
-if (!global.localStorage) {
-  global.localStorage = {
-    getItem: () => null,
-    setItem: () => {},
-    removeItem: () => {},
-    clear: () => {},
-    length: 0,
-    key: () => null,
-  };
-}
-
-// Ensure functions are mocks for spyOn capabilities if needed, 
-// but primarily just ensure they exist.
-Object.defineProperty(window, 'localStorage', {
-  value: {
-    getItem: (key) => {
-      return this.store ? this.store[key] : null;
-    },
-    setItem: (key, value) => {
-      if (!this.store) this.store = {};
-      this.store[key] = value.toString();
-    },
-    removeItem: (key) => {
-      if (this.store) delete this.store[key];
-    },
-    clear: () => {
-      this.store = {};
-    },
-  },
-  writable: true
-});
-
-// A better mock implementation using a closure to hold state
-const localStorageMock = (function() {
+// Mock Web Storage API if it doesn't exist (or is partial) in the jsdom environment
+const createStorageMock = () => {
   let store = {};
   return {
-    getItem: function(key) {
-      return store[key] || null;
-    },
-    setItem: function(key, value) {
+    getItem: (key) => store[key] || null,
+    setItem: (key, value) => {
       store[key] = value.toString();
     },
-    removeItem: function(key) {
+    removeItem: (key) => {
       delete store[key];
     },
-    clear: function() {
+    clear: () => {
       store = {};
-    }
+    },
+    get length() {
+      return Object.keys(store).length;
+    },
+    key: (index) => Object.keys(store)[index] || null,
   };
-})();
+};
+
+const localStorageMock = createStorageMock();
+const sessionStorageMock = createStorageMock();
 
 Object.defineProperty(window, 'localStorage', {
-  value: localStorageMock
+  value: localStorageMock,
+  configurable: true,
+  writable: true,
 });
+
+Object.defineProperty(window, 'sessionStorage', {
+  value: sessionStorageMock,
+  configurable: true,
+  writable: true,
+});
+
+if (typeof globalThis !== 'undefined') {
+  globalThis.localStorage = localStorageMock;
+  globalThis.sessionStorage = sessionStorageMock;
+}

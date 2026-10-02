@@ -13,13 +13,13 @@ vi.mock('../../components/SEO', () => ({
 const mockWorkoutPost: WorkoutPost = {
   workoutId: 1,
   title: 'Standard Beatdown',
-  author: 'Dredd',
+  author: 'OBT',
   slug: 'standard-beatdown',
   workoutDate: '2024-06-01',
   backblastUrl: 'http://example.com',
   content: '<p>It was hot.</p>',
   ao: [{ id: 1, description: 'GridIron', slug: 'gridiron' }],
-  q: [{ memberId: 1, f3Name: 'Dredd' }],
+  q: [{ memberId: 1, f3Name: 'OBT' }],
   paxCount: 15
 };
 
@@ -66,7 +66,7 @@ describe('Archives Landing Page', () => {
 
     // Verify Post Data
     expect(screen.getByText('Standard Beatdown')).toBeInTheDocument();
-    expect(screen.getByText('Dredd')).toBeInTheDocument();
+    expect(screen.getByText('OBT')).toBeInTheDocument();
     expect(screen.getByText('GridIron')).toBeInTheDocument();
   });
 
