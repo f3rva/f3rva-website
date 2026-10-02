@@ -45,6 +45,7 @@ export const AdminLogin: React.FC = () => {
         description="Authenticate to access protected administrator tools."
         url="https://f3rva.org/bigdata/admin/login"
         type="website"
+        noindex={true}
       />
       <div className="bigdata-page-container">
         <BigDataPageHeader

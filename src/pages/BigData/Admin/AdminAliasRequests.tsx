@@ -142,6 +142,7 @@ export const AdminAliasRequests: React.FC = () => {
         description="Review, approve, or reject member alias claims."
         url="https://f3rva.org/bigdata/admin/alias-requests"
         type="website"
+        noindex={true}
       />
       <div className="bigdata-page-container">
         <BigDataPageHeader

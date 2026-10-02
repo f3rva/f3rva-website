@@ -32,4 +32,29 @@ describe('SEO Component Security', () => {
     // will see it as the end of the script block despite being inside a JSON string.
     expect(content).not.toContain('</script>');
   });
+
+  it('should render noindex, nofollow meta tags when noindex is true', () => {
+    render(<SEO title="Admin Page" noindex={true} />);
+
+    const robotsMeta = document.querySelector('meta[name="robots"]');
+    const googlebotMeta = document.querySelector('meta[name="googlebot"]');
+    const bingbotMeta = document.querySelector('meta[name="bingbot"]');
+
+    expect(robotsMeta?.getAttribute('content')).toBe('noindex, nofollow');
+    expect(googlebotMeta?.getAttribute('content')).toBe('noindex, nofollow');
+    expect(bingbotMeta?.getAttribute('content')).toBe('noindex, nofollow');
+  });
+
+  it('should render index, follow meta tags by default', () => {
+    render(<SEO title="Public Page" />);
+
+    const robotsMeta = document.querySelector('meta[name="robots"]');
+    const googlebotMeta = document.querySelector('meta[name="googlebot"]');
+    const bingbotMeta = document.querySelector('meta[name="bingbot"]');
+
+    expect(robotsMeta?.getAttribute('content')).toContain('index, follow');
+    expect(googlebotMeta?.getAttribute('content')).toBe('index, follow');
+    expect(bingbotMeta?.getAttribute('content')).toBe('index, follow');
+  });
 });
+

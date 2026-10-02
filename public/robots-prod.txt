@@ -6,6 +6,7 @@ Allow: /
 
 # Disallow admin areas (if any exist in the future)
 Disallow: /admin/
+Disallow: /bigdata/admin/
 Disallow: /private/
 Disallow: *.json$
 Disallow: /api/
@@ -13,15 +14,35 @@ Disallow: /api/
 # Allow specific bots
 User-agent: Googlebot
 Allow: /
+Disallow: /admin/
+Disallow: /bigdata/admin/
+Disallow: /private/
+Disallow: *.json$
+Disallow: /api/
 
 User-agent: Bingbot
 Allow: /
+Disallow: /admin/
+Disallow: /bigdata/admin/
+Disallow: /private/
+Disallow: *.json$
+Disallow: /api/
 
 User-agent: Slurp
 Allow: /
+Disallow: /admin/
+Disallow: /bigdata/admin/
+Disallow: /private/
+Disallow: *.json$
+Disallow: /api/
 
 User-agent: DuckDuckBot
 Allow: /
+Disallow: /admin/
+Disallow: /bigdata/admin/
+Disallow: /private/
+Disallow: *.json$
+Disallow: /api/
 
 # Sitemap location
 Sitemap: https://f3rva.org/sitemap.xml
