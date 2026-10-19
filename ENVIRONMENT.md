@@ -24,9 +24,9 @@ Base URL for API endpoints.
 Slack App Client ID for Sign in with Slack (OpenID Connect).
 
 ### `VITE_SLACK_REDIRECT_URI`
-OAuth redirect URI callback endpoint.
+OAuth redirect URI callback endpoint (Slack requires `https://`).
 
-- **Local**: `http://localhost:3000/auth/slack/callback` (or `http://localhost:5173/auth/slack/callback`)
+- **Local**: `https://localhost:3000/auth/slack/callback`
 - **Development**: `https://dev.f3rva.org/auth/slack/callback`
 - **Production**: `https://f3rva.org/auth/slack/callback`
 
