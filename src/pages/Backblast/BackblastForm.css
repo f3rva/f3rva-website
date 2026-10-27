@@ -223,6 +223,10 @@
 }
 
 @media (max-width: 640px) {
+  .backblast-form {
+    padding: 1.25rem;
+  }
+
   .form-row {
     flex-direction: column;
     gap: 0;
@@ -253,8 +257,8 @@
 
 .form-actions {
   display: flex;
-  justify-content: space-between;
-  align-items: center;
+  flex-direction: column;
+  align-items: stretch;
   gap: 1rem;
   margin-top: 2rem;
   padding-top: 1.5rem;
@@ -262,22 +266,46 @@
 }
 
 .attendance-summary-badge {
-  display: inline-flex;
+  display: flex;
+  flex-wrap: wrap;
   align-items: center;
-  gap: 0.45rem;
+  justify-content: center;
+  column-gap: 0.4rem;
+  row-gap: 0.25rem;
+  width: 100%;
+  box-sizing: border-box;
   font-size: 0.9rem;
+  line-height: 1.4;
   font-weight: 700;
   color: #1e293b;
   background-color: #f1f5f9;
-  padding: 0.4rem 0.85rem;
+  padding: 0.65rem 0.85rem;
   border-radius: 6px;
   border: 1px solid #cbd5e1;
+  text-align: center;
+}
+
+.attendance-summary-primary {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.45rem;
+  white-space: nowrap;
+}
+
+.attendance-summary-primary svg {
+  flex-shrink: 0;
+}
+
+.attendance-summary-details {
+  white-space: nowrap;
 }
 
 .action-buttons-group {
   display: flex;
-  align-items: center;
+  justify-content: flex-end;
+  align-items: stretch;
   gap: 0.75rem;
+  width: 100%;
 }
 
 .btn-secondary {
@@ -285,11 +313,19 @@
   border: 1px solid #cbd5e1;
   color: #475569;
   padding: 0.65rem 1.25rem;
+  min-height: 44px;
   border-radius: 6px;
+  font-family: inherit;
+  font-size: 0.95rem;
+  line-height: 1.25;
   font-weight: 600;
   text-decoration: none;
   display: inline-flex;
   align-items: center;
+  justify-content: center;
+  text-align: center;
+  white-space: nowrap;
+  box-sizing: border-box;
   transition: all 0.15s ease;
 }
 
@@ -299,13 +335,32 @@
 
 .btn-primary {
   background: var(--primary-color, #a81c1c);
-  border: none;
+  border: 1px solid transparent;
   color: #ffffff;
   padding: 0.65rem 1.75rem;
+  min-height: 44px;
   border-radius: 6px;
+  font-family: inherit;
+  font-size: 0.95rem;
+  line-height: 1.25;
   font-weight: 600;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  white-space: nowrap;
+  box-sizing: border-box;
   cursor: pointer;
   transition: background-color 0.15s ease;
+}
+
+@media (max-width: 640px) {
+  .action-buttons-group .btn-secondary,
+  .action-buttons-group .btn-primary {
+    flex: 1;
+    padding-left: 0.75rem;
+    padding-right: 0.75rem;
+  }
 }
 
 .btn-primary:hover:not(:disabled) {
