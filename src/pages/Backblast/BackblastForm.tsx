@@ -330,10 +330,15 @@ export const BackblastForm: React.FC = () => {
         {/* Submission Actions */}
         <div className="form-actions">
           <div className="attendance-summary-badge">
-            <FaUsers /> {formData.pax.length + formData.fngs.length + formData.drs.length} Total Attendees ({formData.pax.length} PAX
-            {formData.fngs.length > 0 ? `, ${formData.fngs.length} FNG` : ''}
-            {formData.drs.length > 0 ? `, ${formData.drs.length} DR` : ''}) • {formData.qic.length} Q
-            {formData.qic.length === 1 ? '' : 's'}
+            <span className="attendance-summary-primary">
+              <FaUsers /> {formData.pax.length + formData.fngs.length + formData.drs.length} Total Attendees
+            </span>
+            <span className="attendance-summary-details">
+              ({formData.pax.length} PAX
+              {formData.fngs.length > 0 ? `, ${formData.fngs.length} FNG` : ''}
+              {formData.drs.length > 0 ? `, ${formData.drs.length} DR` : ''}) • {formData.qic.length} Q
+              {formData.qic.length === 1 ? '' : 's'}
+            </span>
           </div>
           <div className="action-buttons-group">
             <Link to="/" className="btn-secondary">
