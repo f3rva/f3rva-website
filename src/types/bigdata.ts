@@ -138,18 +138,26 @@ export interface AliasRequestResponse {
 /**
  * Administrator login request payload.
  */
-export interface AdminLoginRequest {
-  username: string;
-  password: string;
+/**
+ * Role assignment record from MEMBER_ROLE.
+ */
+export interface MemberRoleAssignmentResponse {
+  memberId: number;
+  f3Name: string;
+  slackDisplayName?: string | null;
+  role: string;
+  grantedByMemberId?: number | null;
+  grantedByF3Name?: string | null;
+  createdAt?: string | null;
 }
 
 /**
- * JWT Access Token response from admin login.
+ * Response returned when revoking a member role.
  */
-export interface TokenResponse {
-  accessToken: string;
-  tokenType: string;
-  expiresIn: number;
+export interface RevokeMemberRoleResponse {
+  message: string;
+  memberId: number;
+  role: string;
 }
 
 /**
@@ -168,6 +176,7 @@ export interface AuthUserProfile {
   memberId?: number;
   f3Name: string;
   role: 'member' | 'admin';
+  roles?: string[];
   realName?: string;
   email?: string;
 }

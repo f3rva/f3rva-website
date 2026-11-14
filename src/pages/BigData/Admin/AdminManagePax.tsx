@@ -190,7 +190,10 @@ export const AdminManagePax: React.FC = () => {
             📋 Pending Alias Requests
           </Link>
           <Link to="/bigdata/admin/manage-pax" className="admin-nav-tab active">
-            👥 Manage PAX & Merger
+            👥 Manage PAX &amp; Merger
+          </Link>
+          <Link to="/bigdata/admin/roles" className="admin-nav-tab">
+            🛡️ Manage Roles
           </Link>
         </div>
 

@@ -1,7 +1,6 @@
 /* eslint-disable react-refresh/only-export-components */
 import React, { createContext, useState, useEffect, useCallback, useMemo } from 'react';
-import { config } from '../config';
-import { TokenResponse, ApiErrorResponse, AuthUserProfile } from '../types/bigdata';
+import { AuthUserProfile } from '../types/bigdata';
 
 export interface AuthContextType {
   token: string | null;
@@ -11,7 +10,6 @@ export interface AuthContextType {
   adminUsername: string | null;
   loading: boolean;
   error: string | null;
-  login: (username: string, password: string) => Promise<boolean>;
   loginWithToken: (token: string, expiresIn: number, user: AuthUserProfile) => void;
   logout: () => void;
   getAuthHeaders: () => Record<string, string>;
@@ -62,56 +60,44 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     setUser(newUser);
     setError(null);
 
-    // Administrative tokens are stored in sessionStorage for defense-in-depth against shared devices.
-    // Regular member tokens remain in localStorage for a frictionless 60-day community experience.
-    const isUserAdmin = newUser.role === 'admin';
-    const targetStorage = isUserAdmin ? sessionStorage : localStorage;
-    const oppositeStorage = isUserAdmin ? localStorage : sessionStorage;
-
     try {
-      oppositeStorage.removeItem(TOKEN_STORAGE_KEY);
-      oppositeStorage.removeItem(EXPIRY_STORAGE_KEY);
-      oppositeStorage.removeItem(USER_STORAGE_KEY);
+      sessionStorage.removeItem(TOKEN_STORAGE_KEY);
+      sessionStorage.removeItem(EXPIRY_STORAGE_KEY);
+      sessionStorage.removeItem(USER_STORAGE_KEY);
     } catch {
       // Ignore storage access failures
     }
 
     try {
-      targetStorage.setItem(TOKEN_STORAGE_KEY, newToken);
-      targetStorage.setItem(EXPIRY_STORAGE_KEY, expiryTimestamp.toString());
-      targetStorage.setItem(USER_STORAGE_KEY, JSON.stringify(newUser));
+      localStorage.setItem(TOKEN_STORAGE_KEY, newToken);
+      localStorage.setItem(EXPIRY_STORAGE_KEY, expiryTimestamp.toString());
+      localStorage.setItem(USER_STORAGE_KEY, JSON.stringify(newUser));
     } catch {
       // Storage restricted
     }
   }, []);
 
-  // Initialize and validate token on mount (checking sessionStorage first, then localStorage)
+  // Initialize and validate token on mount from localStorage (falling back to sessionStorage for migration)
   useEffect(() => {
     let savedToken: string | null = null;
     let savedExpiry: string | null = null;
     let savedUserStr: string | null = null;
-    let fromLocalStorage = false;
 
-    // Check sessionStorage first (active admin session takes priority)
     try {
-      savedToken = sessionStorage.getItem(TOKEN_STORAGE_KEY);
-      savedExpiry = sessionStorage.getItem(EXPIRY_STORAGE_KEY);
-      savedUserStr = sessionStorage.getItem(USER_STORAGE_KEY);
+      savedToken = localStorage.getItem(TOKEN_STORAGE_KEY);
+      savedExpiry = localStorage.getItem(EXPIRY_STORAGE_KEY);
+      savedUserStr = localStorage.getItem(USER_STORAGE_KEY);
     } catch {
-      // Session storage unavailable
+      // Local storage unavailable
     }
 
-    // Fall back to localStorage for persistent member sessions
     if (!savedToken) {
       try {
-        savedToken = localStorage.getItem(TOKEN_STORAGE_KEY);
-        savedExpiry = localStorage.getItem(EXPIRY_STORAGE_KEY);
-        savedUserStr = localStorage.getItem(USER_STORAGE_KEY);
-        if (savedToken) {
-          fromLocalStorage = true;
-        }
+        savedToken = sessionStorage.getItem(TOKEN_STORAGE_KEY);
+        savedExpiry = sessionStorage.getItem(EXPIRY_STORAGE_KEY);
+        savedUserStr = sessionStorage.getItem(USER_STORAGE_KEY);
       } catch {
-        // Local storage unavailable
+        // Session storage unavailable
       }
     }
 
@@ -122,31 +108,16 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
           setToken(savedToken);
           setExpiresAt(expiryTime);
 
-          let parsedUser: AuthUserProfile = { f3Name: 'admin', role: 'admin' };
+          let parsedUser: AuthUserProfile = { f3Name: 'Member', role: 'member' };
           if (savedUserStr) {
             try {
               parsedUser = JSON.parse(savedUserStr);
             } catch {
-              parsedUser = { f3Name: 'admin', role: 'admin' };
+              parsedUser = { f3Name: 'Member', role: 'member' };
             }
           }
           setUser(parsedUser);
-
-          // If a legacy admin token was found in localStorage, migrate it to sessionStorage
-          if (fromLocalStorage && parsedUser.role === 'admin') {
-            try {
-              sessionStorage.setItem(TOKEN_STORAGE_KEY, savedToken);
-              sessionStorage.setItem(EXPIRY_STORAGE_KEY, savedExpiry);
-              sessionStorage.setItem(USER_STORAGE_KEY, savedUserStr || JSON.stringify(parsedUser));
-              localStorage.removeItem(TOKEN_STORAGE_KEY);
-              localStorage.removeItem(EXPIRY_STORAGE_KEY);
-              localStorage.removeItem(USER_STORAGE_KEY);
-            } catch {
-              // Ignore storage errors
-            }
-          }
         } else {
-          // Token has expired
           logout();
         }
       }
@@ -167,7 +138,6 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
       }
     };
 
-    // Immediate check on visibility change (e.g. returning to an idle tab)
     const handleVisibilityChange = () => {
       if (document.visibilityState === 'visible') {
         checkExpiration();
@@ -183,46 +153,6 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     };
   }, [token, expiresAt, logout]);
 
-  const login = useCallback(async (username: string, password: string): Promise<boolean> => {
-    setLoading(true);
-    setError(null);
-
-    try {
-      const response = await fetch(`${config.apiBaseUrl}/v2/admin/login`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({ username, password }),
-      });
-
-      if (!response.ok) {
-        let message = 'Invalid admin credentials';
-        try {
-          const errData: ApiErrorResponse = await response.json();
-          if (errData.errorMessage) {
-            message = errData.errorMessage;
-          }
-        } catch {
-          // Fallback to HTTP error
-        }
-        setError(message);
-        return false;
-      }
-
-      const tokenData: TokenResponse = await response.json();
-      const adminUser: AuthUserProfile = { f3Name: username, role: 'admin' };
-      loginWithToken(tokenData.accessToken, tokenData.expiresIn, adminUser);
-      return true;
-    } catch (err: unknown) {
-      const message = err instanceof Error ? err.message : 'Network error during login';
-      setError(message);
-      return false;
-    } finally {
-      setLoading(false);
-    }
-  }, [loginWithToken]);
-
   const getAuthHeaders = useCallback((): Record<string, string> => {
     if (token && expiresAt && Date.now() < expiresAt) {
       return {
@@ -237,7 +167,9 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
   }, [token, expiresAt]);
 
   const isAdmin = useMemo(() => {
-    return Boolean(isAuthenticated && user?.role === 'admin');
+    return Boolean(
+      isAuthenticated && (user?.role === 'admin' || user?.roles?.includes('admin'))
+    );
   }, [isAuthenticated, user]);
 
   const adminUsername = useMemo(() => {
@@ -253,12 +185,11 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
       adminUsername,
       loading,
       error,
-      login,
       loginWithToken,
       logout,
       getAuthHeaders,
     }),
-    [token, isAuthenticated, isAdmin, user, adminUsername, loading, error, login, loginWithToken, logout, getAuthHeaders]
+    [token, isAuthenticated, isAdmin, user, adminUsername, loading, error, loginWithToken, logout, getAuthHeaders]
   );
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;

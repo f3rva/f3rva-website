@@ -14,13 +14,10 @@ const MainNavigationHeader: React.FC = () => {
   const [isBigDataOpen, setIsBigDataOpen] = useState<boolean>(false);
   const [isMobileBigDataOpen, setIsMobileBigDataOpen] = useState<boolean>(false);
   const [isMobileUserOpen, setIsMobileUserOpen] = useState<boolean>(false);
-  const [isMobileLoginOpen, setIsMobileLoginOpen] = useState<boolean>(false);
   const [isUserMenuOpen, setIsUserMenuOpen] = useState<boolean>(false);
-  const [isLoginMenuOpen, setIsLoginMenuOpen] = useState<boolean>(false);
 
   const dropdownRef = useRef<HTMLLIElement>(null);
   const userMenuRef = useRef<HTMLDivElement>(null);
-  const loginMenuRef = useRef<HTMLDivElement>(null);
 
   const { isAuthenticated, isAdmin, user, adminUsername, logout } = useAuth();
   const navigate = useNavigate();
@@ -34,9 +31,7 @@ const MainNavigationHeader: React.FC = () => {
     setIsBigDataOpen(false);
     setIsMobileBigDataOpen(false);
     setIsMobileUserOpen(false);
-    setIsMobileLoginOpen(false);
     setIsUserMenuOpen(false);
-    setIsLoginMenuOpen(false);
   };
 
   const toggleBigData = (e: React.MouseEvent): void => {
@@ -89,16 +84,12 @@ const MainNavigationHeader: React.FC = () => {
       if (userMenuRef.current && !userMenuRef.current.contains(event.target as Node)) {
         setIsUserMenuOpen(false);
       }
-      if (loginMenuRef.current && !loginMenuRef.current.contains(event.target as Node)) {
-        setIsLoginMenuOpen(false);
-      }
     };
 
     const handleKeyDown = (event: KeyboardEvent): void => {
       if (event.key === 'Escape') {
         setIsBigDataOpen(false);
         setIsUserMenuOpen(false);
-        setIsLoginMenuOpen(false);
         setIsMenuOpen(false);
       }
     };
@@ -111,6 +102,8 @@ const MainNavigationHeader: React.FC = () => {
       document.removeEventListener('keydown', handleKeyDown);
     };
   }, []);
+
+  const displayUserName = user?.f3Name || adminUsername || (isAdmin ? 'Admin' : 'Member');
 
   return (
     <header className="main-navigation-header">
@@ -222,11 +215,9 @@ const MainNavigationHeader: React.FC = () => {
                 aria-label="User account menu"
               >
                 <div className={`user-avatar ${isAdmin ? 'admin-avatar' : ''}`}>
-                  {isAdmin ? '🛡️' : user?.f3Name ? user.f3Name.charAt(0).toUpperCase() : '👤'}
+                  {isAdmin ? '🛡️' : displayUserName.charAt(0).toUpperCase()}
                 </div>
-                <span className="user-name-label">
-                  {isAdmin ? adminUsername || 'Admin' : user?.f3Name || 'Member'}
-                </span>
+                <span className="user-name-label">{displayUserName}</span>
                 <span className={`dropdown-arrow ${isUserMenuOpen ? 'arrow-up' : ''}`} aria-hidden="true">
                   ▾
                 </span>
@@ -235,9 +226,7 @@ const MainNavigationHeader: React.FC = () => {
               <div className={`user-dropdown-menu ${isUserMenuOpen ? 'menu-visible' : ''}`} role="menu">
                 <div className="user-dropdown-header">
                   <span className="user-greeting-sub">Signed in as</span>
-                  <strong className="user-greeting-name">
-                    {isAdmin ? adminUsername || 'Admin' : user?.f3Name || 'Member'}
-                  </strong>
+                  <strong className="user-greeting-name">{displayUserName}</strong>
                   {isAdmin && <span className="user-role-tag">Administrator</span>}
                 </div>
 
@@ -257,36 +246,36 @@ const MainNavigationHeader: React.FC = () => {
                 </Link>
 
                 {/* Member Profile Stats */}
-                {!isAdmin && user?.memberId && (
-                  <>
-                    <Link
-                      to={`/bigdata/pax/${user.memberId}`}
-                      className="user-dropdown-link"
-                      role="menuitem"
-                      onClick={closeMenu}
-                    >
-                      <div className="dropdown-link-content">
-                        <span className="dropdown-link-title">My Stats & Profile</span>
-                        <span className="dropdown-link-desc">Personal attendance & streaks</span>
-                      </div>
-                    </Link>
-                    <Link
-                      to="/bigdata/claim-alias"
-                      className="user-dropdown-link"
-                      role="menuitem"
-                      onClick={closeMenu}
-                    >
-                      <div className="dropdown-link-content">
-                        <span className="dropdown-link-title">Claim PAX Alias</span>
-                        <span className="dropdown-link-desc">Merge duplicate attendance records</span>
-                      </div>
-                    </Link>
-                  </>
+                {user?.memberId && (
+                  <Link
+                    to={`/bigdata/pax/${user.memberId}`}
+                    className="user-dropdown-link"
+                    role="menuitem"
+                    onClick={closeMenu}
+                  >
+                    <div className="dropdown-link-content">
+                      <span className="dropdown-link-title">My Stats & Profile</span>
+                      <span className="dropdown-link-desc">Personal attendance & streaks</span>
+                    </div>
+                  </Link>
                 )}
+
+                <Link
+                  to="/bigdata/claim-alias"
+                  className="user-dropdown-link"
+                  role="menuitem"
+                  onClick={closeMenu}
+                >
+                  <div className="dropdown-link-content">
+                    <span className="dropdown-link-title">Claim PAX Alias</span>
+                    <span className="dropdown-link-desc">Merge duplicate attendance records</span>
+                  </div>
+                </Link>
 
                 {/* Admin Portal & Tools */}
                 {isAdmin && (
                   <>
+                    <div className="dropdown-divider"></div>
                     <Link
                       to="/bigdata/admin"
                       className="user-dropdown-link admin-action-link"
@@ -311,14 +300,15 @@ const MainNavigationHeader: React.FC = () => {
                       </div>
                     </Link>
                     <Link
-                      to="/bigdata/claim-alias"
-                      className="user-dropdown-link"
+                      to="/bigdata/admin/roles"
+                      className="user-dropdown-link admin-action-link"
                       role="menuitem"
                       onClick={closeMenu}
                     >
+                      <span className="dropdown-item-icon">🛡️</span>
                       <div className="dropdown-link-content">
-                        <span className="dropdown-link-title">Claim PAX Alias</span>
-                        <span className="dropdown-link-desc">Merge duplicate attendance records</span>
+                        <span className="dropdown-link-title">Manage Roles</span>
+                        <span className="dropdown-link-desc">Grant & revoke admin access</span>
                       </div>
                     </Link>
                   </>
@@ -332,57 +322,14 @@ const MainNavigationHeader: React.FC = () => {
               </div>
             </div>
           ) : (
-            <div
-              ref={loginMenuRef}
-              className={`login-menu-container ${isLoginMenuOpen ? 'login-menu-active' : ''}`}
-              onMouseEnter={() => setIsLoginMenuOpen(true)}
-              onMouseLeave={() => setIsLoginMenuOpen(false)}
+            <button
+              type="button"
+              className="nav-login-btn"
+              onClick={handleSlackLogin}
+              aria-label="Sign in with Slack"
             >
-              <button
-                type="button"
-                className="nav-login-btn login-dropdown-trigger"
-                onClick={() => setIsLoginMenuOpen((prev) => !prev)}
-                aria-haspopup="true"
-                aria-expanded={isLoginMenuOpen}
-                aria-label="Log in options"
-              >
-                <span>Log In</span>
-                <span className={`dropdown-arrow ${isLoginMenuOpen ? 'arrow-up' : ''}`} aria-hidden="true">
-                  ▾
-                </span>
-              </button>
-
-              <div className={`login-dropdown-menu ${isLoginMenuOpen ? 'menu-visible' : ''}`} role="menu">
-                <button
-                  type="button"
-                  className="login-dropdown-item slack-login-item"
-                  role="menuitem"
-                  onClick={() => {
-                    setIsLoginMenuOpen(false);
-                    handleSlackLogin();
-                  }}
-                >
-                  <div className="dropdown-link-content">
-                    <span className="dropdown-link-title">Sign in with Slack</span>
-                    <span className="dropdown-link-desc">For all members to post backblasts</span>
-                  </div>
-                </button>
-
-                <div className="dropdown-divider"></div>
-
-                <Link
-                  to="/bigdata/admin/login"
-                  className="login-dropdown-item admin-login-item"
-                  role="menuitem"
-                  onClick={closeMenu}
-                >
-                  <div className="dropdown-link-content">
-                    <span className="dropdown-link-title">Admin Login</span>
-                    <span className="dropdown-link-desc">Manage PAX & alias requests</span>
-                  </div>
-                </Link>
-              </div>
-            </div>
+              Sign in with Slack
+            </button>
           )}
         </div>
 
@@ -477,7 +424,7 @@ const MainNavigationHeader: React.FC = () => {
           {/* Divider between site links and account actions */}
           <li className="mobile-nav-divider" role="separator" />
 
-          {/* Collapsible Mobile User / Log In Accordion */}
+          {/* Collapsible Mobile User / Log In Item */}
           <li className="mobile-nav-item mobile-accordion-item">
             {isAuthenticated ? (
               <>
@@ -489,9 +436,9 @@ const MainNavigationHeader: React.FC = () => {
                 >
                   <span className="mobile-user-trigger-label">
                     <span className={`user-avatar ${isAdmin ? 'admin-avatar' : ''}`}>
-                      {isAdmin ? '🛡️' : user?.f3Name ? user.f3Name.charAt(0).toUpperCase() : '👤'}
+                      {isAdmin ? '🛡️' : displayUserName.charAt(0).toUpperCase()}
                     </span>
-                    <span>{isAdmin ? adminUsername || 'Admin' : user?.f3Name || 'Member'}</span>
+                    <span>{displayUserName}</span>
                   </span>
                   <span className={`dropdown-arrow ${isMobileUserOpen ? 'arrow-up' : ''}`} aria-hidden="true">
                     ▾
@@ -502,11 +449,14 @@ const MainNavigationHeader: React.FC = () => {
                     <Link to="/backblast/new" className="mobile-sublink" onClick={closeMenu}>
                       Post Backblast
                     </Link>
-                    {!isAdmin && user?.memberId && (
+                    {user?.memberId && (
                       <Link to={`/bigdata/pax/${user.memberId}`} className="mobile-sublink" onClick={closeMenu}>
                         My Stats & Profile
                       </Link>
                     )}
+                    <Link to="/bigdata/claim-alias" className="mobile-sublink" onClick={closeMenu}>
+                      Claim PAX Alias
+                    </Link>
                     {isAdmin && (
                       <>
                         <Link to="/bigdata/admin" className="mobile-sublink" onClick={closeMenu}>
@@ -515,11 +465,11 @@ const MainNavigationHeader: React.FC = () => {
                         <Link to="/bigdata/admin/manage-pax" className="mobile-sublink" onClick={closeMenu}>
                           Manage PAX
                         </Link>
+                        <Link to="/bigdata/admin/roles" className="mobile-sublink" onClick={closeMenu}>
+                          Manage Roles
+                        </Link>
                       </>
                     )}
-                    <Link to="/bigdata/claim-alias" className="mobile-sublink" onClick={closeMenu}>
-                      Claim PAX Alias
-                    </Link>
                     <button
                       type="button"
                       className="mobile-sublink mobile-btn-link text-danger"
@@ -531,36 +481,16 @@ const MainNavigationHeader: React.FC = () => {
                 )}
               </>
             ) : (
-              <>
-                <button
-                  type="button"
-                  className="mobile-accordion-trigger"
-                  onClick={() => setIsMobileLoginOpen((prev) => !prev)}
-                  aria-expanded={isMobileLoginOpen}
-                >
-                  <span>Log In</span>
-                  <span className={`dropdown-arrow ${isMobileLoginOpen ? 'arrow-up' : ''}`} aria-hidden="true">
-                    ▾
-                  </span>
-                </button>
-                {isMobileLoginOpen && (
-                  <div className="mobile-accordion-content">
-                    <button
-                      type="button"
-                      className="mobile-sublink mobile-btn-link"
-                      onClick={() => {
-                        closeMenu();
-                        handleSlackLogin();
-                      }}
-                    >
-                      Sign in with Slack
-                    </button>
-                    <Link to="/bigdata/admin/login" className="mobile-sublink" onClick={closeMenu}>
-                      Admin Login
-                    </Link>
-                  </div>
-                )}
-              </>
+              <button
+                type="button"
+                className="mobile-nav-link mobile-btn-link"
+                onClick={() => {
+                  closeMenu();
+                  handleSlackLogin();
+                }}
+              >
+                Sign in with Slack
+              </button>
             )}
           </li>
         </ul>

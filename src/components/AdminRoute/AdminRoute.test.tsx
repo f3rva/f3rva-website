@@ -13,7 +13,6 @@ const mockAuthContext = (overrides: Partial<AuthContextType> = {}): AuthContextT
   adminUsername: null,
   loading: false,
   error: null,
-  login: vi.fn(),
   loginWithToken: vi.fn(),
   logout: vi.fn(),
   getAuthHeaders: vi.fn().mockReturnValue({}),
@@ -79,7 +78,7 @@ describe('AdminRoute Component', () => {
 
     expect(screen.getByText(/Administrator Access Required/i)).toBeInTheDocument();
     expect(screen.getByText(/Bleeder/i)).toBeInTheDocument();
-    expect(screen.getByRole('link', { name: /Sign In as Admin/i })).toBeInTheDocument();
+    expect(screen.getByRole('link', { name: /Back to Big Data/i })).toBeInTheDocument();
     expect(screen.queryByText('Protected Admin Area')).not.toBeInTheDocument();
   });
 
@@ -89,7 +88,8 @@ describe('AdminRoute Component', () => {
         value={mockAuthContext({
           isAuthenticated: true,
           isAdmin: true,
-          adminUsername: 'ChiefAdmin',
+          user: { memberId: 1, f3Name: 'Splinter', role: 'admin', roles: ['admin', 'member'] },
+          adminUsername: 'Splinter',
           token: 'admin-token',
         })}
       >

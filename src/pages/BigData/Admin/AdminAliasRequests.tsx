@@ -176,7 +176,10 @@ export const AdminAliasRequests: React.FC = () => {
             {requests.length > 0 && <span className="admin-tab-badge">{requests.length}</span>}
           </Link>
           <Link to="/bigdata/admin/manage-pax" className="admin-nav-tab">
-            👥 Manage PAX & Merger
+            👥 Manage PAX &amp; Merger
+          </Link>
+          <Link to="/bigdata/admin/roles" className="admin-nav-tab">
+            🛡️ Manage Roles
           </Link>
         </div>
 

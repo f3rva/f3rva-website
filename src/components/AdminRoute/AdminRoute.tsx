@@ -44,24 +44,10 @@ export const AdminRoute: React.FC<AdminRouteProps> = ({ children }) => {
         <div style={{ fontSize: '3rem', marginBottom: '1rem' }}>🛡️</div>
         <h2 style={{ fontSize: '1.5rem', marginBottom: '0.75rem', fontWeight: 600 }}>Administrator Access Required</h2>
         <p style={{ color: '#94a3b8', marginBottom: '1.75rem', lineHeight: '1.6' }}>
-          You are currently signed in as <strong>{user?.f3Name || 'a member'}</strong>. Access to this administrative portal
-          requires dedicated administrator credentials.
+          You are currently signed in as <strong>{user?.f3Name || 'a member'}</strong>, which does not have the{' '}
+          <code>admin</code> role assigned. Ask a regional administrator to grant your PAX account administrator access.
         </p>
         <div style={{ display: 'flex', gap: '1rem', justifyContent: 'center' }}>
-          <Link
-            to="/bigdata/admin/login"
-            state={{ from: location }}
-            style={{
-              padding: '0.75rem 1.5rem',
-              backgroundColor: '#dc2626',
-              color: '#ffffff',
-              borderRadius: '8px',
-              textDecoration: 'none',
-              fontWeight: 600,
-            }}
-          >
-            Sign In as Admin →
-          </Link>
           <Link
             to="/bigdata"
             style={{
