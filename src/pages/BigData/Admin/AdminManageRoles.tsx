@@ -277,7 +277,8 @@ export const AdminManageRoles: React.FC = () => {
                   onChange={(e) => setSelectedRole(e.target.value)}
                   disabled={submitting}
                 >
-                  <option value="admin">admin — Regional Administrator</option>
+                  <option value="admin">admin — Regional Administrator (Full Access + Role Management)</option>
+                  <option value="moderator">moderator — Moderator (Alias Approval, PAX Merge &amp; Backblasts)</option>
                 </select>
               </div>
 

@@ -13,7 +13,10 @@ import '../BigData.css';
 import './ClaimAlias.css';
 
 export const ClaimAlias: React.FC = () => {
-  const { isAuthenticated, isAdmin, user, getAuthHeaders } = useAuth();
+  const { isAuthenticated, isAdmin, isModerator, user, getAuthHeaders } = useAuth();
+  const canModerate = Boolean(
+    isAdmin || isModerator || user?.role === 'moderator' || user?.roles?.includes('moderator')
+  );
 
   // Form state
   const [primaryMember, setPrimaryMember] = useState<MemberSummary | null>(null);
@@ -30,11 +33,11 @@ export const ClaimAlias: React.FC = () => {
 
   // Determine effective primary member (auto-locked to authenticated member if regular user)
   const effectivePrimaryMember = useMemo<MemberSummary | null>(() => {
-    if (!isAdmin && user?.memberId) {
+    if (!canModerate && user?.memberId) {
       return { memberId: user.memberId, f3Name: user.f3Name };
     }
     return primaryMember;
-  }, [isAdmin, user, primaryMember]);
+  }, [canModerate, user, primaryMember]);
 
   // Exclude primary member from alias choices so a member cannot alias to themselves
   const availableAliasMembers = useMemo(() => {
@@ -140,7 +143,7 @@ export const ClaimAlias: React.FC = () => {
           ]);
           setFetchKey((k) => k + 1);
           // Clear inputs
-          if (isAdmin) {
+          if (canModerate) {
             setPrimaryMember(null);
           }
           setAliasMember(null);
@@ -165,7 +168,7 @@ export const ClaimAlias: React.FC = () => {
         setSubmitting(false);
       }
     },
-    [effectivePrimaryMember, aliasMember, setPendingRequests, getAuthHeaders, isAdmin]
+    [effectivePrimaryMember, aliasMember, setPendingRequests, getAuthHeaders, canModerate]
   );
 
   return (
@@ -242,7 +245,7 @@ export const ClaimAlias: React.FC = () => {
               </div>
             ) : (
               <form onSubmit={handleSubmit} className="claim-alias-form">
-                {!isAdmin && user ? (
+                {!canModerate && user ? (
                   <div className="claim-alias-primary-card">
                     <div className="claim-alias-primary-card-header">
                       <span className="claim-alias-step-label">1. Primary Profile (Your Account)</span>
@@ -277,7 +280,7 @@ export const ClaimAlias: React.FC = () => {
 
                 <PaxAutocomplete
                   id="alias-member-select"
-                  label={isAdmin ? '2. Alternate / Duplicate Name to Merge' : '2. Select Duplicate Profile / Alias to Claim'}
+                  label={canModerate ? '2. Alternate / Duplicate Name to Merge' : '2. Select Duplicate Profile / Alias to Claim'}
                   placeholder="Search the alias or duplicate name..."
                   helpText="The secondary name or typo that should be linked and merged into your primary profile."
                   members={availableAliasMembers}

@@ -103,4 +103,38 @@ describe('AdminRoute Component', () => {
 
     expect(screen.getByText('Protected Admin Area')).toBeInTheDocument();
   });
+
+  it('allows moderator on standard AdminRoute but blocks when requireAdminOnly is true', () => {
+    const moderatorCtx = mockAuthContext({
+      isAuthenticated: true,
+      isAdmin: false,
+      isModerator: true,
+      user: { memberId: 2, f3Name: 'HoneyDo', role: 'moderator', roles: ['moderator', 'member'] },
+      token: 'mod-token',
+    });
+
+    const { unmount } = render(
+      <AuthContext.Provider value={moderatorCtx}>
+        <MemoryRouter initialEntries={['/bigdata/admin']}>
+          <AdminRoute>
+            <div>Moderator Area</div>
+          </AdminRoute>
+        </MemoryRouter>
+      </AuthContext.Provider>
+    );
+    expect(screen.getByText('Moderator Area')).toBeInTheDocument();
+    unmount();
+
+    render(
+      <AuthContext.Provider value={moderatorCtx}>
+        <MemoryRouter initialEntries={['/bigdata/admin/roles']}>
+          <AdminRoute requireAdminOnly={true}>
+            <div>Roles Area</div>
+          </AdminRoute>
+        </MemoryRouter>
+      </AuthContext.Provider>
+    );
+    expect(screen.getByText(/Administrator Access Required/i)).toBeInTheDocument();
+    expect(screen.queryByText('Roles Area')).not.toBeInTheDocument();
+  });
 });

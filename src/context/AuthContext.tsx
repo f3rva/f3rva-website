@@ -6,6 +6,7 @@ export interface AuthContextType {
   token: string | null;
   isAuthenticated: boolean;
   isAdmin: boolean;
+  isModerator?: boolean;
   user: AuthUserProfile | null;
   adminUsername: string | null;
   loading: boolean;
@@ -172,6 +173,13 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     );
   }, [isAuthenticated, user]);
 
+  const isModerator = useMemo(() => {
+    return Boolean(
+      isAuthenticated &&
+        (isAdmin || user?.role === 'moderator' || user?.roles?.includes('moderator'))
+    );
+  }, [isAuthenticated, isAdmin, user]);
+
   const adminUsername = useMemo(() => {
     return user?.f3Name || null;
   }, [user]);
@@ -181,6 +189,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
       token,
       isAuthenticated,
       isAdmin,
+      isModerator,
       user,
       adminUsername,
       loading,
@@ -189,7 +198,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
       logout,
       getAuthHeaders,
     }),
-    [token, isAuthenticated, isAdmin, user, adminUsername, loading, error, loginWithToken, logout, getAuthHeaders]
+    [token, isAuthenticated, isAdmin, isModerator, user, adminUsername, loading, error, loginWithToken, logout, getAuthHeaders]
   );
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;

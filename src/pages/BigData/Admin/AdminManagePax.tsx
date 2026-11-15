@@ -15,7 +15,7 @@ import '../SelfService/ClaimAlias.css';
 import './Admin.css';
 
 export const AdminManagePax: React.FC = () => {
-  const { getAuthHeaders, logout } = useAuth();
+  const { isAdmin, getAuthHeaders, logout } = useAuth();
 
   // Form State
   const [primaryMember, setPrimaryMember] = useState<MemberSummary | null>(null);
@@ -192,9 +192,11 @@ export const AdminManagePax: React.FC = () => {
           <Link to="/bigdata/admin/manage-pax" className="admin-nav-tab active">
             👥 Manage PAX &amp; Merger
           </Link>
-          <Link to="/bigdata/admin/roles" className="admin-nav-tab">
-            🛡️ Manage Roles
-          </Link>
+          {isAdmin && (
+            <Link to="/bigdata/admin/roles" className="admin-nav-tab">
+              🛡️ Manage Roles
+            </Link>
+          )}
         </div>
 
         {alert && (

@@ -175,7 +175,7 @@ export interface AuthUserProfile {
   slackUserId?: string;
   memberId?: number;
   f3Name: string;
-  role: 'member' | 'admin';
+  role: 'member' | 'moderator' | 'admin';
   roles?: string[];
   realName?: string;
   email?: string;

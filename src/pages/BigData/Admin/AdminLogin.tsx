@@ -9,7 +9,10 @@ import '../BigData.css';
 import './Admin.css';
 
 export const AdminLogin: React.FC = () => {
-  const { isAuthenticated, isAdmin, user, adminUsername, logout } = useAuth();
+  const { isAuthenticated, isAdmin, isModerator, user, adminUsername, logout } = useAuth();
+  const canModerate = Boolean(
+    isAdmin || isModerator || user?.role === 'moderator' || user?.roles?.includes('moderator')
+  );
   const location = useLocation();
 
   const rawFrom = (location.state as { from?: { pathname: string } })?.from?.pathname;
@@ -53,12 +56,13 @@ export const AdminLogin: React.FC = () => {
         />
 
         <div className="admin-login-card">
-          {isAdmin ? (
+          {canModerate ? (
             <div style={{ textAlign: 'center' }}>
               <div style={{ fontSize: '2.5rem', marginBottom: '0.5rem' }}>🛡️</div>
               <h2 className="admin-login-title">Already Authenticated</h2>
               <p className="admin-login-subtitle">
-                You are signed in as Administrator <strong>{user?.f3Name || adminUsername || 'Admin'}</strong>.
+                You are signed in as {isAdmin ? 'Administrator' : 'Moderator'}{' '}
+                <strong>{user?.f3Name || adminUsername || 'Admin'}</strong>.
               </p>
               <div style={{ display: 'flex', flexDirection: 'column', gap: '0.75rem', marginTop: '1.5rem' }}>
                 <Link

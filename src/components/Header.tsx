@@ -19,7 +19,10 @@ const MainNavigationHeader: React.FC = () => {
   const dropdownRef = useRef<HTMLLIElement>(null);
   const userMenuRef = useRef<HTMLDivElement>(null);
 
-  const { isAuthenticated, isAdmin, user, adminUsername, logout } = useAuth();
+  const { isAuthenticated, isAdmin, isModerator, user, adminUsername, logout } = useAuth();
+  const canModerate = Boolean(
+    isAdmin || isModerator || user?.role === 'moderator' || user?.roles?.includes('moderator')
+  );
   const navigate = useNavigate();
 
   const toggleMenu = (): void => {
@@ -214,8 +217,8 @@ const MainNavigationHeader: React.FC = () => {
                 aria-expanded={isUserMenuOpen}
                 aria-label="User account menu"
               >
-                <div className={`user-avatar ${isAdmin ? 'admin-avatar' : ''}`}>
-                  {isAdmin ? '🛡️' : displayUserName.charAt(0).toUpperCase()}
+                <div className={`user-avatar ${canModerate ? 'admin-avatar' : ''}`}>
+                  {canModerate ? '🛡️' : displayUserName.charAt(0).toUpperCase()}
                 </div>
                 <span className="user-name-label">{displayUserName}</span>
                 <span className={`dropdown-arrow ${isUserMenuOpen ? 'arrow-up' : ''}`} aria-hidden="true">
@@ -227,7 +230,9 @@ const MainNavigationHeader: React.FC = () => {
                 <div className="user-dropdown-header">
                   <span className="user-greeting-sub">Signed in as</span>
                   <strong className="user-greeting-name">{displayUserName}</strong>
-                  {isAdmin && <span className="user-role-tag">Administrator</span>}
+                  {canModerate && (
+                    <span className="user-role-tag">{isAdmin ? 'Administrator' : 'Moderator'}</span>
+                  )}
                 </div>
 
                 <div className="dropdown-divider"></div>
@@ -273,7 +278,7 @@ const MainNavigationHeader: React.FC = () => {
                 </Link>
 
                 {/* Admin Portal & Tools */}
-                {isAdmin && (
+                {canModerate && (
                   <>
                     <div className="dropdown-divider"></div>
                     <Link
@@ -299,18 +304,20 @@ const MainNavigationHeader: React.FC = () => {
                         <span className="dropdown-link-desc">Merge & organize member records</span>
                       </div>
                     </Link>
-                    <Link
-                      to="/bigdata/admin/roles"
-                      className="user-dropdown-link admin-action-link"
-                      role="menuitem"
-                      onClick={closeMenu}
-                    >
-                      <span className="dropdown-item-icon">🛡️</span>
-                      <div className="dropdown-link-content">
-                        <span className="dropdown-link-title">Manage Roles</span>
-                        <span className="dropdown-link-desc">Grant & revoke admin access</span>
-                      </div>
-                    </Link>
+                    {isAdmin && (
+                      <Link
+                        to="/bigdata/admin/roles"
+                        className="user-dropdown-link admin-action-link"
+                        role="menuitem"
+                        onClick={closeMenu}
+                      >
+                        <span className="dropdown-item-icon">🛡️</span>
+                        <div className="dropdown-link-content">
+                          <span className="dropdown-link-title">Manage Roles</span>
+                          <span className="dropdown-link-desc">Grant & revoke admin access</span>
+                        </div>
+                      </Link>
+                    )}
                   </>
                 )}
 
@@ -435,8 +442,8 @@ const MainNavigationHeader: React.FC = () => {
                   aria-expanded={isMobileUserOpen}
                 >
                   <span className="mobile-user-trigger-label">
-                    <span className={`user-avatar ${isAdmin ? 'admin-avatar' : ''}`}>
-                      {isAdmin ? '🛡️' : displayUserName.charAt(0).toUpperCase()}
+                    <span className={`user-avatar ${canModerate ? 'admin-avatar' : ''}`}>
+                      {canModerate ? '🛡️' : displayUserName.charAt(0).toUpperCase()}
                     </span>
                     <span>{displayUserName}</span>
                   </span>
@@ -457,7 +464,7 @@ const MainNavigationHeader: React.FC = () => {
                     <Link to="/bigdata/claim-alias" className="mobile-sublink" onClick={closeMenu}>
                       Claim PAX Alias
                     </Link>
-                    {isAdmin && (
+                    {canModerate && (
                       <>
                         <Link to="/bigdata/admin" className="mobile-sublink" onClick={closeMenu}>
                           Admin Portal
@@ -465,9 +472,11 @@ const MainNavigationHeader: React.FC = () => {
                         <Link to="/bigdata/admin/manage-pax" className="mobile-sublink" onClick={closeMenu}>
                           Manage PAX
                         </Link>
-                        <Link to="/bigdata/admin/roles" className="mobile-sublink" onClick={closeMenu}>
-                          Manage Roles
-                        </Link>
+                        {isAdmin && (
+                          <Link to="/bigdata/admin/roles" className="mobile-sublink" onClick={closeMenu}>
+                            Manage Roles
+                          </Link>
+                        )}
                       </>
                     )}
                     <button

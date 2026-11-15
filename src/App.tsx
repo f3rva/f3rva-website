@@ -220,7 +220,7 @@ const App: React.FC = () => {
                 <Route
                   path="/bigdata/admin/roles"
                   element={
-                    <AdminRoute>
+                    <AdminRoute requireAdminOnly={true}>
                       <AdminManageRoles />
                     </AdminRoute>
                   }

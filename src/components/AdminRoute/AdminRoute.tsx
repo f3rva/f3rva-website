@@ -5,14 +5,15 @@ import LoadingSpinner from '../LoadingSpinner/LoadingSpinner';
 
 interface AdminRouteProps {
   children: React.ReactElement;
+  requireAdminOnly?: boolean;
 }
 
 /**
  * Route protection wrapper for administrative views.
- * Redirects unauthenticated users to the admin login page and requires explicit administrator role.
+ * Redirects unauthenticated users to the admin login page and verifies moderator/administrator role.
  */
-export const AdminRoute: React.FC<AdminRouteProps> = ({ children }) => {
-  const { isAuthenticated, isAdmin, user, loading } = useAuth();
+export const AdminRoute: React.FC<AdminRouteProps> = ({ children, requireAdminOnly = false }) => {
+  const { isAuthenticated, isAdmin, isModerator, user, loading } = useAuth();
   const location = useLocation();
 
   if (loading) {
@@ -27,7 +28,12 @@ export const AdminRoute: React.FC<AdminRouteProps> = ({ children }) => {
     return <Navigate to="/bigdata/admin/login" state={{ from: location }} replace />;
   }
 
-  if (!isAdmin) {
+  const canModerate = Boolean(
+    isAdmin || isModerator || user?.role === 'moderator' || user?.roles?.includes('moderator')
+  );
+  const hasAccess = requireAdminOnly ? isAdmin : canModerate;
+
+  if (!hasAccess) {
     return (
       <div
         style={{
