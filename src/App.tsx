@@ -32,6 +32,7 @@ const ClaimAlias = lazy(() => import('./pages/BigData/SelfService/ClaimAlias'));
 const AdminLogin = lazy(() => import('./pages/BigData/Admin/AdminLogin'));
 const AdminAliasRequests = lazy(() => import('./pages/BigData/Admin/AdminAliasRequests'));
 const AdminManagePax = lazy(() => import('./pages/BigData/Admin/AdminManagePax'));
+const AdminManageRoles = lazy(() => import('./pages/BigData/Admin/AdminManageRoles'));
 const BackblastForm = lazy(() => import('./pages/Backblast/BackblastForm'));
 const SlackCallback = lazy(() => import('./pages/Auth/SlackCallback'));
 
@@ -213,6 +214,14 @@ const App: React.FC = () => {
                   element={
                     <AdminRoute>
                       <AdminManagePax />
+                    </AdminRoute>
+                  }
+                />
+                <Route
+                  path="/bigdata/admin/roles"
+                  element={
+                    <AdminRoute requireAdminOnly={true}>
+                      <AdminManageRoles />
                     </AdminRoute>
                   }
                 />

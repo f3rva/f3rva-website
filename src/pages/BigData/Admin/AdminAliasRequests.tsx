@@ -19,7 +19,7 @@ interface ConfirmActionState {
 }
 
 export const AdminAliasRequests: React.FC = () => {
-  const { getAuthHeaders, logout } = useAuth();
+  const { isAdmin, getAuthHeaders, logout } = useAuth();
   const [requests, setRequests] = useState<AliasRequestResponse[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
@@ -176,8 +176,13 @@ export const AdminAliasRequests: React.FC = () => {
             {requests.length > 0 && <span className="admin-tab-badge">{requests.length}</span>}
           </Link>
           <Link to="/bigdata/admin/manage-pax" className="admin-nav-tab">
-            👥 Manage PAX & Merger
+            👥 Manage PAX &amp; Merger
           </Link>
+          {isAdmin && (
+            <Link to="/bigdata/admin/roles" className="admin-nav-tab">
+              🛡️ Manage Roles
+            </Link>
+          )}
         </div>
 
         {alert && (

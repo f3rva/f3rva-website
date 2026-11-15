@@ -13,7 +13,10 @@ import '../BigData.css';
 export const WorkoutDetail: React.FC = () => {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
-  const { isAuthenticated, user, isAdmin } = useAuth();
+  const { isAuthenticated, user, isAdmin, isModerator } = useAuth();
+  const canModerate = Boolean(
+    isAdmin || isModerator || user?.role === 'moderator' || user?.roles?.includes('moderator')
+  );
 
   const isValidId = Boolean(id && /^\d+$/.test(id));
   const apiUrl = isValidId ? `${config.apiBaseUrl}/v2/workouts/${id}` : null;
@@ -64,7 +67,7 @@ export const WorkoutDetail: React.FC = () => {
           category="WORKOUTS"
           actions={
             <div style={{ display: 'flex', gap: '0.75rem', flexWrap: 'wrap', alignItems: 'center' }}>
-              {isAuthenticated && (isAdmin || user?.f3Name === workout.author || workout.q.some(q => q.f3Name === user?.f3Name)) && (
+              {isAuthenticated && (canModerate || user?.f3Name === workout.author || workout.q.some(q => q.f3Name === user?.f3Name)) && (
                 <Link
                   to={`/backblast/edit/${workout.workoutId}`}
                   className="bigdata-pill action-pill"

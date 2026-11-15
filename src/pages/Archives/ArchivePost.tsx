@@ -25,7 +25,7 @@ const ArchivePost: React.FC = () => {
     day: string;
     slug: string;
   }>();
-  const { isAuthenticated, user, isAdmin } = useAuth();
+  const { isAuthenticated, user, isAdmin, isModerator } = useAuth();
 
   // Validate parameters and format
   const isValidParams = year && month && day && slug;
@@ -69,9 +69,12 @@ const ArchivePost: React.FC = () => {
     return <Navigate to="/404" replace />;
   }
 
+  const canModerate = Boolean(
+    isAdmin || isModerator || user?.role === 'moderator' || user?.roles?.includes('moderator')
+  );
   const canEdit = Boolean(
     isAuthenticated &&
-      (isAdmin || user?.f3Name === post.author || post.q?.some((q) => q.f3Name === user?.f3Name))
+      (canModerate || user?.f3Name === post.author || post.q?.some((q) => q.f3Name === user?.f3Name))
   );
 
   return (

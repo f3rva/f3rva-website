@@ -32,7 +32,6 @@ const mockAuthContext = (overrides: Partial<AuthContextType> = {}): AuthContextT
   adminUsername: null,
   loading: false,
   error: null,
-  login: vi.fn(),
   loginWithToken: vi.fn(),
   logout: vi.fn(),
   getAuthHeaders: vi.fn().mockReturnValue({}),
