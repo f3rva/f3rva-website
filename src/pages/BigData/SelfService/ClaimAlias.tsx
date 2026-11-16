@@ -9,6 +9,7 @@ import BigDataPageHeader from '../../../components/BigDataPageHeader';
 import SEO from '../../../components/SEO';
 import PaxAutocomplete from './PaxAutocomplete';
 import { trackClaimAliasSubmit } from '../../../utils/analytics';
+import { buildSlackAuthUrl } from '../../../utils/slackAuth';
 import '../BigData.css';
 import './ClaimAlias.css';
 
@@ -72,12 +73,9 @@ export const ClaimAlias: React.FC = () => {
 
   const handleSlackLogin = useCallback(() => {
     sessionStorage.setItem('f3rva_auth_return_to', window.location.pathname);
-    if (config.slackClientId) {
-      window.location.href = `https://slack.com/openid/connect/authorize?response_type=code&scope=openid%20profile%20email&client_id=${encodeURIComponent(
-        config.slackClientId
-      )}&redirect_uri=${encodeURIComponent(config.slackRedirectUri)}&state=${encodeURIComponent(
-        window.location.pathname
-      )}`;
+    const slackAuthUrl = buildSlackAuthUrl(window.location.pathname);
+    if (slackAuthUrl) {
+      window.location.href = slackAuthUrl;
     }
   }, []);
 

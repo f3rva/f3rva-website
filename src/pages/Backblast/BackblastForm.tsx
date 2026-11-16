@@ -2,7 +2,7 @@ import React from 'react';
 import { useParams, Link } from 'react-router-dom';
 import { useAuth } from '../../hooks/useAuth';
 import { useBackblastForm } from '../../hooks/useBackblastForm';
-import { config } from '../../config';
+import { buildSlackAuthUrl } from '../../utils/slackAuth';
 import RichTextEditor from '../../components/RichTextEditor';
 import LoadingSpinner from '../../components/LoadingSpinner/LoadingSpinner';
 import PaxMultiSelect from '../../components/PaxMultiSelect';
@@ -69,11 +69,10 @@ export const BackblastForm: React.FC = () => {
     });
   }, [formData.fngs, members, originalFngs]);
 
-  const slackAuthUrl = `${config.slackClientId ? `https://slack.com/openid/connect/authorize?response_type=code&scope=openid%20profile%20email&client_id=${encodeURIComponent(config.slackClientId)}&redirect_uri=${encodeURIComponent(config.slackRedirectUri)}&state=${encodeURIComponent(window.location.pathname)}` : '#'}`;
-
   const handleSlackLoginClick = () => {
     sessionStorage.setItem('f3rva_auth_return_to', window.location.pathname);
-    if (config.slackClientId) {
+    const slackAuthUrl = buildSlackAuthUrl(window.location.pathname);
+    if (slackAuthUrl) {
       window.location.href = slackAuthUrl;
     } else {
       alert('Slack Client ID is not configured in this environment.');

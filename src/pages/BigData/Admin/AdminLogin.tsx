@@ -1,7 +1,7 @@
 import React from 'react';
 import { useLocation, Link } from 'react-router-dom';
 import { useAuth } from '../../../hooks/useAuth';
-import { config } from '../../../config';
+import { buildSlackAuthUrl } from '../../../utils/slackAuth';
 import BigDataPageHeader from '../../../components/BigDataPageHeader';
 import SEO from '../../../components/SEO';
 import { sanitizeRedirectPath } from '../../../utils/validation';
@@ -20,10 +20,8 @@ export const AdminLogin: React.FC = () => {
 
   const handleSlackLogin = () => {
     sessionStorage.setItem('f3rva_auth_return_to', from);
-    if (config.slackClientId) {
-      const slackAuthUrl = `https://slack.com/openid/connect/authorize?response_type=code&scope=openid%20profile%20email&client_id=${encodeURIComponent(
-        config.slackClientId
-      )}&redirect_uri=${encodeURIComponent(config.slackRedirectUri)}&state=${encodeURIComponent(from)}`;
+    const slackAuthUrl = buildSlackAuthUrl(from);
+    if (slackAuthUrl) {
       window.location.href = slackAuthUrl;
     }
   };
