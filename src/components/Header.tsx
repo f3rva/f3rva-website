@@ -1,7 +1,7 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../hooks/useAuth';
-import { config } from '../config';
+import { buildSlackAuthUrl } from '../utils/slackAuth';
 import './Header.css';
 
 /**
@@ -48,18 +48,10 @@ const MainNavigationHeader: React.FC = () => {
     navigate('/bigdata');
   };
 
-  // Slack OAuth authorization URL
-  const slackAuthUrl = config.slackClientId
-    ? `https://slack.com/openid/connect/authorize?response_type=code&scope=openid%20profile%20email&client_id=${encodeURIComponent(
-        config.slackClientId
-      )}&redirect_uri=${encodeURIComponent(config.slackRedirectUri)}&state=${encodeURIComponent(
-        window.location.pathname
-      )}`
-    : '#';
-
   const handleSlackLogin = (): void => {
     sessionStorage.setItem('f3rva_auth_return_to', window.location.pathname);
-    if (config.slackClientId) {
+    const slackAuthUrl = buildSlackAuthUrl(window.location.pathname);
+    if (slackAuthUrl) {
       window.location.href = slackAuthUrl;
     } else {
       navigate('/backblast/new');

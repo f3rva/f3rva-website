@@ -16,6 +16,8 @@ interface Config {
   slackClientId: string;
   /** Slack OAuth Redirect URI */
   slackRedirectUri: string;
+  /** Slack Workspace / Team ID for scoping OIDC login */
+  slackTeamId: string;
 }
 
 export const config: Config = {
@@ -25,6 +27,7 @@ export const config: Config = {
   slackRedirectUri:
     import.meta.env.VITE_SLACK_REDIRECT_URI ||
     (typeof window !== 'undefined' ? `${window.location.origin}/auth/slack/callback` : '/auth/slack/callback'),
+  slackTeamId: import.meta.env.VITE_SLACK_TEAM_ID || '',
 };
 
 // Validate required environment variables in development
