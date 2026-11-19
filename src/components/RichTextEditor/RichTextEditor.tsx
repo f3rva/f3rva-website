@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useRef } from 'react';
 import { useEditor, EditorContent } from '@tiptap/react';
 import StarterKit from '@tiptap/starter-kit';
 import Link from '@tiptap/extension-link';
@@ -31,6 +31,11 @@ export const RichTextEditor: React.FC<RichTextEditorProps> = ({
   onChange,
   disabled = false,
 }) => {
+  const onChangeRef = useRef(onChange);
+  useEffect(() => {
+    onChangeRef.current = onChange;
+  }, [onChange]);
+
   const editor = useEditor({
     extensions: [
       StarterKit.configure({
@@ -46,21 +51,27 @@ export const RichTextEditor: React.FC<RichTextEditorProps> = ({
     ],
     content,
     editable: !disabled,
-    onUpdate: ({ editor: currentEditor }) => {
-      onChange(currentEditor.getHTML());
+    onUpdate: ({ editor: currentEditor, transaction }) => {
+      if (transaction.docChanged) {
+        onChangeRef.current(currentEditor.getHTML());
+      }
     },
   });
 
   // Keep content synchronized if updated externally
   useEffect(() => {
-    if (editor && content !== editor.getHTML()) {
-      editor.commands.setContent(content, { emitUpdate: false });
+    if (editor) {
+      const currentHtml = editor.getHTML();
+      const isBothEmpty = !content.trim() && currentHtml === '<p></p>';
+      if (!isBothEmpty && content !== currentHtml) {
+        editor.commands.setContent(content, { emitUpdate: false });
+      }
     }
   }, [content, editor]);
 
   useEffect(() => {
-    if (editor) {
-      editor.setEditable(!disabled);
+    if (editor && editor.isEditable !== !disabled) {
+      editor.setEditable(!disabled, false);
     }
   }, [disabled, editor]);
 

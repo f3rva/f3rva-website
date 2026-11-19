@@ -14,6 +14,9 @@ export const ALL_PAX_NAME = 'All PAX';
 export const DEFAULT_PAGE_SIZE = 20;
 export const DEFAULT_PAGE_SIZE_OPTIONS = [10, 20, 50] as const;
 
+/** Expiration window for saved backblast drafts in localStorage (6 hours) */
+export const BACKBLAST_DRAFT_TTL_MS = 6 * 60 * 60 * 1000;
+
 /** Alias claim status enumeration */
 export const ALIAS_STATUS = {
   PENDING: 'pending',

@@ -3,6 +3,7 @@ import { useParams, Link } from 'react-router-dom';
 import { useAuth } from '../../hooks/useAuth';
 import { useBackblastForm } from '../../hooks/useBackblastForm';
 import { buildSlackAuthUrl } from '../../utils/slackAuth';
+import { formatDisplayDate, getDateFromString } from '../../utils/dateUtils';
 import RichTextEditor from '../../components/RichTextEditor';
 import LoadingSpinner from '../../components/LoadingSpinner/LoadingSpinner';
 import PaxMultiSelect from '../../components/PaxMultiSelect';
@@ -19,6 +20,7 @@ import {
   FaSave,
   FaUserPlus,
   FaGlobeAmericas,
+  FaHistory,
 } from 'react-icons/fa';
 import './BackblastForm.css';
 
@@ -29,6 +31,7 @@ export const BackblastForm: React.FC = () => {
 
   const {
     formData,
+    todayDate,
     aos,
     loadingAos,
     members,
@@ -39,13 +42,37 @@ export const BackblastForm: React.FC = () => {
     validationErrors,
     isEditMode,
     lastSaved,
+    pendingDraft,
+    isDirty,
     originalFngs,
     updateField,
     setManualSlug,
     addQToPax,
+    resetDateToToday,
+    restoreDraft,
+    discardDraft,
     submit,
     clearDraft,
   } = useBackblastForm(workoutId);
+
+  const formattedWorkoutDate = React.useMemo(() => {
+    if (!formData.workoutDate || !/^\d{4}-\d{2}-\d{2}$/.test(formData.workoutDate)) {
+      return null;
+    }
+    return formatDisplayDate(formData.workoutDate);
+  }, [formData.workoutDate]);
+
+  const pastDateDaysAgo = React.useMemo(() => {
+    if (isEditMode || !formData.workoutDate || !/^\d{4}-\d{2}-\d{2}$/.test(formData.workoutDate)) {
+      return 0;
+    }
+    if (formData.workoutDate >= todayDate) {
+      return 0;
+    }
+    const selected = getDateFromString(formData.workoutDate);
+    const today = getDateFromString(todayDate);
+    return Math.round((today.getTime() - selected.getTime()) / (24 * 60 * 60 * 1000));
+  }, [formData.workoutDate, todayDate, isEditMode]);
 
   const regularPaxMembers = React.useMemo(
     () => (members || []).filter((m) => !m.isDr),
@@ -138,12 +165,43 @@ export const BackblastForm: React.FC = () => {
             )}
           </div>
         </div>
-        {!isEditMode && (
+        {!isEditMode && (isDirty || Boolean(lastSaved)) && (
           <button type="button" className="btn-clear-draft" onClick={clearDraft} title="Clear saved draft">
             <FaTrashAlt /> Clear Draft
           </button>
         )}
       </div>
+
+      {!isEditMode && pendingDraft && (
+        <div className="draft-recovery-banner" role="status">
+          <div className="draft-recovery-content">
+            <FaHistory className="draft-recovery-icon" aria-hidden="true" />
+            <div className="draft-recovery-text">
+              <strong>Unsaved draft found</strong> from{' '}
+              {pendingDraft.savedAt.toLocaleTimeString([], { hour: 'numeric', minute: '2-digit' })}
+              {pendingDraft.data.title.trim() ? ` (“${pendingDraft.data.title.trim()}”)` : ''}.
+            </div>
+          </div>
+          <div className="draft-recovery-actions">
+            <button
+              type="button"
+              className="btn-restore-draft"
+              onClick={restoreDraft}
+              disabled={submitting}
+            >
+              Restore Draft
+            </button>
+            <button
+              type="button"
+              className="btn-discard-draft"
+              onClick={discardDraft}
+              disabled={submitting}
+            >
+              Discard
+            </button>
+          </div>
+        </div>
+      )}
 
       {error && (
         <div className="backblast-alert-error" role="alert">
@@ -195,17 +253,40 @@ export const BackblastForm: React.FC = () => {
               <label htmlFor="bb-date" className="date-field-label">
                 <FaCalendarAlt className="field-icon" /> Workout Date <span className="required">*</span>
               </label>
+              {formattedWorkoutDate && (
+                <span className="date-weekday-preview" aria-live="polite">
+                  {formattedWorkoutDate}
+                </span>
+              )}
             </div>
             <div className="date-field-help">Date when the beatdown took place.</div>
             <input
               id="bb-date"
               type="date"
+              max={todayDate}
               className={`form-input date-input ${validationErrors.workoutDate ? 'has-error' : ''}`}
               value={formData.workoutDate}
               onChange={(e) => updateField('workoutDate', e.target.value)}
               disabled={submitting}
             />
             {validationErrors.workoutDate && <span className="field-error">{validationErrors.workoutDate}</span>}
+            {pastDateDaysAgo > 0 && !validationErrors.workoutDate && (
+              <div className="date-past-warning" role="status">
+                <span>
+                  <strong>Heads up:</strong> You&apos;re posting for{' '}
+                  <strong>{pastDateDaysAgo === 1 ? 'yesterday' : `${pastDateDaysAgo} days ago`}</strong>
+                  {formattedWorkoutDate ? ` (${formattedWorkoutDate})` : ''}.
+                </span>
+                <button
+                  type="button"
+                  className="btn-reset-today"
+                  onClick={resetDateToToday}
+                  disabled={submitting}
+                >
+                  Set to Today
+                </button>
+              </div>
+            )}
           </div>
 
           <div className="form-group col-half">

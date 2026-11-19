@@ -37,4 +37,27 @@ describe('RichTextEditor', () => {
     expect(screen.getByRole('button', { name: /italic/i })).toBeDisabled();
     expect(screen.getByRole('button', { name: /strikethrough/i })).toBeDisabled();
   });
+
+  it('does not invoke onChange on initial mount or when toggling disabled', () => {
+    const mockOnChange = vi.fn();
+    const { rerender } = render(
+      <RichTextEditor
+        content=""
+        onChange={mockOnChange}
+        disabled={false}
+      />
+    );
+
+    expect(mockOnChange).not.toHaveBeenCalled();
+
+    rerender(
+      <RichTextEditor
+        content=""
+        onChange={mockOnChange}
+        disabled={true}
+      />
+    );
+
+    expect(mockOnChange).not.toHaveBeenCalled();
+  });
 });

@@ -1,7 +1,9 @@
-import { useState, useEffect, useCallback, useMemo, useRef } from 'react';
+import { useState, useEffect, useCallback, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from './useAuth';
 import { config } from '../config';
+import { BACKBLAST_DRAFT_TTL_MS } from '../config/constants';
+import { formatDateToISO } from '../utils/dateUtils';
 import {
   AOSummary,
   MemberSummary,
@@ -27,6 +29,17 @@ export interface BackblastFormData {
   slug: string;
 }
 
+export interface PendingBackblastDraft {
+  data: BackblastFormData;
+  dateManuallyEdited: boolean;
+  savedAt: Date;
+}
+
+interface StoredDraftPayload extends Partial<BackblastFormData> {
+  aoName?: string;
+  dateManuallyEdited?: boolean;
+}
+
 export function slugify(text: string): string {
   return text
     .toLowerCase()
@@ -49,20 +62,47 @@ function parseNames(input: unknown): string[] {
   return [];
 }
 
+function listsMatchDefault(list: string[], defaultName?: string): boolean {
+  if (!defaultName) {
+    return list.length === 0;
+  }
+  return list.length === 1 && list[0].trim().toLowerCase() === defaultName.trim().toLowerCase();
+}
+
+function hasSubstantiveDraftContent(data: BackblastFormData, defaultName?: string): boolean {
+  const trimmedBody = data.body.trim();
+  const hasBody = trimmedBody.length > 0 && trimmedBody !== '<p></p>';
+  return (
+    data.title.trim().length > 0 ||
+    data.aoNames.length > 0 ||
+    data.fngs.length > 0 ||
+    data.drs.length > 0 ||
+    hasBody ||
+    !listsMatchDefault(data.qic, defaultName) ||
+    !listsMatchDefault(data.pax, defaultName)
+  );
+}
+
+function clearStoredDraft(): void {
+  try {
+    localStorage.removeItem(DRAFT_STORAGE_KEY);
+    localStorage.removeItem(DRAFT_TIMESTAMP_KEY);
+  } catch {
+    // Ignore localStorage errors
+  }
+}
+
 export function useBackblastForm(workoutId?: number) {
   const navigate = useNavigate();
   const { user, isAuthenticated, getAuthHeaders } = useAuth();
 
   const isEditMode = Boolean(workoutId);
 
-  const initialDate = useMemo(() => {
-    const today = new Date();
-    return today.toISOString().split('T')[0];
-  }, []);
+  const [todayDate, setTodayDate] = useState<string>(() => formatDateToISO(new Date()));
 
-  const [formData, setFormData] = useState<BackblastFormData>({
+  const [formData, setFormData] = useState<BackblastFormData>(() => ({
     title: '',
-    workoutDate: initialDate,
+    workoutDate: formatDateToISO(new Date()),
     aoNames: [],
     qic: [],
     pax: [],
@@ -70,7 +110,7 @@ export function useBackblastForm(workoutId?: number) {
     drs: [],
     body: '',
     slug: '',
-  });
+  }));
 
   const [aos, setAos] = useState<AOSummary[]>([]);
   const [loadingAos, setLoadingAos] = useState<boolean>(true);
@@ -81,11 +121,14 @@ export function useBackblastForm(workoutId?: number) {
   const [error, setError] = useState<string | null>(null);
   const [validationErrors, setValidationErrors] = useState<Record<string, string>>({});
   const [slugManuallyEdited, setSlugManuallyEdited] = useState<boolean>(false);
+  const [dateManuallyEdited, setDateManuallyEdited] = useState<boolean>(false);
   const [lastSaved, setLastSaved] = useState<Date | null>(null);
+  const [pendingDraft, setPendingDraft] = useState<PendingBackblastDraft | null>(null);
   const [isDirty, setIsDirty] = useState<boolean>(false);
   const [originalFngs, setOriginalFngs] = useState<string[]>([]);
 
   const isInitialMount = useRef<boolean>(true);
+  const hasSavedInSessionRef = useRef<boolean>(false);
 
   // Fetch available AOs
   useEffect(() => {
@@ -134,12 +177,16 @@ export function useBackblastForm(workoutId?: number) {
     };
   }, []);
 
-  // Initialize form: Load existing workout in edit mode, or load saved draft in create mode
+  // Initialize form: Load existing workout in edit mode, or start fresh & check for a valid draft in create mode
   useEffect(() => {
     let isMounted = true;
 
     const initialize = async () => {
       setLoadingInitial(true);
+      const currentToday = formatDateToISO(new Date());
+      if (isMounted) {
+        setTodayDate(currentToday);
+      }
 
       if (isEditMode && workoutId) {
         try {
@@ -157,10 +204,11 @@ export function useBackblastForm(workoutId?: number) {
             const drNames = Array.isArray(data.drs) ? data.drs.map((d) => d.f3Name) : [];
 
             setOriginalFngs(fngNames);
+            setPendingDraft(null);
 
             setFormData({
               title: data.title || '',
-              workoutDate: data.workoutDate || initialDate,
+              workoutDate: data.workoutDate || currentToday,
               aoNames: aoList,
               qic: qNames,
               pax: paxNames,
@@ -170,6 +218,7 @@ export function useBackblastForm(workoutId?: number) {
               slug: data.slug || '',
             });
             setSlugManuallyEdited(true);
+            setDateManuallyEdited(true);
             setIsDirty(false);
           }
         } catch (err: unknown) {
@@ -180,50 +229,79 @@ export function useBackblastForm(workoutId?: number) {
           if (isMounted) setLoadingInitial(false);
         }
       } else {
-        // Create mode: Check for saved draft
+        // Create mode: Always start with a clean form defaulting to today's local date.
+        // If a non-expired substantive draft exists, surface it via pendingDraft for explicit recovery.
+        const userQ = user?.f3Name ? [user.f3Name] : [];
+
+        if (isMounted) {
+          setOriginalFngs([]);
+          setFormData({
+            title: '',
+            workoutDate: currentToday,
+            aoNames: [],
+            qic: userQ,
+            pax: userQ,
+            fngs: [],
+            drs: [],
+            body: '',
+            slug: '',
+          });
+          setSlugManuallyEdited(false);
+          setDateManuallyEdited(false);
+          setLastSaved(null);
+          setIsDirty(false);
+          setPendingDraft(null);
+          hasSavedInSessionRef.current = false;
+        }
+
         try {
           const savedDraft = localStorage.getItem(DRAFT_STORAGE_KEY);
           const savedTimestamp = localStorage.getItem(DRAFT_TIMESTAMP_KEY);
 
-          if (savedDraft && isMounted) {
-            const parsed = JSON.parse(savedDraft);
-            const userQ = user?.f3Name ? [user.f3Name] : [];
-            const parsedAos = parseNames(parsed.aoNames || parsed.aoName);
+          if (savedDraft) {
+            const savedAt = savedTimestamp ? new Date(savedTimestamp) : null;
+            const savedAtMs = savedAt ? savedAt.getTime() : Number.NaN;
+            const isExpired =
+              Number.isNaN(savedAtMs) || Date.now() - savedAtMs > BACKBLAST_DRAFT_TTL_MS;
 
-            setOriginalFngs([]);
-            setFormData({
-              title: parsed.title || '',
-              workoutDate: parsed.workoutDate || initialDate,
-              aoNames: parsedAos,
-              qic: parseNames(parsed.qic).length > 0 ? parseNames(parsed.qic) : userQ,
-              pax: parseNames(parsed.pax).length > 0 ? parseNames(parsed.pax) : userQ,
-              fngs: parseNames(parsed.fngs),
-              drs: parseNames(parsed.drs),
-              body: parsed.body || '',
-              slug: parsed.slug || '',
-            });
+            if (isExpired) {
+              clearStoredDraft();
+            } else {
+              const parsed: StoredDraftPayload = JSON.parse(savedDraft);
+              const parsedAos = parseNames(parsed.aoNames || parsed.aoName);
+              const parsedQic = parseNames(parsed.qic);
+              const parsedPax = parseNames(parsed.pax);
 
-            if (savedTimestamp) {
-              setLastSaved(new Date(savedTimestamp));
+              const draftData: BackblastFormData = {
+                title: typeof parsed.title === 'string' ? parsed.title : '',
+                workoutDate:
+                  typeof parsed.workoutDate === 'string' && parsed.workoutDate
+                    ? parsed.workoutDate
+                    : currentToday,
+                aoNames: parsedAos,
+                qic: parsedQic.length > 0 ? parsedQic : userQ,
+                pax: parsedPax.length > 0 ? parsedPax : userQ,
+                fngs: parseNames(parsed.fngs),
+                drs: parseNames(parsed.drs),
+                body: typeof parsed.body === 'string' ? parsed.body : '',
+                slug: typeof parsed.slug === 'string' ? parsed.slug : '',
+              };
+
+              if (hasSubstantiveDraftContent(draftData, user?.f3Name) && savedAt) {
+                if (isMounted) {
+                  setPendingDraft({
+                    data: draftData,
+                    dateManuallyEdited: parsed.dateManuallyEdited === true,
+                    savedAt,
+                  });
+                }
+              } else {
+                clearStoredDraft();
+              }
             }
-          } else if (isMounted) {
-            setOriginalFngs([]);
-            setFormData({
-              title: '',
-              workoutDate: initialDate,
-              aoNames: [],
-              qic: user?.f3Name ? [user.f3Name] : [],
-              pax: user?.f3Name ? [user.f3Name] : [],
-              fngs: [],
-              drs: [],
-              body: '',
-              slug: '',
-            });
-            setLastSaved(null);
-            setIsDirty(false);
           }
         } catch {
-          // Ignore localStorage errors
+          clearStoredDraft();
         } finally {
           if (isMounted) setLoadingInitial(false);
         }
@@ -234,9 +312,40 @@ export function useBackblastForm(workoutId?: number) {
     return () => {
       isMounted = false;
     };
-  }, [isEditMode, workoutId, initialDate, user?.f3Name]);
+  }, [isEditMode, workoutId, user?.f3Name]);
 
-  // Auto-save draft in create mode (only when user has made dirty edits while authenticated)
+  // Keep todayDate fresh and auto-update unedited workoutDate if the tab stays open past midnight
+  useEffect(() => {
+    const syncCurrentDate = () => {
+      if (document.visibilityState === 'hidden') return;
+      const currentToday = formatDateToISO(new Date());
+      setTodayDate((prevToday) => (prevToday === currentToday ? prevToday : currentToday));
+
+      if (!isEditMode && !dateManuallyEdited) {
+        setFormData((prev) =>
+          prev.workoutDate === currentToday ? prev : { ...prev, workoutDate: currentToday }
+        );
+      }
+
+      setPendingDraft((prev) => {
+        if (!prev) return null;
+        if (Date.now() - prev.savedAt.getTime() > BACKBLAST_DRAFT_TTL_MS) {
+          clearStoredDraft();
+          return null;
+        }
+        return prev;
+      });
+    };
+
+    document.addEventListener('visibilitychange', syncCurrentDate);
+    window.addEventListener('focus', syncCurrentDate);
+    return () => {
+      document.removeEventListener('visibilitychange', syncCurrentDate);
+      window.removeEventListener('focus', syncCurrentDate);
+    };
+  }, [isEditMode, dateManuallyEdited]);
+
+  // Auto-save draft in create mode (only when user has made substantive dirty edits while authenticated)
   useEffect(() => {
     if (isInitialMount.current) {
       isInitialMount.current = false;
@@ -244,16 +353,27 @@ export function useBackblastForm(workoutId?: number) {
     }
 
     if (!isEditMode && !loadingInitial && isDirty && isAuthenticated) {
-      try {
-        localStorage.setItem(DRAFT_STORAGE_KEY, JSON.stringify(formData));
-        const now = new Date();
-        localStorage.setItem(DRAFT_TIMESTAMP_KEY, now.toISOString());
-        setLastSaved(now);
-      } catch {
-        // Ignore localStorage errors
+      if (hasSubstantiveDraftContent(formData, user?.f3Name)) {
+        try {
+          const payload: StoredDraftPayload = {
+            ...formData,
+            dateManuallyEdited,
+          };
+          localStorage.setItem(DRAFT_STORAGE_KEY, JSON.stringify(payload));
+          const now = new Date();
+          localStorage.setItem(DRAFT_TIMESTAMP_KEY, now.toISOString());
+          hasSavedInSessionRef.current = true;
+          setLastSaved(now);
+        } catch {
+          // Ignore localStorage errors
+        }
+      } else if (hasSavedInSessionRef.current) {
+        clearStoredDraft();
+        hasSavedInSessionRef.current = false;
+        setLastSaved(null);
       }
     }
-  }, [formData, isEditMode, loadingInitial, isDirty, isAuthenticated]);
+  }, [formData, dateManuallyEdited, isEditMode, loadingInitial, isDirty, isAuthenticated, user?.f3Name]);
 
   // Prevent accidental navigation with unsaved modifications
   useEffect(() => {
@@ -274,6 +394,14 @@ export function useBackblastForm(workoutId?: number) {
 
   const updateField = useCallback(
     <K extends keyof BackblastFormData>(field: K, value: BackblastFormData[K]) => {
+      if (field === 'body' && typeof value === 'string') {
+        const isIncomingEmpty = !value.trim() || value.trim() === '<p></p>';
+        const isCurrentEmpty = !formData.body.trim() || formData.body.trim() === '<p></p>';
+        if (isIncomingEmpty && isCurrentEmpty) {
+          return;
+        }
+      }
+
       setFormData((prev) => {
         const updated = { ...prev, [field]: value };
 
@@ -285,6 +413,11 @@ export function useBackblastForm(workoutId?: number) {
         return updated;
       });
 
+      if (field === 'workoutDate') {
+        setDateManuallyEdited(true);
+      }
+
+      setPendingDraft(null);
       setIsDirty(true);
 
       setValidationErrors((prev) => {
@@ -296,11 +429,12 @@ export function useBackblastForm(workoutId?: number) {
         return prev;
       });
     },
-    [slugManuallyEdited]
+    [slugManuallyEdited, formData.body]
   );
 
   const setManualSlug = useCallback((slugValue: string) => {
     setSlugManuallyEdited(true);
+    setPendingDraft(null);
     setIsDirty(true);
     setFormData((prev) => ({ ...prev, slug: slugify(slugValue) }));
   }, []);
@@ -315,14 +449,69 @@ export function useBackblastForm(workoutId?: number) {
         pax: [...prev.pax, ...missingQs],
       };
     });
+    setPendingDraft(null);
     setIsDirty(true);
+  }, []);
+
+  const resetDateToToday = useCallback(() => {
+    const currentToday = formatDateToISO(new Date());
+    setTodayDate(currentToday);
+    setFormData((prev) => ({ ...prev, workoutDate: currentToday }));
+    setDateManuallyEdited(false);
+    setValidationErrors((prev) => {
+      if (prev.workoutDate) {
+        const next = { ...prev };
+        delete next.workoutDate;
+        return next;
+      }
+      return prev;
+    });
+  }, []);
+
+  const restoreDraft = useCallback(() => {
+    if (!pendingDraft) return;
+    const currentToday = formatDateToISO(new Date());
+    setTodayDate(currentToday);
+
+    const restoredDate =
+      pendingDraft.dateManuallyEdited && pendingDraft.data.workoutDate
+        ? pendingDraft.data.workoutDate
+        : currentToday;
+
+    setFormData({
+      ...pendingDraft.data,
+      workoutDate: restoredDate,
+    });
+    setDateManuallyEdited(pendingDraft.dateManuallyEdited);
+    setSlugManuallyEdited(
+      Boolean(pendingDraft.data.slug && pendingDraft.data.slug !== slugify(pendingDraft.data.title))
+    );
+    setLastSaved(pendingDraft.savedAt);
+    hasSavedInSessionRef.current = true;
+    setValidationErrors({});
+    setError(null);
+    setPendingDraft(null);
+    setIsDirty(true);
+  }, [pendingDraft]);
+
+  const discardDraft = useCallback(() => {
+    clearStoredDraft();
+    hasSavedInSessionRef.current = false;
+    setPendingDraft(null);
+    setLastSaved(null);
   }, []);
 
   const validate = useCallback((): boolean => {
     const errors: Record<string, string> = {};
+    const currentToday = formatDateToISO(new Date());
+    setTodayDate((prev) => (prev === currentToday ? prev : currentToday));
 
     if (!formData.title.trim()) errors.title = 'Title is required.';
-    if (!formData.workoutDate) errors.workoutDate = 'Workout date is required.';
+    if (!formData.workoutDate) {
+      errors.workoutDate = 'Workout date is required.';
+    } else if (formData.workoutDate > currentToday) {
+      errors.workoutDate = 'Workout date cannot be in the future.';
+    }
     if (formData.aoNames.length === 0) errors.aoNames = 'At least one Area of Operations (AO) is required.';
     if (formData.qic.length === 0) errors.qic = 'At least one Q is required.';
     if (formData.pax.length === 0 && formData.fngs.length === 0 && formData.drs.length === 0) {
@@ -435,17 +624,17 @@ export function useBackblastForm(workoutId?: number) {
 
         const data: WorkoutCreatedResponse = await res.json();
         // Clear saved draft on successful creation
-        try {
-          localStorage.removeItem(DRAFT_STORAGE_KEY);
-          localStorage.removeItem(DRAFT_TIMESTAMP_KEY);
-        } catch {
-          // Ignore localStorage error
-        }
+        clearStoredDraft();
+        hasSavedInSessionRef.current = false;
 
+        const currentToday = formatDateToISO(new Date());
+        setTodayDate(currentToday);
         setIsDirty(false);
+        setDateManuallyEdited(false);
+        setPendingDraft(null);
         setFormData({
           title: '',
-          workoutDate: initialDate,
+          workoutDate: currentToday,
           aoNames: [],
           qic: user?.f3Name ? [user.f3Name] : [],
           pax: user?.f3Name ? [user.f3Name] : [],
@@ -485,20 +674,18 @@ export function useBackblastForm(workoutId?: number) {
     } finally {
       setSubmitting(false);
     }
-  }, [validate, formData, aos, getAuthHeaders, isEditMode, workoutId, user, initialDate, navigate]);
+  }, [validate, formData, aos, getAuthHeaders, isEditMode, workoutId, user, navigate]);
 
   const clearDraft = useCallback(() => {
     if (window.confirm('Are you sure you want to clear your saved draft? All unsaved text will be lost.')) {
-      try {
-        localStorage.removeItem(DRAFT_STORAGE_KEY);
-        localStorage.removeItem(DRAFT_TIMESTAMP_KEY);
-      } catch {
-        // Ignore
-      }
+      clearStoredDraft();
+      hasSavedInSessionRef.current = false;
+      const currentToday = formatDateToISO(new Date());
+      setTodayDate(currentToday);
       setOriginalFngs([]);
       setFormData({
         title: '',
-        workoutDate: initialDate,
+        workoutDate: currentToday,
         aoNames: [],
         qic: user?.f3Name ? [user.f3Name] : [],
         pax: user?.f3Name ? [user.f3Name] : [],
@@ -508,15 +695,18 @@ export function useBackblastForm(workoutId?: number) {
         slug: '',
       });
       setSlugManuallyEdited(false);
+      setDateManuallyEdited(false);
       setValidationErrors({});
       setError(null);
       setLastSaved(null);
+      setPendingDraft(null);
       setIsDirty(false);
     }
-  }, [initialDate, user]);
+  }, [user]);
 
   return {
     formData,
+    todayDate,
     aos,
     loadingAos,
     members,
@@ -527,11 +717,15 @@ export function useBackblastForm(workoutId?: number) {
     validationErrors,
     isEditMode,
     lastSaved,
+    pendingDraft,
     isDirty,
     originalFngs,
     updateField,
     setManualSlug,
     addQToPax,
+    resetDateToToday,
+    restoreDraft,
+    discardDraft,
     submit,
     clearDraft,
   };

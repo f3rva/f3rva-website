@@ -1,8 +1,9 @@
 import { render, screen, fireEvent } from '@testing-library/react';
-import { describe, it, expect, vi, beforeEach } from 'vitest';
+import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 import { MemoryRouter, Routes, Route } from 'react-router-dom';
 import { BackblastForm } from './BackblastForm';
 import { AuthContext } from '../../context/AuthContext';
+import { formatDateToISO } from '../../utils/dateUtils';
 
 vi.mock('../../components/RichTextEditor', () => ({
   default: ({ content, onChange }: { content: string; onChange: (val: string) => void }) => (
@@ -16,6 +17,7 @@ vi.mock('../../components/RichTextEditor', () => ({
 describe('BackblastForm', () => {
   beforeEach(() => {
     vi.clearAllMocks();
+    localStorage.clear();
     globalThis.fetch = vi.fn().mockImplementation((url: string) => {
       if (url.includes('/v2/workouts/aos')) {
         return Promise.resolve({
@@ -34,6 +36,10 @@ describe('BackblastForm', () => {
         json: async () => [],
       } as Response);
     });
+  });
+
+  afterEach(() => {
+    vi.useRealTimers();
   });
 
   it('renders Slack login prompt when unauthenticated', () => {
@@ -253,5 +259,112 @@ describe('BackblastForm', () => {
 
     // Alert should NOT be present for Flipper
     expect(screen.queryByRole('alert')).not.toBeInTheDocument();
+    // Past-date heads-up warning should NOT appear in edit mode
+    expect(screen.queryByText(/heads up:/i)).not.toBeInTheDocument();
+  });
+
+  it('displays draft recovery banner and supports restoring or discarding a saved draft', async () => {
+    const savedAt = new Date(Date.now() - 15 * 60 * 1000);
+    localStorage.setItem(
+      'f3rva_backblast_draft',
+      JSON.stringify({
+        title: 'Saved Beatdown',
+        workoutDate: formatDateToISO(new Date()),
+        aoNames: ['First Watch'],
+        body: '<p>Saved body</p>',
+      })
+    );
+    localStorage.setItem('f3rva_backblast_draft_time', savedAt.toISOString());
+
+    const mockAuthContext = {
+      token: 'valid-jwt',
+      isAuthenticated: true,
+      isAdmin: false,
+      user: { memberId: 1, f3Name: 'Dingo', role: 'member' as const },
+      adminUsername: 'Dingo',
+      loading: false,
+      error: null,
+      loginWithToken: vi.fn(),
+      logout: vi.fn(),
+      getAuthHeaders: vi.fn().mockReturnValue({ Authorization: 'Bearer valid-jwt' }),
+    };
+
+    const { unmount } = render(
+      <AuthContext.Provider value={mockAuthContext}>
+        <MemoryRouter>
+          <BackblastForm />
+        </MemoryRouter>
+      </AuthContext.Provider>
+    );
+
+    expect(await screen.findByText(/unsaved draft found/i)).toBeInTheDocument();
+    expect(screen.getByText(/saved beatdown/i)).toBeInTheDocument();
+    expect(screen.getByLabelText(/workout title/i)).toHaveValue('');
+
+    fireEvent.click(screen.getByRole('button', { name: /restore draft/i }));
+    expect(screen.getByLabelText(/workout title/i)).toHaveValue('Saved Beatdown');
+    expect(screen.queryByText(/unsaved draft found/i)).not.toBeInTheDocument();
+
+    unmount();
+
+    // Re-render with draft and click Discard
+    localStorage.setItem('f3rva_backblast_draft_time', savedAt.toISOString());
+    render(
+      <AuthContext.Provider value={mockAuthContext}>
+        <MemoryRouter>
+          <BackblastForm />
+        </MemoryRouter>
+      </AuthContext.Provider>
+    );
+
+    expect(await screen.findByText(/unsaved draft found/i)).toBeInTheDocument();
+    fireEvent.click(screen.getByRole('button', { name: /discard/i }));
+    expect(screen.queryByText(/unsaved draft found/i)).not.toBeInTheDocument();
+    expect(localStorage.getItem('f3rva_backblast_draft')).toBeNull();
+  });
+
+  it('shows past-date warning with Set to Today button and blocks future dates in create mode', async () => {
+    vi.useFakeTimers({ toFake: ['Date'] });
+    vi.setSystemTime(new Date(2026, 10, 19, 8, 0, 0));
+
+    const mockAuthContext = {
+      token: 'valid-jwt',
+      isAuthenticated: true,
+      isAdmin: false,
+      user: { memberId: 1, f3Name: 'Dingo', role: 'member' as const },
+      adminUsername: 'Dingo',
+      loading: false,
+      error: null,
+      loginWithToken: vi.fn(),
+      logout: vi.fn(),
+      getAuthHeaders: vi.fn().mockReturnValue({ Authorization: 'Bearer valid-jwt' }),
+    };
+
+    render(
+      <AuthContext.Provider value={mockAuthContext}>
+        <MemoryRouter>
+          <BackblastForm />
+        </MemoryRouter>
+      </AuthContext.Provider>
+    );
+
+    const dateInput = await screen.findByLabelText(/workout date/i);
+    expect(dateInput).toHaveValue('2026-11-19');
+    expect(dateInput).toHaveAttribute('max', '2026-11-19');
+
+    // Select a date 3 days ago
+    fireEvent.change(dateInput, { target: { value: '2026-11-16' } });
+    expect(screen.getByText(/heads up:/i)).toBeInTheDocument();
+    expect(screen.getByText(/3 days ago/i)).toBeInTheDocument();
+
+    // Reset back to today
+    fireEvent.click(screen.getByRole('button', { name: /set to today/i }));
+    expect(dateInput).toHaveValue('2026-11-19');
+    expect(screen.queryByText(/heads up:/i)).not.toBeInTheDocument();
+
+    // Select a future date and submit
+    fireEvent.change(dateInput, { target: { value: '2026-11-25' } });
+    fireEvent.click(screen.getByRole('button', { name: /publish backblast/i }));
+    expect(await screen.findByText('Workout date cannot be in the future.')).toBeInTheDocument();
   });
 });
